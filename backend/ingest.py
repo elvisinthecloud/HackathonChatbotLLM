@@ -59,8 +59,10 @@ async def ingest(manifest: Path) -> dict:
             total = 0
             async with httpx.AsyncClient(timeout=60) as client:
                 for document in documents:
-                    # Reuse source chunking and Ollama embed API, but embed CONTENT ONLY.
-                    chunks = chunk_text(document["content"])
+                    # Answer chunks embed approved content. Optional routing text is
+                    # embedded separately and is never returned as answer context.
+                    retrieval_text = document.get("retrieval_text")
+                    chunks = [document["content"]] if retrieval_text else chunk_text(document["content"])
                     vectors = []
                     for content in chunks:
                         response = await client.post(
@@ -86,6 +88,23 @@ async def ingest(manifest: Path) -> dict:
                     ).fetchone()[0]
                     # Deletes are scoped to one validated allowlisted article, never broad prune.
                     conn.execute("DELETE FROM article_chunks WHERE article_id=%s", (article_id,))
+                    if retrieval_text:
+                        response = await client.post(
+                            os.environ["OLLAMA_BASE_URL"] + "/api/embed",
+                            json={"model": os.environ["OLLAMA_EMBED_MODEL"], "input": retrieval_text},
+                        )
+                        if response.status_code != 200:
+                            raise RuntimeError("Demo retrieval embedding request failed")
+                        data = response.json()
+                        route_vector = (data.get("embeddings") or [data.get("embedding")])[0]
+                        if not isinstance(route_vector, list) or len(route_vector) != 768 or any(
+                            not isinstance(v, (int, float)) or not math.isfinite(v) for v in route_vector
+                        ):
+                            raise RuntimeError("Expected a finite 768-dimensional retrieval embedding")
+                        conn.execute(
+                            "INSERT INTO article_chunks(article_id,chunk_index,content,embedding,metadata) VALUES(%s,-1,'',%s::vector,%s)",
+                            (article_id, json.dumps(route_vector), Jsonb({"retrieval_only": True})),
+                        )
                     for index, (content, vector) in enumerate(zip(chunks, vectors)):
                         conn.execute(
                             "INSERT INTO article_chunks(article_id,chunk_index,content,embedding) VALUES(%s,%s,%s,%s::vector)",
