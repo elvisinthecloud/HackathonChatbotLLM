@@ -700,6 +700,7 @@ async def retrieve_chunks(
     history: list[dict[str, str]] | None = None,
     image_context: dict[str, str] | None = None,
     selected_bucket_id: str | None = None,
+    issue_category: str | None = None,
 ) -> tuple[
     list[dict[str, Any]],
     str | None,
@@ -709,7 +710,12 @@ async def retrieve_chunks(
     """
     Returns (chunks, matched_bucket_id, confidence_score, clarification_options).
     """
-    question_embedding = await embed_text(question)
+    # The intake category is a weak semantic hint. It improves the search query,
+    # but never participates in access control or replaces the user's report.
+    semantic_query = question
+    if issue_category:
+        semantic_query = f"Tentative support category: {issue_category}\nUser report: {question}"
+    question_embedding = await embed_text(semantic_query)
 
     matched_bucket_id: str | None = None
     confidence: float = 0.0
@@ -718,10 +724,10 @@ async def retrieve_chunks(
     semantic_winner: str | None = None
 
     if image_context and image_context.get("description"):
-        context_query = f"{question}\n{image_context['description']}"
+        context_query = f"{semantic_query}\n{image_context['description']}"
         context_embedding = await embed_text(context_query)
     elif history and is_context_dependent_followup(question):
-        context_query = build_retrieval_query(question, history)
+        context_query = build_retrieval_query(semantic_query, history)
         context_embedding = await embed_text(context_query)
 
     routing_embedding = context_embedding or question_embedding
@@ -833,7 +839,7 @@ async def retrieve_chunks(
         return question_chunks, matched_bucket_id, confidence, []
 
     if context_embedding is None:
-        context_query = build_retrieval_query(question, history)
+        context_query = build_retrieval_query(semantic_query, history)
         context_embedding = await embed_text(context_query)
     context_chunks = search_chunks(context_embedding, bucket_ids=bucket_ids_to_search)
 
@@ -893,7 +899,8 @@ def ground_answer(answer: str, chunks: list[dict[str, Any]]) -> str:
 
 # Main entry point. Every retrieval call runs inside server-derived access context.
 async def answer_question(question: str, session: dict, selected_course_id: str | None,
-                          image: str | None = None) -> dict[str, Any]:
+                          image: str | None = None,
+                          issue_category: str | None = None) -> dict[str, Any]:
     access_token = None
     with langfuse.start_as_current_span(name="rag_answer", input={"question": question, "has_image": image is not None}) as trace:
         try:
@@ -913,6 +920,7 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
                 "phase":"curated-demo", "profile_id":profile["id"], "role":profile["role"],
                 "course_id":context.get("course_id"), "delivery_area":context.get("delivery_area"), "system_area":context.get("system_area"), "activity":context.get("activity"),
                 "discovery_portal":context.get("discovery_portal"), "context_changed":changed,
+                "issue_category":issue_category,
                 "allowed_article_ids":list(access.article_ids), "model":settings.chat_model,
                 "embed_model":settings.embed_model})
             with langfuse.start_as_current_span(name="access_filter", input={"role":profile["role"], "context":context}) as filtering:
@@ -926,7 +934,8 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
                 answer="I don't have an approved article for this request under your selected demo profile and course context. Please check the selected profile/course or contact the Helpdesk."
             else:
                 chunks, matched_bucket, confidence, options = await retrieve_chunks(question, history=history,
-                    image_context={"description":image_text} if image_text else None)
+                    image_context={"description":image_text} if image_text else None,
+                    issue_category=issue_category)
                 if options:
                     chunks=[]
                     prompt="Please clarify which system or course this question concerns."

@@ -19,6 +19,26 @@ class SessionTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(ValidationError):
             api.SessionRequest(profile_id='student',role='Academics Officer')
 
+    def test_issue_category_is_optional_and_limited_to_intake_choices(self):
+        base={'session_id':'s'*43,'message':'My course will not open'}
+        self.assertIsNone(api.ChatRequest(**base).issue_category)
+        self.assertEqual(
+            api.ChatRequest(**base,issue_category='Courseware Issue').issue_category,
+            'Courseware Issue',
+        )
+        with self.assertRaises(ValidationError):
+            api.ChatRequest(**base,issue_category='Invented Category')
+
+    async def test_issue_category_is_a_hint_and_does_not_replace_user_report(self):
+        api.chat_lock=asyncio.Lock()
+        session={'id':'internal-id','profile':PROFILES['student'],'turns':[]}
+        result={'answer':'Article answer','sources':[],'retrieved_count':0,'trace_id':None,'context':{},'_context_changed':False,'_image_text':''}
+        request=api.ChatRequest(session_id='s'*43,message='My Moodle course is missing',issue_category='Courseware Issue')
+        with patch.object(api,'load_session',return_value=session),patch.object(api,'save_turn'),patch.object(api,'answer_question',new_callable=AsyncMock,return_value=result) as answer:
+            await api.chat(request)
+            self.assertEqual(answer.call_args.args[0],'My Moodle course is missing')
+            self.assertEqual(answer.call_args.kwargs['issue_category'],'Courseware Issue')
+
     def test_course_change_excludes_prior_model_history_and_error_evidence(self):
         old=('earlier private course detail','old answer','sts1.auth.ecuf.deas.mil refused to connect',0,{'course_id':'CYBERM0000'})
         now=('current detail','new answer','',1,{'course_id':'5500'})

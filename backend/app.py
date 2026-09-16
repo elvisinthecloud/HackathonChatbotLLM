@@ -34,6 +34,7 @@ class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     session_id: str = Field(pattern=r"^[A-Za-z0-9_-]{43}$")
     course_id: str | None = Field(default=None, max_length=160)
+    issue_category: Literal["Account/Profile Issue", "Courseware Issue", "Roles and Permissions", "Other"] | None = None
     message: str = Field(min_length=1, max_length=4000)
     image: str | None = Field(default=None, max_length=5_592_408)
 
@@ -217,7 +218,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
     async with chat_lock:
         try:
             session=load_session(request.session_id)
-            result = await answer_question(message, session=session, selected_course_id=request.course_id, image=request.image)
+            result = await answer_question(
+                message,
+                session=session,
+                selected_course_id=request.course_id,
+                image=request.image,
+                issue_category=request.issue_category,
+            )
             save_turn(session,request.course_id,result["context"],result.pop("_context_changed"),message,
                       result.pop("_image_text"),request.image is not None,result)
             return ChatResponse(**result,session_id=request.session_id)

@@ -18,6 +18,7 @@
   const profileSelect = document.getElementById("profileSelect");
   const courseSelect = document.getElementById("courseSelect");
   const courseSuggestions = document.getElementById("courseSuggestions");
+  const clarifyPanel = document.getElementById("clarifyPanel");
   const profileDescription = document.getElementById("profileDescription");
   const resolvedContext = document.getElementById("resolvedContext");
   const sessionError = document.getElementById("sessionError");
@@ -39,6 +40,7 @@
   let courses = [];
   let selectedProfile = null;
   let selectedCourseId = null;
+  let selectedIssueCategory = null;
   let sessionId = null;
   let sessionGeneration = 0;
 
@@ -411,7 +413,33 @@
     if (hasGreeted) return;
     if (!selectedProfile) return;
     hasGreeted = true;
-    appendBot(`You are using the ${selectedProfile.display_role || selectedProfile.role} demo profile. Ask a support question and I’ll answer with citations when available.`);
+    appendBot("Hi! I’m the MCeLE Support Assistant. What kind of issue can I help you with?");
+    showIssueChoices();
+  }
+
+  function showIssueChoices() {
+    clarifyPanel.replaceChildren();
+    chatBody.appendChild(clarifyPanel);
+    clarifyPanel.hidden = false;
+
+    ["Account/Profile Issue", "Courseware Issue", "Roles and Permissions", "Other"].forEach((category) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      const icon = document.createElement("span");
+      icon.textContent = "💬";
+      icon.setAttribute("aria-hidden", "true");
+      button.append(icon, document.createTextNode(category));
+      button.addEventListener("click", () => {
+        if (isSending || !sessionId) return;
+        selectedIssueCategory = category;
+        appendUser(category);
+        clarifyPanel.hidden = true;
+        appendBot("Please tell me more about what’s happening and what you’re trying to do.");
+        chatInput.focus();
+      });
+      clarifyPanel.appendChild(button);
+    });
+    scrollToBottom();
   }
 
   function openChat() {
@@ -426,6 +454,7 @@
 
   function clearChat() {
     if (isSending) return;
+    selectedIssueCategory = null;
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
@@ -435,7 +464,7 @@
     chatInput.focus();
   }
 
-  async function requestChat(text, image) {
+  async function requestChat(text, image, issueCategory) {
     if (!sessionId) throw new Error("The demo session is not ready yet.");
     const response = await fetch(apiUrl, {
       method: "POST",
@@ -444,6 +473,7 @@
         session_id: sessionId,
         message: text,
         course_id: selectedCourseId,
+        issue_category: issueCategory,
         ...(image ? { image } : {}),
       })
     });
@@ -491,6 +521,7 @@
   }
 
   function resetTranscript() {
+    selectedIssueCategory = null;
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
@@ -612,6 +643,8 @@
     const text = (rawText || "").trim();
     if (!text || isSending || !sessionId) return;
 
+    clarifyPanel.hidden = true;
+
     if (pendingImagePreviewSrc) {
       appendUserWithImage(text, pendingImagePreviewSrc);
     } else {
@@ -622,15 +655,18 @@
     const typing = appendTyping();
 
     const imageToSend = pendingImage;
+    const issueCategoryToSend = selectedIssueCategory;
     clearImage();
 
     try {
       const data = await requestChat(
         text,
-        imageToSend
+        imageToSend,
+        issueCategoryToSend
       );
 
       typing.remove();
+      selectedIssueCategory = null;
       appendBot(data.answer, data.sources);
       updateResolvedContext(data.context);
     } catch (error) {

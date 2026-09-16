@@ -44,6 +44,33 @@ def chunk(article_id: str) -> dict:
 
 
 class GroundingTests(unittest.IsolatedAsyncioTestCase):
+    async def test_issue_category_is_embedded_with_the_user_report(self):
+        queries = []
+
+        async def embed(query):
+            queries.append(query)
+            return [0.1, 0.2, 0.3]
+
+        @contextmanager
+        def span(*args, **kwargs):
+            yield MagicMock()
+
+        fake_langfuse = MagicMock()
+        fake_langfuse.start_as_current_span.side_effect = span
+        with patch.object(rag, "langfuse", fake_langfuse), \
+             patch.object(rag, "embed_text", side_effect=embed), \
+             patch.object(rag, "classify_question_bucket", return_value=[]), \
+             patch.object(rag, "search_chunks", return_value=[]):
+            await rag.retrieve_chunks(
+                "My Moodle course is missing",
+                selected_bucket_id="courseware",
+                issue_category="Courseware Issue",
+            )
+
+        self.assertEqual(len(queries), 1)
+        self.assertIn("Tentative support category: Courseware Issue", queries[0])
+        self.assertIn("User report: My Moodle course is missing", queries[0])
+
     def test_ao_copy_family_uses_only_the_semantically_best_article(self):
         token = rag.ACCESS.set(RetrievalAccess(
             "Academics Officer",
