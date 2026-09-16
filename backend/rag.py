@@ -864,7 +864,7 @@ def ground_answer(answer: str, chunks: list[dict[str, Any]]) -> str:
 
 # Main entry point. Every retrieval call runs inside server-derived access context.
 async def answer_question(question: str, session: dict, selected_course_id: str | None,
-                          image: str | None = None) -> dict[str, Any]:
+                          image: str | None = None, selected_system: str | None = None) -> dict[str, Any]:
     access_token = None
     with langfuse.start_as_current_span(name="rag_answer", input={"question": question, "has_image": image is not None}) as trace:
         try:
@@ -872,7 +872,7 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
             langfuse.update_current_trace(tags=["mcele-hackathon-demo", "curated-demo"],
                                           session_id=session["id"], user_id=profile["id"])
             image_text = (await extract_image_context(image)).get("description", "") if image else ""
-            context, conflict, changed = resolve_context(selected_course_id, session["context"], session["selected_course_id"], question, image_text)
+            context, conflict, changed = resolve_context(selected_course_id, session["context"], session["selected_course_id"], question, image_text, selected_system)
             history, previous_evidence = context_memory(session, changed)
             evidence = question + "\n" + image_text + "\n" + previous_evidence
             access = resolve_access(profile, context, evidence)

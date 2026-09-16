@@ -12,6 +12,12 @@ COURSES = {
     'CDETBAIC01': {'id':'CDETBAIC01','title':'Basic AI Course','aliases':['CDETBAIC01','Basic AI Course'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
 }
 
+# Selector entries do not assert an unverified delivery/enrollment mapping.
+for _code in ('EPME4000', 'EPME5000', 'EPME3000', 'EWSPREREQ'):
+    COURSES[_code] = {'id': _code, 'title': _code, 'aliases': [],
+                      'discovery_portal': None, 'content_area': None, 'enrollment_area': None}
+TICKET_COURSES = ('EPME4000', 'EPME5000', 'EPME3000', '5500', '6800', 'CYBERM0000', 'EWSPREREQ')
+
 PROFILES = {
     'student': {'id':'student','name':'Demo Student','role':'Student','display_role':'Student','course_ids':['CYBERM0000'],'delivery_areas':['MCeLE']},
     'instructor': {'id':'instructor','name':'Demo Instructor','role':'Adjunct Faculty','display_role':'Instructor','course_ids':[],'delivery_areas':['Moodle']},
@@ -89,7 +95,7 @@ def task_activity(text: str) -> str | None:
 
 
 def resolve_context(selected: str | None, previous: dict, previous_selected: str | None,
-                    question: str, image_text: str = '') -> tuple[dict, str | None, bool]:
+                    question: str, image_text: str = '', selected_system: str | None = None) -> tuple[dict, str | None, bool]:
     selected=(selected or '').strip() or None
     if selected and len(selected)>160:
         raise ValueError('Course query is too long')
@@ -130,11 +136,17 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
             system='Moodle'
         elif question.strip().casefold() == 'mcele' or re.search(r'\b(?:in|on)\s+mcele\b',question,re.I):
             system='MCeLE'
-    context={'course_id':course_id,'course_title':course.get('title') or selected,'course_query':selected,
+    # Only a confirmed registry mapping constrains an explicit site choice.
+    # Prior conversational site hints must not prevent switching an unknown mapping.
+    mapped_system = (course.get('enrollment_area') if activity == 'enrollment' else
+                     course.get('content_area') if activity in ('course-content', 'course-management') else None)
+    if selected_system:
+        system = selected_system
+    context={'selected_system': selected_system, 'course_id':course_id,'course_title':course.get('title') or selected,'course_query':selected,
              'course_known':bool(course), 'activity':activity if activity!='ambiguous' else None,
              'system_area':system,'delivery_area':course.get('content_area'),
              'enrollment_area':course.get('enrollment_area'),'discovery_portal':course.get('discovery_portal')}
-    conflict=len(mentions)>1 or bool(chosen and mentions and mentions!=[chosen])
+    conflict=bool(selected_system and mapped_system and selected_system != mapped_system) or len(mentions)>1 or bool(chosen and mentions and mentions!=[chosen])
     # For known courses, task mapping wins over a casual mention of the other portal.
     # Explicit contradictory task location or screenshot evidence must be clarified.
     explicit_wrong_moodle=bool(system=='MCeLE' and (screenshot_moodle or
