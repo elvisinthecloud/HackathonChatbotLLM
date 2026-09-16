@@ -1,0 +1,153 @@
+{
+  "inventory": {
+    "project": "mcele-hackathon-demo",
+    "release": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944",
+    "release_id": "150982c95159b944",
+    "containers": [
+      "mcele-hackathon-demo-db",
+      "mcele-hackathon-demo-backend",
+      "mcele-hackathon-demo-frontend",
+      "mcele-hackathon-demo-tunnel"
+    ],
+    "network": "mcele-hackathon-demo-network",
+    "volume": "mcele-hackathon-demo-postgres-data",
+    "image": "mcele-hackathon-demo-backend:150982c95159b944",
+    "runtime_file": "/home/velvux/.config/mcele-hackathon-demo/runtime.env",
+    "local_frontend": "http://127.0.0.1:8081",
+    "phase": "running",
+    "original_before": {
+      "frontend": true,
+      "backend": true,
+      "langfuse": true,
+      "original_chunk_count": 315
+    },
+    "original_after": {
+      "frontend": true,
+      "backend": true,
+      "langfuse": true,
+      "original_chunk_count": 315
+    }
+  },
+  "instructor": {
+    "conversation": "passed",
+    "profile": "Instructor",
+    "citations": [
+      "MOODLE-COPY-002"
+    ],
+    "trace_id": "9849239068408c2222ab85d57389914b",
+    "trace_observations": [
+      "access_filter",
+      "article_ambiguity",
+      "article_candidate_search",
+      "bucket_classify",
+      "embed_text",
+      "ollama_chat",
+      "rag_answer",
+      "retrieval_route",
+      "vector_search"
+    ],
+    "dataset_id": "mcele-curated-v1"
+  },
+  "health": {
+    "8000": {
+      "ok": true,
+      "database": true,
+      "ollama": true,
+      "chunk_count": 315,
+      "ollama_base_url": "http://192.168.50.212:11434",
+      "chat_model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+      "vision_model": "qwen2.5vl:7b",
+      "embedding_model": "nomic-embed-text",
+      "temperature": 0.2,
+      "num_ctx": 16384,
+      "vision_num_ctx": 16384,
+      "top_k": 5,
+      "ambiguity_top_articles": 5,
+      "ambiguity_score_margin": 0.05,
+      "bucket_count": 27,
+      "bucket_confidence_threshold": 0.6,
+      "ollama_models": [
+        "qwen2.5vl:7b",
+        "qwen2.5vl:3b",
+        "nomic-embed-text:latest",
+        "qwen3:30b-a3b-instruct-2507-q4_K_M",
+        "llama3:8b"
+      ]
+    },
+    "8081": {
+      "ok": true,
+      "database": true,
+      "ollama": true,
+      "chunk_count": 4,
+      "dataset_id": "mcele-curated-v1",
+      "phase": "curated-demo"
+    }
+  },
+  "resources": [
+    {
+      "name": "mcele-hackathon-demo-db",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.75,
+      "ram_limit_mib": 768.0,
+      "mounts": [
+        {
+          "source": "/var/lib/docker/volumes/mcele-hackathon-demo-postgres-data/_data",
+          "target": "/var/lib/postgresql/data",
+          "type": "volume",
+          "writable": true
+        },
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944/database/schema.sql",
+          "target": "/docker-entrypoint-initdb.d/001-schema.sql",
+          "type": "bind",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-backend",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 1.5,
+      "ram_limit_mib": 1024.0,
+      "mounts": [
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944/knowledge/curated",
+          "target": "/knowledge",
+          "type": "bind",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-frontend",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.25,
+      "ram_limit_mib": 256.0,
+      "mounts": [
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944/frontend",
+          "target": "/usr/share/nginx/html",
+          "type": "bind",
+          "writable": false
+        },
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944/frontend/nginx.conf",
+          "target": "/etc/nginx/conf.d/default.conf",
+          "type": "bind",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-tunnel",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.25,
+      "ram_limit_mib": 256.0,
+      "mounts": []
+    }
+  ]
+}

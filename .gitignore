@@ -1,0 +1,23 @@
+# Keep credentials, generated files, and macOS metadata out of Git.
+.env
+.env.*
+*.env
+*.pem
+*.key
+._*
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.pytest_cache/
+.cache/
+release-hashes.json
+inventory.json
+verification.json
+*.tar.gz
+
+# Local discovery notes include unselected source material.
+docs/article-discovery.md
+recovery/partial-documents/initial-inspection-and-article-discovery.partial.md

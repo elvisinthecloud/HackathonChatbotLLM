@@ -1,0 +1,17 @@
+{
+  "article_id": "DEMO-BASELINE-NAV-001",
+  "title": "Synthetic demo navigation help",
+  "service_area": "demo",
+  "allowed_roles": [
+    "baseline"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Synthetic project-authored demo content: Open the demo chat and ask \"What is the baseline confirmation?\" Read the reply and its source citation. Select Clear to start a fresh conversation. This baseline uses only synthetic knowledge and does not provide real MCeLE or Moodle support procedures.",
+  "provenance": {
+    "type": "synthetic",
+    "description": "Written by the project for a bounded navigation smoke demo; contains no operational procedure or copied knowledge-base material."
+  },
+  "synthetic": true,
+  "redistribution": "project-authored"
+}

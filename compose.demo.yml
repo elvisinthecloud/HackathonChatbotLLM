@@ -1,0 +1,107 @@
+name: mcele-hackathon-demo
+
+services:
+  demo-db:
+    image: pgvector/pgvector:pg16
+    container_name: mcele-hackathon-demo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mcele_demo
+      POSTGRES_USER: mcele_demo
+      POSTGRES_PASSWORD: ${DEMO_DB_PASSWORD:?DEMO_DB_PASSWORD must be set in runtime.env}
+    volumes:
+      - mcele-hackathon-demo-postgres-data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    networks:
+      - mcele-hackathon-demo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mcele_demo -d mcele_demo"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    cpus: "0.75"
+    mem_limit: 768m
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  demo-backend:
+    image: mcele-hackathon-demo-backend:${DEMO_RELEASE_ID:?Release ID is required}
+    build:
+      context: ./backend
+    container_name: mcele-hackathon-demo-backend
+    restart: unless-stopped
+    env_file:
+      - ${DEMO_RUNTIME_FILE:-/home/velvux/.config/mcele-hackathon-demo/runtime.env}
+    environment:
+      DATABASE_URL: postgresql://mcele_demo:${DEMO_DB_PASSWORD:?DEMO_DB_PASSWORD must be set in runtime.env}@demo-db:5432/mcele_demo
+      DEMO_DB_PASSWORD: ${DEMO_DB_PASSWORD:?DEMO_DB_PASSWORD must be set in runtime.env}
+      DEMO_INSTANCE_ID: mcele-hackathon-demo
+      OLLAMA_BASE_URL: http://192.168.50.212:11434
+      OLLAMA_CHAT_MODEL: qwen3:30b-a3b-instruct-2507-q4_K_M
+      OLLAMA_VISION_MODEL: qwen2.5vl:7b
+      OLLAMA_EMBED_MODEL: nomic-embed-text
+      TAXONOMY_PATH: /knowledge/taxonomy.json
+      DEMO_DATASET_MANIFEST: /knowledge/manifest.json
+      LANGFUSE_HOST: http://host.docker.internal:3000
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./knowledge/curated:/knowledge:ro
+    depends_on:
+      demo-db:
+        condition: service_healthy
+    networks:
+      - mcele-hackathon-demo-network
+    expose: ["8000"]
+    cpus: "1.50"
+    mem_limit: 1024m
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  demo-frontend:
+    image: nginx:alpine
+    container_name: mcele-hackathon-demo-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      demo-backend:
+        condition: service_started
+    networks:
+      - mcele-hackathon-demo-network
+    cpus: "0.25"
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}
+
+  demo-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: mcele-hackathon-demo-tunnel
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--url", "http://demo-frontend:80"]
+    profiles: ["public"]
+    depends_on:
+      demo-frontend:
+        condition: service_started
+    networks:
+      - mcele-hackathon-demo-network
+    cpus: "0.25"
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}
+
+networks:
+  mcele-hackathon-demo-network:
+    name: mcele-hackathon-demo-network
+    driver: bridge
+
+volumes:
+  mcele-hackathon-demo-postgres-data:
+    name: mcele-hackathon-demo-postgres-data

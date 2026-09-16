@@ -1,0 +1,17 @@
+{
+  "article_id": "MOODLE-COPY-002",
+  "title": "I am an Instructor. Can I copy a Moodle course?",
+  "service_area": "Moodle",
+  "allowed_roles": [
+    "Adjunct Faculty"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Copying or creating courses in Moodle requires the **Academics Officer (AO) Moodle role**. Your selected **Instructor (Adjunct Faculty)** profile does not have that role.\n\nYou will need to obtain the appropriate AO permissions or contact a user with the AO role to copy the course for you.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved user-supplied Instructor and AO demo requirements and copying transcript."
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

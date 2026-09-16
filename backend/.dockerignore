@@ -1,0 +1,14 @@
+**
+!app.py
+!db.py
+!rag.py
+!prompts.py
+!text_utils.py
+!ingest.py
+!demo_config.py
+!demo_dataset.py
+!requirements.txt
+!requirements.lock
+!Dockerfile
+!demo_policy.py
+!demo_sessions.py

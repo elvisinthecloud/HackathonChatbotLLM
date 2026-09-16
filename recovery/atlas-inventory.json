@@ -1,0 +1,29 @@
+{
+  "project": "mcele-hackathon-demo",
+  "release": "/home/velvux/mcele-hackathon-demo/releases/150982c95159b944",
+  "release_id": "150982c95159b944",
+  "containers": [
+    "mcele-hackathon-demo-db",
+    "mcele-hackathon-demo-backend",
+    "mcele-hackathon-demo-frontend",
+    "mcele-hackathon-demo-tunnel"
+  ],
+  "network": "mcele-hackathon-demo-network",
+  "volume": "mcele-hackathon-demo-postgres-data",
+  "image": "mcele-hackathon-demo-backend:150982c95159b944",
+  "runtime_file": "/home/velvux/.config/mcele-hackathon-demo/runtime.env",
+  "local_frontend": "http://127.0.0.1:8081",
+  "phase": "running",
+  "original_before": {
+    "frontend": true,
+    "backend": true,
+    "langfuse": true,
+    "original_chunk_count": 315
+  },
+  "original_after": {
+    "frontend": true,
+    "backend": true,
+    "langfuse": true,
+    "original_chunk_count": 315
+  }
+}

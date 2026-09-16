@@ -1,0 +1,15 @@
+{
+  "dataset_id": "mcele-curated-v1",
+  "article_files": [
+    "articles/mcele-course-launch-sts1-student.json",
+    "articles/moodle-copy-permission-instructor.json",
+    "articles/moodle-copy-course-ao.json",
+    "articles/mcele-ecdep-request-tm.json"
+  ],
+  "article_ids": [
+    "MCELE-LAUNCH-001",
+    "MOODLE-COPY-002",
+    "MOODLE-COPY-001",
+    "MCELE-ECDEP-001"
+  ]
+}

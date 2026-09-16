@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MCeLE Support Demo</title>
+  <link rel="stylesheet" href="./chat-widget.css" />
+</head>
+<body data-chat-api-url="/api/chat">
+  <main class="demo-shell">
+    <section class="workspace-panel" aria-labelledby="demo-title">
+      <div class="brand-lockup">
+        <div class="brand-monogram" aria-hidden="true">M</div>
+        <div>
+          <p class="eyebrow">MCeLE Support Assistant</p>
+          <h1 id="demo-title">Find answers with citations</h1>
+          <p class="baseline-label">Select a demo profile to begin</p>
+        </div>
+      </div>
+      <p class="workspace-note">Choose a seeded profile to simulate identity, then ask about MCeLE support. Profile selection is a demo workflow and does not represent production authentication.</p>
+    </section>
+  </main>
+
+  <button class="chat-fab" id="chatFab" aria-label="Open MCeLE assistant">
+    <span class="chat-fab-monogram" aria-hidden="true">M</span>
+  </button>
+
+  <section class="chat-panel" id="chatPanel" aria-live="polite" aria-label="MCeLE assistant">
+    <header class="chat-header">
+      <div class="chat-header-title">
+        <span>MCeLE Support Assistant</span>
+        <span id="chatStatus">Loading demo profiles…</span>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="Close chat">&times;</button>
+    </header>
+    <section class="demo-controls" aria-label="Demo profile and course context">
+      <div class="control-row">
+        <label for="profileSelect">Profile</label>
+        <select id="profileSelect" disabled><option>Loading profiles…</option></select>
+      </div>
+      <div class="control-row">
+        <label for="courseSelect">Course context</label>
+        <input id="courseSelect" list="courseSuggestions" maxlength="160" placeholder="No course selected / use my message" autocomplete="off" disabled />
+        <datalist id="courseSuggestions"></datalist>
+      </div>
+      <div id="profileDescription" class="profile-description" role="status"></div>
+      <div id="resolvedContext" class="resolved-context" hidden></div>
+      <div id="sessionError" class="session-error" role="alert" hidden></div>
+    </section>
+    <div class="chat-body" id="chatBody"></div>
+    <div id="chatImagePreview" style="display:none;"></div>
+    <aside class="support-panel" id="supportPanel" aria-labelledby="supportPanelTitle" hidden>
+      <div class="support-panel-heading">
+        <strong id="supportPanelTitle">MCeLE Help Desk</strong>
+        <button type="button" class="support-panel-close" id="supportPanelClose" aria-label="Close Help Desk information">&times;</button>
+      </div>
+      <p id="supportMessage">Ticket handoff will be configured after the demo scenarios.</p>
+    </aside>
+    <form class="chat-input" id="chatForm">
+      <input type="file" id="chatImageInput" accept="image/png,image/jpeg,image/webp" style="display:none" />
+      <button type="button" id="chatImageBtn" class="attach-btn" title="Attach screenshot" aria-label="Attach image">Upload Image</button>
+      <button type="button" id="btnClear" class="clear-btn">Clear</button>
+      <input id="chatInput" type="text" maxlength="4000" placeholder="Ask a question" autocomplete="off" />
+      <button id="chatSend" type="submit">Send</button>
+    </form>
+    <footer class="chat-footer">
+      <button type="button" class="support" id="btnSupport" aria-expanded="false" aria-controls="supportPanel">Contact Help Desk</button>
+    </footer>
+  </section>
+
+  <script src="./chat-widget.js?v=9339243e"></script>
+</body>
+</html>

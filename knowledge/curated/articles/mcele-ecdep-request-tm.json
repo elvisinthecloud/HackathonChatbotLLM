@@ -1,0 +1,20 @@
+{
+  "article_id": "MCELE-ECDEP-001",
+  "title": "Recommend or deny a student's ECDEP seminar enrollment request",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Training Manager"
+  ],
+  "course_scope": "courses",
+  "course_ids": [
+    "5500",
+    "6800"
+  ],
+  "content": "As a **Training Manager**, use this procedure in **MCeLE** to review and recommend or deny a student's enrollment request for either of these ECDEP seminars:\n\n- **5500 — Sergeants School Seminar Program**\n- **6800 — SNCO Leadership School Seminar**\n\nTo process the request:\n\n1. Sign in, open the left-hand navigation menu, and select **Administration**.\n2. From the expanded menu, select **Requests**.\n3. On the **Manage Requests** page, set the filters to **TYPE: Course Enrollment**, **REGION: All**, and **STATUS: All Active**. The page automatically refreshes to update the request table.\n4. Locate the student whose request you want to process. Select **Course enrollment** to the left of their username.\n5. Review the request and ensure all fields are properly completed.\n6. Scroll down and expand **Request file list**. Confirm that both **NAVMC Form 11580** and the **prerequisite certification** are present. In some cases, the prerequisite certificate is bundled inside the form.\n7. Expand **Decision** and make your selection. Add your comments in the provided text field.\n8. Select **Recommend** or **Deny** to complete your action on the request.\n\nIf you experience issues while processing enrollment requests, contact the **Helpdesk** for assistance.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved user-supplied video script and confirmed course-code and title scope; table artifacts and narration markers were removed and wording was edited for readability."
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

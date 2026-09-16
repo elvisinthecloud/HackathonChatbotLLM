@@ -1,0 +1,11 @@
+{
+  "dataset_id": "mcele-baseline-v1",
+  "article_files": [
+    "articles/demo-navigation-help.json",
+    "articles/demo-smoke-confirmation.json"
+  ],
+  "article_ids": [
+    "DEMO-BASELINE-NAV-001",
+    "DEMO-BASELINE-SMOKE-001"
+  ]
+}

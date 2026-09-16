@@ -1,0 +1,20 @@
+{
+  "conversation": "passed",
+  "profile": "Instructor",
+  "citations": [
+    "MOODLE-COPY-002"
+  ],
+  "trace_id": "9849239068408c2222ab85d57389914b",
+  "trace_observations": [
+    "access_filter",
+    "article_ambiguity",
+    "article_candidate_search",
+    "bucket_classify",
+    "embed_text",
+    "ollama_chat",
+    "rag_answer",
+    "retrieval_route",
+    "vector_search"
+  ],
+  "dataset_id": "mcele-curated-v1"
+}

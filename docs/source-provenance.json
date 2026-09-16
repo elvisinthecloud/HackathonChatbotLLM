@@ -1,0 +1,102 @@
+{
+  "source_host": "atlas",
+  "source_root": "/home/velvux/ChatBotLLM",
+  "source_compose": "docker-compose.proxmox-app.yml",
+  "copied_on": "2026-09-14",
+  "files": [
+    {
+      "path": "backend/app.py",
+      "original_sha256": "4a4b8562d4a8519cb32bb868e7b6c7a197c4862ae16c3db2b6f6d9e7d6b00ef0",
+      "initial_copy_sha256": "4a4b8562d4a8519cb32bb868e7b6c7a197c4862ae16c3db2b6f6d9e7d6b00ef0",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/db.py",
+      "original_sha256": "94ee269b43f3416bcec3f7cda8b509ffd50f3dc0bea55fe3ee5b8dd97799c125",
+      "initial_copy_sha256": "e67167e6add1abefc987fb61cdd66011c8907a0c7a4402476c39bb1f2dd5e62e",
+      "runtime_matches_original": true,
+      "sanitization": [
+        "Removed credential-bearing fallback DSN before transfer; explicit configuration required."
+      ]
+    },
+    {
+      "path": "backend/rag.py",
+      "original_sha256": "39addc95206da7808cf12c60ef6f81b254c64d58a6ac45a6ceb1fdc4e62ba79b",
+      "initial_copy_sha256": "39addc95206da7808cf12c60ef6f81b254c64d58a6ac45a6ceb1fdc4e62ba79b",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/prompts.py",
+      "original_sha256": "acc3078268f066f7e8971fa717a697db97f0c2a271a38bd0514b81fd581e8042",
+      "initial_copy_sha256": "acc3078268f066f7e8971fa717a697db97f0c2a271a38bd0514b81fd581e8042",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/text_utils.py",
+      "original_sha256": "4eb059886ad1ab86f5b1378e1a61ea45f6eb031cd07724031938102948240398",
+      "initial_copy_sha256": "4eb059886ad1ab86f5b1378e1a61ea45f6eb031cd07724031938102948240398",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/ingest.py",
+      "original_sha256": "69fd28ea57f3a506fde4b1001b7361df7276f2e7af6ebf5429637b30b265f2bf",
+      "initial_copy_sha256": "69fd28ea57f3a506fde4b1001b7361df7276f2e7af6ebf5429637b30b265f2bf",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/requirements.txt",
+      "original_sha256": "e6b9222a93f20fcc9bcc7657c87e16121bbe42841e3aa5ea92d43bf19fdba5ba",
+      "initial_copy_sha256": "e6b9222a93f20fcc9bcc7657c87e16121bbe42841e3aa5ea92d43bf19fdba5ba",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "backend/Dockerfile",
+      "original_sha256": "02719bcfb1c67b0dad7383a73de64057e86c8f4012a6b6b9948ea1a9e6995ca1",
+      "initial_copy_sha256": "02719bcfb1c67b0dad7383a73de64057e86c8f4012a6b6b9948ea1a9e6995ca1",
+      "runtime_matches_original": true,
+      "sanitization": []
+    },
+    {
+      "path": "frontend/index.html",
+      "original_sha256": "99ce64c39018b5a8ac04301f660122365595bd7d275f5da05e8b19026a8802fd",
+      "initial_copy_sha256": "99ce64c39018b5a8ac04301f660122365595bd7d275f5da05e8b19026a8802fd",
+      "runtime_matches_original": null,
+      "sanitization": []
+    },
+    {
+      "path": "frontend/chat-widget.js",
+      "original_sha256": "9339243e9a5a2fed1c3b41ffacc3eb78dabd608b5137fc7d71138f10d3d3723f",
+      "initial_copy_sha256": "9339243e9a5a2fed1c3b41ffacc3eb78dabd608b5137fc7d71138f10d3d3723f",
+      "runtime_matches_original": null,
+      "sanitization": []
+    },
+    {
+      "path": "frontend/chat-widget.css",
+      "original_sha256": "18b7bbdac52fcf93e555ec17c8eef3d497b22c248fdb8c8ea7bbebda42eca8a4",
+      "initial_copy_sha256": "18b7bbdac52fcf93e555ec17c8eef3d497b22c248fdb8c8ea7bbebda42eca8a4",
+      "runtime_matches_original": null,
+      "sanitization": []
+    },
+    {
+      "path": "frontend/nginx.conf",
+      "original_sha256": "79d5ace92ede07cdf9e9ac93185c4d8f009fe3e1b7675bd3b82a7ef2ca0c7ad0",
+      "initial_copy_sha256": "79d5ace92ede07cdf9e9ac93185c4d8f009fe3e1b7675bd3b82a7ef2ca0c7ad0",
+      "runtime_matches_original": null,
+      "sanitization": []
+    },
+    {
+      "path": "database/schema.sql",
+      "original_sha256": "22b2212470a657528d459c3cabacd9983163e46b1abb33a318f719ea20150e83",
+      "initial_copy_sha256": "22b2212470a657528d459c3cabacd9983163e46b1abb33a318f719ea20150e83",
+      "runtime_matches_original": null,
+      "sanitization": []
+    }
+  ],
+  "excluded": "All non-allowlisted files, secrets, Git history, corpus/taxonomy, data, backups and deployment scripts."
+}

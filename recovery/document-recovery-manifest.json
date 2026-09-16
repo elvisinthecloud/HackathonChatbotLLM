@@ -1,0 +1,87 @@
+[
+  {
+    "file": "docs/article-drafts/mcele-course-launch-sts1-student.md",
+    "source": "recorded complete article-draft read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/article-drafts/mcele-ecdep-request-tm.md",
+    "source": "recorded complete article-draft read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/article-drafts/moodle-copy-course-ao.md",
+    "source": "recorded complete article-draft read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/article-drafts/moodle-copy-permission-instructor.md",
+    "source": "recorded complete article-draft read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "config/runtime.env.example",
+    "source": "recorded non-secret template read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/profiles-courses-and-access.md",
+    "source": "recorded complete policy read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "recovery/partial-documents/demo-decisions-and-deployment-review.partial.md",
+    "source": "truncated combined read",
+    "status": "partial; original boundary and content missing"
+  },
+  {
+    "file": "recovery/partial-documents/README.partial.md",
+    "source": "truncated combined read",
+    "status": "partial; contains tail of another report after truncation"
+  },
+  {
+    "file": "recovery/partial-documents/initial-inspection-and-article-discovery.partial.md",
+    "source": "truncated combined read",
+    "status": "partial; middle missing"
+  },
+  {
+    "file": "docs/source-provenance.json",
+    "source": "recorded complete provenance JSON read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/grounding-fix.md",
+    "source": "recorded complete file read",
+    "status": "exact earlier snapshot; before final verification text update"
+  },
+  {
+    "file": "AGENTS.md",
+    "source": "latest user-provided project instructions",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": ".gitignore",
+    "source": "recorded file content and later explicit edit",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "recovery/MCeLE_Hackathon_Demo_Handoff.md",
+    "source": "original Downloads copy",
+    "status": "exact file copy"
+  },
+  {
+    "file": "recovery/verified-runtime-snapshot.json",
+    "source": "recorded post-deployment read",
+    "status": "recovered from recorded file content"
+  },
+  {
+    "file": "docs/curated-validation.json",
+    "source": "Atlas verification reports",
+    "status": "reconstructed summary"
+  },
+  {
+    "file": "docs/atlas-deployment-record.json",
+    "source": "Atlas reports and recorded runtime inspection",
+    "status": "reconstructed summary"
+  }
+]

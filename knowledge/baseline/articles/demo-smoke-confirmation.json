@@ -1,0 +1,17 @@
+{
+  "article_id": "DEMO-BASELINE-SMOKE-001",
+  "title": "Synthetic smoke-test confirmation",
+  "service_area": "demo",
+  "allowed_roles": [
+    "baseline"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Synthetic project-authored demo content: When a smoke test asks for the baseline confirmation, reply with the exact phrase DEMO BASELINE CONFIRMED. Keep the phrase uppercase and preserve its spaces. This is a test fixture for retrieval and answer verification, not operational advice.",
+  "provenance": {
+    "type": "synthetic",
+    "description": "Written by the project as a distinctive retrieval and answer-verification fixture; contains no real integration details or operational knowledge."
+  },
+  "synthetic": true,
+  "redistribution": "project-authored"
+}

@@ -1,0 +1,95 @@
+{
+  "release_id": "c0e172cd39238e51",
+  "resources": [
+    {
+      "name": "mcele-hackathon-demo-db",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.75,
+      "ram_limit_mib": 768.0,
+      "mounts": [
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/c0e172cd39238e51/database/schema.sql",
+          "target": "/docker-entrypoint-initdb.d/001-schema.sql",
+          "type": "bind",
+          "writable": false
+        },
+        {
+          "source": "/var/lib/docker/volumes/mcele-hackathon-demo-postgres-data/_data",
+          "target": "/var/lib/postgresql/data",
+          "type": "volume",
+          "writable": true
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-backend",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 1.5,
+      "ram_limit_mib": 1024.0,
+      "mounts": [
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/c0e172cd39238e51/knowledge/curated",
+          "target": "/knowledge",
+          "type": "bind",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-frontend",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.25,
+      "ram_limit_mib": 256.0,
+      "mounts": [
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/c0e172cd39238e51/frontend/nginx.conf",
+          "target": "/etc/nginx/conf.d/default.conf",
+          "type": "bind",
+          "writable": false
+        },
+        {
+          "source": "/home/velvux/mcele-hackathon-demo/releases/c0e172cd39238e51/frontend",
+          "target": "/usr/share/nginx/html",
+          "type": "bind",
+          "writable": false
+        }
+      ]
+    },
+    {
+      "name": "mcele-hackathon-demo-tunnel",
+      "running": true,
+      "restart_policy": "unless-stopped",
+      "cpu_limit": 0.25,
+      "ram_limit_mib": 256.0,
+      "mounts": []
+    }
+  ],
+  "article_ids": [
+    "MCELE-ECDEP-001",
+    "MCELE-LAUNCH-001",
+    "MOODLE-COPY-001",
+    "MOODLE-COPY-002"
+  ],
+  "health": {
+    "8000": {
+      "ok": true,
+      "chunk_count": 315
+    },
+    "8081": {
+      "ok": true,
+      "chunk_count": 4
+    }
+  },
+  "course_change_transcript_retained": true,
+  "backend_images": [
+    "mcele-hackathon-demo-backend:c0e172cd39238e51",
+    "mcele-hackathon-demo-backend:da1a16ad9ac0ac10",
+    "mcele-hackathon-demo-backend:ed7ce6d5a051864e",
+    "mcele-hackathon-demo-backend:717fbd98c639da62"
+  ],
+  "public_url": "https://domain-heater-nelson-tours.trycloudflare.com",
+  "runtime_dependency_check": "All source/config mounts and database storage are on Atlas; no workstation or USB mounts"
+}
