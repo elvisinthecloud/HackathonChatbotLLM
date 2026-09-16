@@ -1,0 +1,31 @@
+{
+  "status": "deployed-and-ao-copy-verified",
+  "release_id": "fab13e75b00fb0ab",
+  "validated_on": "2026-09-16",
+  "isolated_project": "mcele-hackathon-demo",
+  "dataset_id": "mcele-curated-v1",
+  "curated_article_count": 7,
+  "database_chunk_count": 9,
+  "chunk_count_note": "Seven answer chunks plus two retrieval-only AO routing embeddings.",
+  "offline_tests_passed": 21,
+  "live_checks": {
+    "ao_stuck_copy": {
+      "question": "I am trying to copy my moodle course but it keeps taking forever and isn't working?",
+      "source_path": "MOODLE-COPY-003",
+      "source_title": "Troubleshoot a Moodle course copy that is slow, stuck, or fails",
+      "trace_id": "769f5bc605cfd89f8f61f989605060d2",
+      "passed": true
+    },
+    "ao_normal_copy_regression": {
+      "question": "How do I copy a course in Moodle?",
+      "source_path": "MOODLE-COPY-001",
+      "trace_id": "ee09b1c16873211e67e2454ae03731c0",
+      "passed": true
+    }
+  },
+  "original_chatbot": {
+    "healthy": true,
+    "chunk_count": 315,
+    "modified": false
+  }
+}
