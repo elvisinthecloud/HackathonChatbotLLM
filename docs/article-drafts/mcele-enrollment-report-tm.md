@@ -3,7 +3,7 @@
 ## Article record
 
 - Article ID: `MCELE-ENROLLMENT-REPORT-001`
-- Status: Added to the local curated dataset; not ingested or deployed
+- Status: Included in the deployed isolated hackathon dataset and live-tested
 - Service/area: MCeLE
 - Allowed role: Training Manager
 - Course scope: General enrollment reporting; no individual course restriction
@@ -20,13 +20,13 @@ As a **Training Manager**, use the **Enrollment Report** in MCeLE to verify a Ma
 2. From the left-hand menu, select **TM Dashboard**.
 3. Select the **Reports** tab.
 4. In the **Report Name** column, select **Enrollment Report**.
-5. Complete the report form fields for the enrollment you need to check.
+5. Complete the required report fields marked with an asterisk (`*`): **Course Code**, **Start Date**, and **End Date**.
 6. Select **View Report** and respond to any system messages.
 7. Review the generated report to verify the Marine's enrollment status.
 
 ## Editorial and retrieval notes
 
-- The source provides the report-navigation sequence but does not enumerate Enrollment Report form fields. Do not invent names, identifiers, date ranges, filters, result columns, or export steps.
+- The user confirmed that **Course Code**, **Start Date**, and **End Date** are the required fields marked with an asterisk. Do not invent any additional field names, identifiers, filters, result columns, or export steps.
 - Keep ticket 118579 and any ticket-specific personal information out of the chatbot article and model context.
 - Restrict this article to Training Manager. It does not grant or explain the Training Manager role.
 - This article verifies status only. It does not enroll, approve, recommend, deny, or modify a Marine's record.

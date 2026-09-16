@@ -83,7 +83,7 @@ def task_activity(text: str) -> str | None:
     management=bool(re.search(r'\b(?:copy|copying|create|creating|AO|academics officer|permissions?|MClearn)\b',text,re.I))
     enrollment=bool(re.search(r'\b(?:enroll\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*)\b',text,re.I))
     content=bool(re.search(r'\b(?:launch\w*|content|lesson|refused to connect|screenshot|error)\b',text,re.I))
-    credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year)\b',text,re.I))
+    credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year|calendar year|fiscal year)\b',text,re.I))
     if management and enrollment:
         return 'ambiguous'
     if management:return 'course-management'

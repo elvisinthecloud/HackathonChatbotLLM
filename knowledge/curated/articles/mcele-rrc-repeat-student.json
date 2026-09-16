@@ -7,10 +7,10 @@
   ],
   "course_scope": "general",
   "course_ids": [],
-  "content": "A course that you have already completed cannot be completed again to receive **Reserve Retirement Credits (RRC)** a second time. Beginning a new anniversary year does not make the same completed course eligible for another RRC award.\n\nReview the MCeLE catalog for other courses that award RRC:\n\n1. Open the **Course Catalog**.\n2. Use the **Item Has** filter to find courses that provide RRC.\n3. Review a course's search-result tile or open its **Full Details** tab to see the number of Reserve Retirement Credits awarded upon completion.\n4. Select a different eligible course to earn additional RRC.\n\nThis guidance does not create exceptions for a new anniversary year or calendar year.",
+  "content": "A course that you have already completed cannot be completed again to receive **Reserve Retirement Credits (RRC)** a second time. Beginning a new **calendar year**, **fiscal year**, or **anniversary year** does not make the same completed course eligible for another RRC award.\n\nReview the MCeLE catalog for other courses that award RRC:\n\n1. Open the **Course Catalog**.\n2. Use the **Item Has** filter to find courses that provide RRC.\n3. Review a course's search-result tile or open its **Full Details** tab to see the number of Reserve Retirement Credits awarded upon completion.\n4. Select a different eligible course to earn additional RRC.\n\nThis guidance does not create calendar-year, fiscal-year, or anniversary-year exceptions.",
   "provenance": {
     "type": "adapted",
-    "description": "The no-repeat rule and anniversary-year answer come from the confirmed user-supplied Help Desk response. Catalog discovery steps were adapted from verified Atlas Course Catalog articles describing the Item Has filter and RRC fields."
+    "description": "The no-repeat rule and year-based answer come from the confirmed user-supplied Help Desk response. Catalog discovery steps were adapted from verified Atlas Course Catalog articles describing the Item Has filter and RRC fields."
   },
   "synthetic": false,
   "redistribution": "pending-submission-review"

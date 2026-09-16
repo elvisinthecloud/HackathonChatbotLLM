@@ -1,6 +1,6 @@
 # Article expansion status — 2026-09-16
 
-The clean GitHub recovery began with four deployed curated articles. This work expands the isolated hackathon dataset to seven source-supported articles. Release `fab13e75b00fb0ab` was deployed and ingested on Atlas on 2026-09-16. The original chatbot remained healthy with 315 chunks.
+The clean GitHub recovery began with four deployed curated articles. This work expands the isolated hackathon dataset to seven source-supported articles. Release `34e27280c7bae06d` was deployed and ingested on Atlas on 2026-09-16. The original chatbot remained healthy with 315 chunks.
 
 | Scenario | Article ID | Local dataset | Source status | Remaining decision |
 | --- | --- | --- | --- | --- |
