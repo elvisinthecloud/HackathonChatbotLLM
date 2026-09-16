@@ -6,7 +6,9 @@ Recovered to this Desktop folder on 2026-09-16 after the USB drive disappeared. 
 
 All 34 files from deployed release `150982c95159b944` were read from the isolated Atlas demo and verified against its SHA-256 release manifest. This includes the backend, frontend, schema, guarded deployment scripts, four curated articles, and synthetic screenshot. No production corpus, databases, runtime credentials, or raw conversations were copied. Atlas was not modified.
 
-The demo provides five simulated profiles with explicit role filtering, task-specific course mappings, server-side transcripts, and Langfuse traces. Instructor and AO copying answers use their permitted excerpts. Unsupported generated HTTP links trigger a source-excerpt fallback. The original deployment was last verified healthy with 315 chunks; the demo has four approved article chunks.
+The demo provides five simulated profiles with explicit role filtering, task-specific course mappings, server-side transcripts, and Langfuse traces. Instructor and AO copying answers use their permitted excerpts. Unsupported generated HTTP links trigger a source-excerpt fallback. The original deployment was last verified healthy with 315 chunks; the deployed hackathon demo has four approved article chunks.
+
+The local `codex/article-dataset-expansion` work expands the curated hackathon dataset to seven source-supported articles. It adds separate AO stuck-copy troubleshooting, a Training Manager Enrollment Report procedure, and Student repeat-course RRC guidance. CSC access and EPME-after-MOL authoring records remain outside the dataset until their stated source decisions are resolved. See [the article expansion status](docs/article-expansion-status.md).
 
 Public demo: https://domain-heater-nelson-tours.trycloudflare.com
 

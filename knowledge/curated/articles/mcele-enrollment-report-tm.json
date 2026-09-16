@@ -1,0 +1,17 @@
+{
+  "article_id": "MCELE-ENROLLMENT-REPORT-001",
+  "title": "Verify a Marine's enrollment status with the Enrollment Report",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Training Manager"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "As a **Training Manager**, use the **Enrollment Report** in MCeLE to verify a Marine's enrollment status.\n\n1. Log in to **MCeLE** and confirm that your active role is **Training Manager**.\n2. From the left-hand menu, select **TM Dashboard**.\n3. Select the **Reports** tab.\n4. In the **Report Name** column, select **Enrollment Report**.\n5. Complete the report form fields for the enrollment you need to check.\n6. Select **View Report** and respond to any system messages.\n7. Review the generated report to verify the Marine's enrollment status.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from verified Atlas Training Manager reporting guidance and the user-approved Enrollment Report scenario derived from ticket 118579; the ticket number and ticket-specific personal information are excluded."
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

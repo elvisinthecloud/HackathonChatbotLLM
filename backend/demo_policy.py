@@ -24,7 +24,10 @@ ARTICLE_POLICY = {
     'MCELE-LAUNCH-001': ('Student','MCeLE','general',()),
     'MOODLE-COPY-002': ('Adjunct Faculty','Moodle','general',()),
     'MOODLE-COPY-001': ('Academics Officer','Moodle','general',()),
+    'MOODLE-COPY-003': ('Academics Officer','Moodle','general',()),
     'MCELE-ECDEP-001': ('Training Manager','MCeLE','courses',('5500','6800')),
+    'MCELE-ENROLLMENT-REPORT-001': ('Training Manager','MCeLE','general',()),
+    'MCELE-RRC-001': ('Student','MCeLE','general',()),
 }
 ERROR_HOST = 'sts1.auth.ecuf.deas.mil'
 
@@ -80,9 +83,11 @@ def task_activity(text: str) -> str | None:
     management=bool(re.search(r'\b(?:copy|copying|create|creating|AO|academics officer|permissions?|MClearn)\b',text,re.I))
     enrollment=bool(re.search(r'\b(?:enroll\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*)\b',text,re.I))
     content=bool(re.search(r'\b(?:launch\w*|content|lesson|refused to connect|screenshot|error)\b',text,re.I))
+    credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year)\b',text,re.I))
     if management and enrollment:
         return 'ambiguous'
     if management:return 'course-management'
+    if credit:return 'course-credit'
     if enrollment:return 'enrollment'
     if content:return 'course-content'
     return None
@@ -112,13 +117,20 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
     course=COURSES.get(course_id,{})
     system=None
     if course:
-        system=course.get('enrollment_area') if activity=='enrollment' else (course.get('content_area') if activity in ('course-content','course-management') else None)
+        if activity=='course-credit':
+            system='MCeLE'
+        else:
+            system=course.get('enrollment_area') if activity=='enrollment' else (course.get('content_area') if activity in ('course-content','course-management') else None)
     else:
         if question_moodle or screenshot_moodle:
             system='Moodle'
         if re.search(r'\b(?:in|on|through|delivered by|hosted by)\s+mcele\b',question,re.I):
             system='MCeLE'
         if activity=='enrollment' and re.search(r'\b(?:ECDEP|PME|seminar)\b',question,re.I):
+            system='MCeLE'
+        if activity=='enrollment' and re.search(r'\b(?:Enrollment Report|enrollment status|verify (?:a )?Marine)\b',question,re.I):
+            system='MCeLE'
+        if activity=='course-credit':
             system='MCeLE'
         if not system and not course_changed and activity==previous.get('activity'):
             system=previous.get('system_area')
@@ -156,12 +168,20 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
 def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAccess:
     role=profile['role']
     area,course=context.get('system_area'),context.get('course_id')
+    slow_copy=bool(re.search(r'\b(?:slow|stuck|keeps? loading|never submits?|times? out|fails?|failed|performance)\b',evidence,re.I))
+    enrollment_report=bool(re.search(r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b',evidence,re.I))
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
-                'MOODLE-COPY-001':'course-management','MCELE-ECDEP-001':'enrollment'}
+                'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
+                'MCELE-ECDEP-001':'enrollment','MCELE-ENROLLMENT-REPORT-001':'enrollment',
+                'MCELE-RRC-001':'course-credit'}
     ids=tuple(aid for aid,(grant,delivery,scope,courses) in ARTICLE_POLICY.items()
               if role==grant and area==delivery and not context.get('unresolved')
               and context.get('activity')==activities[aid]
               and (scope=='general' or course in courses or (course is None and not context.get('course_query')))
+              and (aid!='MOODLE-COPY-003' or slow_copy)
+              and (aid!='MOODLE-COPY-001' or not slow_copy)
+              and (aid!='MCELE-ENROLLMENT-REPORT-001' or enrollment_report)
+              and (aid!='MCELE-ECDEP-001' or not enrollment_report)
               and (aid!='MCELE-LAUNCH-001' or exact_error(evidence)))
     return RetrievalAccess(role,area,course,ids)
 

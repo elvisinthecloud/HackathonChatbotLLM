@@ -9,7 +9,10 @@ The demo keeps vector RAG with explicit server-side permissions. It does not use
 | Student | Student | MCELE-LAUNCH-001 | Course content in MCeLE, with exact error evidence |
 | Instructor | Adjunct Faculty | MOODLE-COPY-002 | Course management in Moodle; permission guidance only |
 | Academics Officer (AO) | Academics Officer | MOODLE-COPY-001 | Course management in Moodle; copying steps/tutorial/training reminder |
+| Academics Officer (AO) | Academics Officer | MOODLE-COPY-003 | Course management in Moodle; slow, stuck, timed-out, or failed copy troubleshooting |
 | Training Manager | Training Manager | MCELE-ECDEP-001 | Enrollment in MCeLE; 5500 or 6800, or general guidance explicitly scoped to those seminars |
+| Training Manager | Training Manager | MCELE-ENROLLMENT-REPORT-001 | Enrollment reporting in MCeLE; verify a Marine's enrollment status |
+| Student | Student | MCELE-RRC-001 | Reserve Retirement Credit guidance in MCeLE |
 | Regional Director | Regional Director | None | Presentation placeholder |
 
 There is no inheritance. A profile's course/system associations are context hints, not additional access grants. Course scope is relevance metadata, separate from role access. General MCeLE launch guidance can apply to CYBERM0000 or CDETBAIC01 when the exact error is evidenced. Training Manager guidance is not extended to CSC/EWS enrollment merely because enrollment is also on MCeLE.
@@ -31,7 +34,7 @@ User correction accepted on 2026-09-14: course alone does not identify which sys
 
 The registry uses only user-supplied mappings. EWS is displayed by code rather than inventing a corrected full title. The course field accepts a known code, name, alias, or unrecognized text. Recognized mentions in messages/screenshots also provide context. Unknown course text does not create a new registry record or establish a platform. The user may clarify a missing system for that conversation.
 
-Task categories are enrollment, course content, and course management. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model.
+Task categories are enrollment, course content, course management, and course credit. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model. Within course management, stuck-copy language selects the AO troubleshooting article instead of the normal copy procedure. Within enrollment, report or status-verification language selects the Enrollment Report article instead of the ECDEP Recommend/Deny workflow.
 
 ## Screenshot behavior
 
@@ -55,4 +58,4 @@ The dedicated Atlas database, volume, network, ports, resource limits, and Langf
 
 Run local tests with the documented Python environment, then use `scripts/deploy.py --apply` under the existing approval. The deployment verifies an Instructor conversation and its trace before declaring success. `scripts/verify_scenarios.py --run --synthetic-screenshot <release>/verification/synthetic-sts1.png` runs bounded sequential role/course/vision checks on Atlas. It prints only verification summaries and trace IDs, never keys or session tokens.
 
-The four article bodies are unchanged from the approved Knowledge content. Metadata and editorial notes are not embedded. Redistribution status remains pending for public repository/submission packaging; current demo use was approved. Ticket destination/fields, final walkthrough, and repository creation remain deferred.
+The deployed release still contains the original four approved article bodies. The local expansion contains seven curated article bodies; metadata and editorial notes are not embedded. Redistribution status remains pending for public submission packaging. Ticket destination/fields and final walkthrough remain deferred.

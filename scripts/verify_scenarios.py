@@ -77,6 +77,12 @@ def main():
         'https://elearning.mcele.usmc.mil/moodle/course/index.php?categoryid=1264'])
     verify_trace(ao['trace_id'],'Academics Officer','MOODLE-COPY-001')
     report['ao']={'passed':True,'trace_id':ao['trace_id']}
+    ao_stuck=chat(session('ao'),'I am trying to copy a course in Moodle to make a clone, but it keeps loading and never submits. What should I do?')
+    only_source(ao_stuck,'MOODLE-COPY-003')
+    require(ao_stuck['answer'],['Quality Assurance report','Marine Video Services','Ecosystem Library',
+        'completion criteria','question bank','1100','2100','3100','Content Management and Removal Policy'])
+    verify_trace(ao_stuck['trace_id'],'Academics Officer','MOODLE-COPY-003')
+    report['ao_stuck_copy']={'passed':True,'trace_id':ao_stuck['trace_id']}
     tm=session('training-manager','5500')
     first=chat(tm,'How do I review a student PME seminar enrollment request and use Recommend or Deny? My reference note is orange-seminar.','5500')
     only_source(first,'MCELE-ECDEP-001')
@@ -92,6 +98,16 @@ def main():
     if not generations or any('orange-seminar' in json.dumps(g.get('input')) for g in generations):
         raise RuntimeError('Previous course detail leaked into new model context')
     report['training_manager']={'passed':True,'trace_id':second['trace_id'],'course_change':'old-model-context-cleared'}
+    enrollment_report=chat(session('training-manager'),"I want to verify a Marine's enrollment status. How can I do that?")
+    only_source(enrollment_report,'MCELE-ENROLLMENT-REPORT-001')
+    require(enrollment_report['answer'],['TM Dashboard','Reports','Enrollment Report','View Report','enrollment status'])
+    verify_trace(enrollment_report['trace_id'],'Training Manager','MCELE-ENROLLMENT-REPORT-001')
+    report['training_manager_enrollment_report']={'passed':True,'trace_id':enrollment_report['trace_id']}
+    rrc=chat(session('student'),'Can I redo a course I completed a few months ago to get more Reserve Retirement Credits now that I am in a new anniversary year?')
+    only_source(rrc,'MCELE-RRC-001')
+    require(rrc['answer'],['cannot','second time','anniversary year','Course Catalog','Item Has'])
+    verify_trace(rrc['trace_id'],'Student','MCELE-RRC-001')
+    report['student_rrc_repeat']={'passed':True,'trace_id':rrc['trace_id']}
     rd=chat(session('regional-director'),'How do I copy a course in Moodle?')
     if rd.get('sources'):raise RuntimeError('Placeholder role exposed sources')
     require(rd['answer'],['placeholder'])

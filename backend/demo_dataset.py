@@ -5,11 +5,23 @@ from pathlib import Path
 
 from demo_config import ARTICLE_IDS, DATASET_ID
 
-ARTICLE_FILES = ("articles/mcele-course-launch-sts1-student.json", "articles/moodle-copy-permission-instructor.json",
-                 "articles/moodle-copy-course-ao.json", "articles/mcele-ecdep-request-tm.json")
+ARTICLE_FILES = (
+    "articles/mcele-course-launch-sts1-student.json",
+    "articles/moodle-copy-permission-instructor.json",
+    "articles/moodle-copy-course-ao.json",
+    "articles/moodle-copy-stuck-ao.json",
+    "articles/mcele-ecdep-request-tm.json",
+    "articles/mcele-enrollment-report-tm.json",
+    "articles/mcele-rrc-repeat-student.json",
+)
 BUCKETS = {"mcele-launch":"MCeLE course launch error", "moodle-copy":"Moodle course copying",
-           "mcele-ecdep":"MCeLE ECDEP enrollment requests"}
-ARTICLE_BUCKETS = dict(zip(ARTICLE_IDS, ("mcele-launch", "moodle-copy", "moodle-copy", "mcele-ecdep")))
+           "mcele-ecdep":"MCeLE ECDEP enrollment requests",
+           "mcele-enrollment-report":"MCeLE enrollment reporting",
+           "mcele-rrc":"MCeLE Reserve Retirement Credits"}
+ARTICLE_BUCKETS = dict(zip(ARTICLE_IDS, (
+    "mcele-launch", "moodle-copy", "moodle-copy", "moodle-copy",
+    "mcele-ecdep", "mcele-enrollment-report", "mcele-rrc",
+)))
 
 
 class DatasetError(ValueError):

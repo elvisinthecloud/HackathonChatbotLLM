@@ -8,6 +8,12 @@
     },
     "mcele-ecdep": {
       "label": "MCeLE ECDEP enrollment requests"
+    },
+    "mcele-enrollment-report": {
+      "label": "MCeLE enrollment reporting"
+    },
+    "mcele-rrc": {
+      "label": "MCeLE Reserve Retirement Credits"
     }
   },
   "articles": []
