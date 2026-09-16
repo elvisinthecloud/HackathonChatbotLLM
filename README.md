@@ -18,6 +18,14 @@ The curated dataset contains nine scenarios:
 
 Submission-ready text articles are in [`hackathon-dataset`](hackathon-dataset), with a ready-to-upload [`hackathon-dataset.zip`](hackathon-dataset.zip). The archive contains nine `.txt` files with only an Article record and Knowledge content; internal editorial and retrieval notes are excluded.
 
+## Pipeline
+
+1. Curated articles are validated, split into answer chunks, embedded with Ollama, and stored in PostgreSQL with pgvector.
+2. The user selects a demo role and may provide a course. The backend resolves the task and system from server-owned policy.
+3. Role, course, and system filters limit which articles are eligible before semantic similarity search runs.
+4. The local chat model answers from the permitted excerpts and adds citations.
+5. Grounding checks citations and links before returning the answer. Demo conversations can be traced with Langfuse.
+
 ## Project structure
 
 - `backend/` — FastAPI chatbot, role policy, retrieval, grounding, and ingestion.
