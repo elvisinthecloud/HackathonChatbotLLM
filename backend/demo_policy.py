@@ -5,8 +5,12 @@ import re
 
 COURSES = {
     'CYBERM0000': {'id':'CYBERM0000','title':'CYBERM0000 biennial training','aliases':['CYBERM0000'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':None},
-    '5500': {'id':'5500','title':'Sergeants School Seminar Program','aliases':['5500','Sergeants School Seminar','Sergeants School Seminar Program'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
-    '6800': {'id':'6800','title':'SNCO Leadership School Seminar','aliases':['6800','SNCO Leadership School Seminar'], 'discovery_portal':'MCeLE','content_area':None,'enrollment_area':'MCeLE'},
+    '5500': {'id':'5500','title':'Sergeants School Seminar Program','aliases':['5500','EPME5500','Sergeants School Seminar','Sergeants School Seminar Program'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
+    '6800': {'id':'6800','title':'SNCO Leadership School Seminar','aliases':['6800','EPME6800','SNCO Leadership School Seminar'], 'discovery_portal':'MCeLE','content_area':None,'enrollment_area':'MCeLE'},
+    'EPME3000': {'id':'EPME3000','title':'Leading Marines DEP','aliases':['EPME3000','EPME3000AA','Leading Marines','Leading Marines DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME4000': {'id':'EPME4000','title':'Corporals Course DEP','aliases':['EPME4000','EPME4000AA','Corporals Course','Corporals Course DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME5000': {'id':'EPME5000','title':'Sergeants School DEP','aliases':['EPME5000','EPME5000BA','Sergeants School DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME6000': {'id':'EPME6000','title':'Career Course DEP','aliases':['EPME6000','EPME6000BA','Career Course DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
     'CSC': {'id':'CSC','title':'Command and Staff (CSC)','aliases':['CSC','Command and Staff','Command and Staff (CSC)'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
     'EWS': {'id':'EWS','title':'EWS','aliases':['EWS','expiditionary school warfare'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
     'CDETBAIC01': {'id':'CDETBAIC01','title':'Basic AI Course','aliases':['CDETBAIC01','Basic AI Course'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
@@ -28,6 +32,7 @@ ARTICLE_POLICY = {
     'MCELE-ECDEP-001': ('Training Manager','MCeLE','courses',('5500','6800')),
     'MCELE-ENROLLMENT-REPORT-001': ('Training Manager','MCeLE','general',()),
     'MCELE-RRC-001': ('Student','MCeLE','general',()),
+    'MCELE-EPME-001': ('Student','MCeLE','courses',('EPME3000','EPME4000','EPME5000','EPME6000','5500','6800')),
 }
 ERROR_HOST = 'sts1.auth.ecuf.deas.mil'
 
@@ -81,7 +86,7 @@ def course_mentions(text: str) -> list[str]:
 
 def task_activity(text: str) -> str | None:
     management=bool(re.search(r'\b(?:copy|copying|create|creating|AO|academics officer|permissions?|MClearn)\b',text,re.I))
-    enrollment=bool(re.search(r'\b(?:enroll\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*)\b',text,re.I))
+    enrollment=bool(re.search(r'\b(?:enroll\w*|eligib\w*|prerequisit\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|EPME\w*|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*|requirements?|qualif\w*|take|start)\b',text,re.I))
     content=bool(re.search(r'\b(?:launch\w*|content|lesson|refused to connect|screenshot|error)\b',text,re.I))
     credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year|calendar year|fiscal year)\b',text,re.I))
     if management and enrollment:
@@ -126,7 +131,7 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
             system='Moodle'
         if re.search(r'\b(?:in|on|through|delivered by|hosted by)\s+mcele\b',question,re.I):
             system='MCeLE'
-        if activity=='enrollment' and re.search(r'\b(?:ECDEP|PME|seminar)\b',question,re.I):
+        if activity=='enrollment' and re.search(r'\b(?:ECDEP|EPME\w*|PME|seminar)\b',question,re.I):
             system='MCeLE'
         if activity=='enrollment' and re.search(r'\b(?:Enrollment Report|enrollment status|verify (?:a )?Marine)\b',question,re.I):
             system='MCeLE'
@@ -172,7 +177,7 @@ def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAcce
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
                 'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
                 'MCELE-ECDEP-001':'enrollment','MCELE-ENROLLMENT-REPORT-001':'enrollment',
-                'MCELE-RRC-001':'course-credit'}
+                'MCELE-RRC-001':'course-credit','MCELE-EPME-001':'enrollment'}
     ids=tuple(aid for aid,(grant,delivery,scope,courses) in ARTICLE_POLICY.items()
               if role==grant and area==delivery and not context.get('unresolved')
               and context.get('activity')==activities[aid]

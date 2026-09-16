@@ -13,6 +13,7 @@ The demo keeps vector RAG with explicit server-side permissions. It does not use
 | Training Manager | Training Manager | MCELE-ECDEP-001 | Enrollment in MCeLE; 5500 or 6800, or general guidance explicitly scoped to those seminars |
 | Training Manager | Training Manager | MCELE-ENROLLMENT-REPORT-001 | Enrollment reporting in MCeLE; verify a Marine's enrollment status |
 | Student | Student | MCELE-RRC-001 | Reserve Retirement Credit guidance in MCeLE |
+| Student | Student | MCELE-EPME-001 | EPME eligibility and enrollment in MCeLE for the six approved course families |
 | Regional Director | Regional Director | None | Presentation placeholder |
 
 There is no inheritance. A profile's course/system associations are context hints, not additional access grants. Course scope is relevance metadata, separate from role access. General MCeLE launch guidance can apply to CYBERM0000 or CDETBAIC01 when the exact error is evidenced. Training Manager guidance is not extended to CSC/EWS enrollment merely because enrollment is also on MCeLE.
@@ -28,13 +29,17 @@ User correction accepted on 2026-09-14: course alone does not identify which sys
 | CYBERM0000 | MCeLE | Not confirmed separately | MCeLE |
 | 5500 — Sergeants School Seminar Program | Moodle | MCeLE | MCeLE |
 | 6800 — SNCO Leadership School Seminar | Not confirmed | MCeLE | MCeLE |
+| EPME3000 — Leading Marines DEP | MCeLE | MCeLE | MCeLE |
+| EPME4000 — Corporals Course DEP | MCeLE | MCeLE | MCeLE |
+| EPME5000 — Sergeants School DEP | MCeLE | MCeLE | MCeLE |
+| EPME6000 — Career Course DEP | MCeLE | MCeLE | MCeLE |
 | CSC — Command and Staff | Moodle | MCeLE | MCeLE |
 | EWS | Moodle | MCeLE | MCeLE |
 | CDETBAIC01 — Basic AI Course | MCeLE | MCeLE | MCeLE |
 
 The registry uses only user-supplied mappings. EWS is displayed by code rather than inventing a corrected full title. The course field accepts a known code, name, alias, or unrecognized text. Recognized mentions in messages/screenshots also provide context. Unknown course text does not create a new registry record or establish a platform. The user may clarify a missing system for that conversation.
 
-Task categories are enrollment, course content, course management, and course credit. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model. For an AO course-management question, the normal-copy and stuck-copy articles both pass deterministic access control. Each has a retrieval-only summary that is embedded but never exposed as answer context. Embedding similarity chooses the single closest article before its approved content reaches the answer generator, so paraphrases such as “taking forever” do not require a growing keyword list. Within enrollment, report or status-verification language selects the Enrollment Report article instead of the ECDEP Recommend/Deny workflow.
+Task categories are enrollment, course content, course management, and course credit. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model. For an AO course-management question, the normal-copy and stuck-copy articles both pass deterministic access control. Each has a retrieval-only summary that is embedded but never exposed as answer context. Embedding similarity chooses the single closest article before its approved content reaches the answer generator, so paraphrases such as “taking forever” do not require a growing keyword list. Within enrollment, report or status-verification language selects the Enrollment Report article instead of the ECDEP Recommend/Deny workflow. Student EPME questions use MCTFS as the grade/select-status authority and can be scoped to one named EPME course or answered with the complete six-course policy.
 
 ## Screenshot behavior
 
@@ -54,8 +59,8 @@ Sessions expire for API use after 24 hours; records are retained until a separat
 
 ## Deployment and verification
 
-The dedicated Atlas database, volume, network, ports, resource limits, and Langfuse project remain unchanged. Ingestion transactionally indexes exactly four approved articles and retires only the two named synthetic baseline records in demo storage. It creates only `demo_sessions` and `demo_turns` in the identity-checked demo database. The existing public demo tunnel is preserved during routine code updates when it is running, helping preserve its random URL.
+The dedicated Atlas database, volume, network, ports, resource limits, and Langfuse project remain unchanged. Ingestion transactionally indexes only the explicit curated article allowlist and retires only the two named synthetic baseline records in demo storage. It creates only `demo_sessions` and `demo_turns` in the identity-checked demo database. The existing public demo tunnel is preserved during routine code updates when it is running, helping preserve its random URL.
 
 Run local tests with the documented Python environment, then use `scripts/deploy.py --apply` under the existing approval. The deployment verifies an Instructor conversation and its trace before declaring success. `scripts/verify_scenarios.py --run --synthetic-screenshot <release>/verification/synthetic-sts1.png` runs bounded sequential role/course/vision checks on Atlas. It prints only verification summaries and trace IDs, never keys or session tokens.
 
-Isolated release `34e27280c7bae06d` contains seven curated article bodies. Retrieval-only AO summaries are embedded for semantic selection but are excluded from answer excerpts and model context. Metadata and editorial notes are not embedded. Redistribution status remains pending for public submission packaging. Ticket destination/fields and final walkthrough remain deferred.
+Isolated release `34e27280c7bae06d` contains seven curated article bodies. The eighth EPME article is local and pending review and deployment. Retrieval-only AO summaries are embedded for semantic selection but are excluded from answer excerpts and model context. Metadata and editorial notes are not embedded. Redistribution status remains pending for public submission packaging. Ticket destination/fields and final walkthrough remain deferred.

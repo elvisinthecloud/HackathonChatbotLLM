@@ -7,7 +7,8 @@
     "articles/moodle-copy-stuck-ao.json",
     "articles/mcele-ecdep-request-tm.json",
     "articles/mcele-enrollment-report-tm.json",
-    "articles/mcele-rrc-repeat-student.json"
+    "articles/mcele-rrc-repeat-student.json",
+    "articles/mcele-epme-eligibility-student.json"
   ],
   "article_ids": [
     "MCELE-LAUNCH-001",
@@ -16,6 +17,7 @@
     "MOODLE-COPY-003",
     "MCELE-ECDEP-001",
     "MCELE-ENROLLMENT-REPORT-001",
-    "MCELE-RRC-001"
+    "MCELE-RRC-001",
+    "MCELE-EPME-001"
   ]
 }
