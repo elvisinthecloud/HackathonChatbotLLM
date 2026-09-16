@@ -33,6 +33,10 @@ class ExpandedDatasetTests(unittest.TestCase):
             ],
         )
         self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 5)
+        by_id = {document["source_path"]: document for document in documents}
+        for article_id in ("MOODLE-COPY-001", "MOODLE-COPY-003"):
+            self.assertTrue(by_id[article_id]["retrieval_text"])
+            self.assertNotIn("retrieval_text", by_id[article_id]["metadata"])
 
     def test_ao_copy_articles_share_a_semantic_candidate_set(self):
         _, normal = routed("ao", "How do I copy a course in Moodle?")

@@ -100,14 +100,17 @@ def cosine_similarity(a: list[float], b: list[float]) -> float:
     return float(np.dot(arr_a, arr_b) / denom)
 
 
-def select_semantic_article(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def select_semantic_article(
+    chunks: list[dict[str, Any]],
+    winning_article: str | None = None,
+) -> list[dict[str, Any]]:
     access = ACCESS.get()
     if not chunks or access is None:
         return chunks
     allowed = frozenset(access.article_ids)
     if allowed not in SINGLE_ARTICLE_FAMILIES:
         return chunks
-    winning_article = chunks[0].get("source_path")
+    winning_article = winning_article or chunks[0].get("source_path")
     return [chunk for chunk in chunks if chunk.get("source_path") == winning_article]
 
 
@@ -262,6 +265,7 @@ def search_chunks(
                 JOIN articles a ON a.id = c.article_id
                 WHERE c.embedding IS NOT NULL
                 AND ({ACCESS_FILTER_SQL})
+                AND COALESCE(c.metadata->>'retrieval_only', 'false') != 'true'
                 {bucket_filter}
                 ORDER BY c.embedding <=> %s::vector
                 LIMIT %s
@@ -711,6 +715,7 @@ async def retrieve_chunks(
     confidence: float = 0.0
     bucket_ids_to_search: list[str] | None = None
     context_embedding: list[float] | None = None
+    semantic_winner: str | None = None
 
     if image_context and image_context.get("description"):
         context_query = f"{question}\n{image_context['description']}"
@@ -744,6 +749,9 @@ async def retrieve_chunks(
         decision_source = "user_selection"
     else:
         article_candidates = search_article_candidates(routing_embedding)
+        access = ACCESS.get()
+        if access is not None and frozenset(access.article_ids) in SINGLE_ARTICLE_FAMILIES and article_candidates:
+            semantic_winner = article_candidates[0].get("source_path")
         bucket_options, untagged_candidates = competitive_bucket_options(
             article_candidates
         )
@@ -805,7 +813,8 @@ async def retrieve_chunks(
             )
 
     question_chunks = select_semantic_article(
-        search_chunks(question_embedding, bucket_ids=bucket_ids_to_search)
+        search_chunks(question_embedding, bucket_ids=bucket_ids_to_search),
+        semantic_winner,
     )
 
     with langfuse.start_as_current_span(
@@ -834,7 +843,7 @@ async def retrieve_chunks(
     else:
         merged = merge_chunks(question_chunks, context_chunks, limit)
 
-    return select_semantic_article(merged), matched_bucket_id, confidence, []
+    return select_semantic_article(merged, semantic_winner), matched_bucket_id, confidence, []
 
 
 

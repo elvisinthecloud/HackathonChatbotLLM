@@ -34,3 +34,4 @@ Review the [MCeLE Content Management and Removal Policy](https://lmshelp.mcele.u
 - Do not claim a single root cause. The source says the listed design and policy problems can cause or contribute to slow, unreliable copies.
 - Do not invent a cancel, reset, retry interval, browser fix, administrator action, or guaranteed resolution.
 - Preserve the source URLs exactly. The demo has not independently verified that the linked resources are publicly accessible.
+- The structured dataset carries a retrieval-only summary covering paraphrases such as “taking forever” and “isn't working.” It is embedded for article selection but is excluded from answer excerpts and model context.

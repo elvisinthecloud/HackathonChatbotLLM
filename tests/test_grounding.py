@@ -57,7 +57,7 @@ class GroundingTests(unittest.IsolatedAsyncioTestCase):
                 {"source_path": "MOODLE-COPY-001", "score": 0.72, "content": "normal copy"},
             ]
             self.assertEqual(
-                [item["source_path"] for item in rag.select_semantic_article(chunks)],
+                [item["source_path"] for item in rag.select_semantic_article(chunks, "MOODLE-COPY-003")],
                 ["MOODLE-COPY-003"],
             )
         finally:

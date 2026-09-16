@@ -55,7 +55,11 @@ def load_dataset(manifest_path: Path) -> list[dict]:
         article = read_json_file(root / rel, root)
         from demo_policy import ARTICLE_POLICY
         role, area, scope, courses = ARTICLE_POLICY[article_id]
-        extras = {"excluded_delivery_areas", "required_error"} if article_id == "MCELE-LAUNCH-001" else set()
+        extras = set()
+        if article_id == "MCELE-LAUNCH-001":
+            extras.update({"excluded_delivery_areas", "required_error"})
+        if article_id in {"MOODLE-COPY-001", "MOODLE-COPY-003"}:
+            extras.add("retrieval_text")
         if set(article) != expected | extras:
             raise DatasetError("Article fields do not match curated schema")
         if not (article["article_id"] == article_id and article["allowed_roles"] == [role]
@@ -64,7 +68,7 @@ def load_dataset(manifest_path: Path) -> list[dict]:
                 and article["redistribution"] == "pending-submission-review"
                 and isinstance(article["provenance"], dict) and article["provenance"].get("type") == "adapted"):
             raise DatasetError("Curated article differs from its explicit access/scope policy")
-        if extras and (article["excluded_delivery_areas"] != ["Moodle"] or article["required_error"] != "sts1.auth.ecuf.deas.mil refused to connect"):
+        if article_id == "MCELE-LAUNCH-001" and (article["excluded_delivery_areas"] != ["Moodle"] or article["required_error"] != "sts1.auth.ecuf.deas.mil refused to connect"):
             raise DatasetError("Student article requires the approved error and Moodle exclusion")
         if not isinstance(article["title"], str) or not 1 <= len(article["title"]) <= 160:
             raise DatasetError("Invalid article title")
@@ -73,10 +77,14 @@ def load_dataset(manifest_path: Path) -> list[dict]:
             raise DatasetError("Invalid curated article content")
         if any(marker in content for marker in ("## Article record", "## Editorial and retrieval notes", "## Knowledge content")):
             raise DatasetError("Authoring sections cannot be embedded")
-        metadata = {k: v for k, v in article.items() if k != "content"}
+        retrieval_text = article.get("retrieval_text")
+        if retrieval_text is not None and (not isinstance(retrieval_text, str) or not 1 <= len(retrieval_text) <= 1000):
+            raise DatasetError("Invalid retrieval text")
+        metadata = {k: v for k, v in article.items() if k not in {"content", "retrieval_text"}}
         metadata.update(dataset_id=DATASET_ID, clarification_bucket_id=ARTICLE_BUCKETS[article_id], bucket_label=BUCKETS[ARTICLE_BUCKETS[article_id]])
         documents.append({"title": article["title"], "source_path": article_id,
                           "content": content, "metadata": metadata,
+                          "retrieval_text": retrieval_text,
                           "content_sha256": hashlib.sha256(content.encode()).hexdigest()})
     return documents
 
