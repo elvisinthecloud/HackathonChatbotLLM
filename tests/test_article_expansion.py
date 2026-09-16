@@ -68,6 +68,15 @@ class ExpandedDatasetTests(unittest.TestCase):
         self.assertEqual(selected_context["system_area"], "MCeLE")
         self.assertEqual(selected_access.article_ids, ("MCELE-RRC-001",))
 
+        for year_type in ("calendar year", "fiscal year"):
+            with self.subTest(year_type=year_type):
+                year_context, year_access = routed(
+                    "student",
+                    f"Can I redo a completed course for more points in a new {year_type}?",
+                )
+                self.assertEqual(year_context["activity"], "course-credit")
+                self.assertEqual(year_access.article_ids, ("MCELE-RRC-001",))
+
 
 if __name__ == "__main__":
     unittest.main()
