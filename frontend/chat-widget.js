@@ -719,11 +719,15 @@
   });
   function choice(label, action) {
     const button = document.createElement("button");
-    button.type = "button"; button.textContent = label;
+    button.type = "button";
+    const icon = document.createElement("span");
+    icon.textContent = "💬"; icon.setAttribute("aria-hidden", "true");
+    button.append(icon, document.createTextNode(label));
     button.addEventListener("click", action); clarifyPanel.append(button);
   }
   function showIssueChoices() {
     clarifyPanel.replaceChildren();
+    chatBody.append(clarifyPanel);
     clarifyPanel.hidden = false;
     ["Account/Profile Issue", "Courseware Issue", "Roles and Permissions", "Other"].forEach(category => {
       choice(category, () => {
@@ -735,6 +739,7 @@
         chatInput.focus();
       });
     });
+    scrollToBottom();
   }
   btnSupport.addEventListener("click", async () => {
     await loadSupportInfo();

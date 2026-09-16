@@ -733,8 +733,8 @@ h1 {
 
 /* Neutral issue intake. */
 [hidden] { display: none !important; }
-.clarify-panel { padding: 12px 18px; border-top: 1px solid #d5dfe4; max-height: 180px; overflow-y: auto; background: #f1f7fa; }
-.clarify-panel p { margin: 0 0 8px; font-weight: 600; }
-.clarify-panel button { margin: 3px; padding: 8px 12px; border: 1px solid #8ca3b1; border-radius: 20px; background: white; color: #123647; cursor: pointer; }
-.clarify-panel button:hover { background: #dcecf5; }
+.clarify-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 0 0 16px; padding: 0; }
+.clarify-panel button { display: flex; align-items: center; gap: 8px; max-width: 100%; padding: 11px 14px; border: 1px solid #b9cde0; border-radius: 16px 16px 16px 4px; background: #edf4fc; color: #123647; font: inherit; text-align: left; cursor: pointer; }
+.clarify-panel button:hover { background: #dcecf5; border-color: #3976b8; }
+.clarify-panel button:focus-visible { outline: 2px solid #1467ce; outline-offset: 2px; }
 #btnSupport { font-weight: 650; }
