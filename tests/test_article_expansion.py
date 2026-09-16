@@ -18,7 +18,7 @@ def routed(profile_id: str, question: str, course: str | None = None):
 
 
 class ExpandedDatasetTests(unittest.TestCase):
-    def test_manifest_loads_exactly_seven_curated_articles(self):
+    def test_manifest_loads_exactly_eight_curated_articles(self):
         documents = load_dataset(ROOT / "knowledge/curated/manifest.json")
         self.assertEqual(
             [document["source_path"] for document in documents],
@@ -30,9 +30,10 @@ class ExpandedDatasetTests(unittest.TestCase):
                 "MCELE-ECDEP-001",
                 "MCELE-ENROLLMENT-REPORT-001",
                 "MCELE-RRC-001",
+                "MCELE-EPME-001",
             ],
         )
-        self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 5)
+        self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 6)
         by_id = {document["source_path"]: document for document in documents}
         for article_id in ("MOODLE-COPY-001", "MOODLE-COPY-003"):
             self.assertTrue(by_id[article_id]["retrieval_text"])
@@ -76,6 +77,43 @@ class ExpandedDatasetTests(unittest.TestCase):
                 )
                 self.assertEqual(year_context["activity"], "course-credit")
                 self.assertEqual(year_access.article_ids, ("MCELE-RRC-001",))
+
+    def test_epme_policy_routes_general_and_course_specific_questions(self):
+        general_context, general_access = routed(
+            "student",
+            "Is it possible to enroll a Marine into an EPME course once the Marine has been selected and shows on MOL?",
+        )
+        self.assertEqual(general_context["activity"], "enrollment")
+        self.assertEqual(general_context["system_area"], "MCeLE")
+        self.assertEqual(general_access.article_ids, ("MCELE-EPME-001",))
+
+        for general_question in (
+            "What are the requirements to start an EPME course?",
+            "How do I know if I am eligible for EPME?",
+        ):
+            with self.subTest(general_question=general_question):
+                context, access = routed("student", general_question)
+                self.assertEqual(context["activity"], "enrollment")
+                self.assertEqual(access.article_ids, ("MCELE-EPME-001",))
+
+        cases = (
+            ("Can a Sergeant select take EPME5000?", "EPME5000"),
+            ("Who is eligible to enroll in EPME6000BA?", "EPME6000"),
+            ("What are the enrollment requirements for EPME5500?", "5500"),
+            ("What prerequisite is required for EPME6800?", "6800"),
+        )
+        for question, course_id in cases:
+            with self.subTest(question=question):
+                context, access = routed("student", question)
+                self.assertEqual(context["course_id"], course_id)
+                self.assertEqual(access.article_ids, ("MCELE-EPME-001",))
+
+        documents = load_dataset(ROOT / "knowledge/curated/manifest.json")
+        article = next(document for document in documents if document["source_path"] == "MCELE-EPME-001")
+        self.assertTrue(article["content"].startswith("Use these requirements"))
+        self.assertNotIn("source of truth", article["content"].lower())
+        self.assertIn("Sergeant selects cannot enroll", article["content"])
+        self.assertIn("Staff Sergeant selects and above", article["content"])
 
 
 if __name__ == "__main__":
