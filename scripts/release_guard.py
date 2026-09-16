@@ -7,7 +7,7 @@ import re
 import subprocess
 
 PROJECT = "mcele-hackathon-demo"
-HOST = "velvux@atlas.tail65b4a7.ts.net"
+HOST = "velvux@100.98.232.101"
 ROOT = Path("/home/velvux/mcele-hackathon-demo")
 RUNTIME = Path("/home/velvux/.config/mcele-hackathon-demo/runtime.env")
 SERVICES = ("demo-db", "demo-backend", "demo-frontend", "demo-tunnel")
