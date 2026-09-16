@@ -34,11 +34,12 @@ class ExpandedDatasetTests(unittest.TestCase):
         )
         self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 5)
 
-    def test_ao_normal_and_stuck_copy_intents_are_separate(self):
+    def test_ao_copy_articles_share_a_semantic_candidate_set(self):
         _, normal = routed("ao", "How do I copy a course in Moodle?")
         _, stuck = routed("ao", "My Moodle course copy keeps loading and never submits. What should I do?")
-        self.assertEqual(normal.article_ids, ("MOODLE-COPY-001",))
-        self.assertEqual(stuck.article_ids, ("MOODLE-COPY-003",))
+        expected = ("MOODLE-COPY-001", "MOODLE-COPY-003")
+        self.assertEqual(normal.article_ids, expected)
+        self.assertEqual(stuck.article_ids, expected)
 
     def test_instructor_cannot_retrieve_ao_troubleshooting(self):
         _, access = routed("instructor", "My Moodle course copy is stuck and keeps loading.")
