@@ -14,15 +14,17 @@ ARTICLE_FILES = (
     "articles/mcele-enrollment-report-tm.json",
     "articles/mcele-rrc-repeat-student.json",
     "articles/mcele-epme-eligibility-student.json",
+    "articles/mcele-csc-access-student.json",
 )
 BUCKETS = {"mcele-launch":"MCeLE course launch error", "moodle-copy":"Moodle course copying",
            "mcele-ecdep":"MCeLE ECDEP enrollment requests",
            "mcele-enrollment-report":"MCeLE enrollment reporting",
            "mcele-rrc":"MCeLE Reserve Retirement Credits",
-           "mcele-epme":"MCeLE EPME eligibility and enrollment"}
+           "mcele-epme":"MCeLE EPME eligibility and enrollment",
+           "mcele-csc":"CSC access from MCeLE to Moodle"}
 ARTICLE_BUCKETS = dict(zip(ARTICLE_IDS, (
     "mcele-launch", "moodle-copy", "moodle-copy", "moodle-copy",
-    "mcele-ecdep", "mcele-enrollment-report", "mcele-rrc", "mcele-epme",
+    "mcele-ecdep", "mcele-enrollment-report", "mcele-rrc", "mcele-epme", "mcele-csc",
 )))
 
 

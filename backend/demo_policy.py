@@ -33,6 +33,7 @@ ARTICLE_POLICY = {
     'MCELE-ENROLLMENT-REPORT-001': ('Training Manager','MCeLE','general',()),
     'MCELE-RRC-001': ('Student','MCeLE','general',()),
     'MCELE-EPME-001': ('Student','MCeLE','courses',('EPME3000','EPME4000','EPME5000','EPME6000','5500','6800')),
+    'MCELE-CSC-001': ('Student','MCeLE','courses',('CSC',)),
 }
 ERROR_HOST = 'sts1.auth.ecuf.deas.mil'
 
@@ -110,6 +111,10 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
     question_moodle=bool(re.search(r'\bmoodle\b',question,re.I))
     screenshot_moodle=bool(re.search(r'\bmoodle\b',image_text,re.I))
     activity=task_activity(question)
+    csc_context=chosen=='CSC' or mentions==['CSC']
+    if csc_context and re.search(r"\b(?:access|get to|missing|not (?:appear|show)|doesn't (?:appear|show)|can't find|cannot find|where is|My Courses|Moodle)\b",question,re.I):
+        # CSC discovery/enrollment begins in MCeLE even though its content opens in Moodle.
+        activity='enrollment'
     course_id=chosen or (mentions[0] if len(mentions)==1 and not unknown else None)
     # An explicitly new, general Moodle task may leave an automatically inferred course.
     if not course_id and not unknown and not changed_selection and not (question_moodle and activity and activity!=previous.get('activity')):
@@ -177,13 +182,15 @@ def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAcce
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
                 'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
                 'MCELE-ECDEP-001':'enrollment','MCELE-ENROLLMENT-REPORT-001':'enrollment',
-                'MCELE-RRC-001':'course-credit','MCELE-EPME-001':'enrollment'}
+                'MCELE-RRC-001':'course-credit','MCELE-EPME-001':'enrollment',
+                'MCELE-CSC-001':'enrollment'}
     ids=tuple(aid for aid,(grant,delivery,scope,courses) in ARTICLE_POLICY.items()
               if role==grant and area==delivery and not context.get('unresolved')
               and context.get('activity')==activities[aid]
               and (scope=='general' or course in courses or (course is None and not context.get('course_query')))
               and (aid!='MCELE-ENROLLMENT-REPORT-001' or enrollment_report)
               and (aid!='MCELE-ECDEP-001' or not enrollment_report)
+              and (aid!='MCELE-CSC-001' or course=='CSC')
               and (aid!='MCELE-LAUNCH-001' or exact_error(evidence)))
     return RetrievalAccess(role,area,course,ids)
 

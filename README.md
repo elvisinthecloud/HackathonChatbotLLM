@@ -8,7 +8,7 @@ All 34 files from deployed release `150982c95159b944` were read from the isolate
 
 The demo provides five simulated profiles with explicit role filtering, task-specific course mappings, server-side transcripts, and Langfuse traces. Instructor and AO copying answers use their permitted excerpts. Unsupported generated HTTP links trigger a source-excerpt fallback. The original deployment remains healthy with 315 chunks. Isolated hackathon release `34e27280c7bae06d` contains seven curated articles plus two retrieval-only AO routing embeddings.
 
-The `codex/article-dataset-expansion` work currently contains eight source-supported articles. The eighth is a locally prepared Student EPME eligibility policy covering MOL, MCTFS, and six course families; it remains pending review and deployment. The CSC authoring record remains outside the dataset until its escalation-order decision is resolved. See [the article expansion status](docs/article-expansion-status.md) and [live validation record](docs/article-expansion-validation.json).
+The `codex/article-dataset-expansion` work currently contains nine source-supported articles. The Student EPME eligibility policy and CSC cross-system access article are included locally and remain pending deployment. See [the article expansion status](docs/article-expansion-status.md) and [live validation record](docs/article-expansion-validation.json).
 
 Public demo: https://domain-heater-nelson-tours.trycloudflare.com
 

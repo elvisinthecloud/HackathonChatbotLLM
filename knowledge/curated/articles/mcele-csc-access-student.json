@@ -1,0 +1,19 @@
+{
+  "article_id": "MCELE-CSC-001",
+  "title": "Access CSC and troubleshoot a missing Moodle enrollment",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student"
+  ],
+  "course_scope": "courses",
+  "course_ids": [
+    "CSC"
+  ],
+  "content": "CSC course content is delivered in Moodle. Course discovery and enrollment are handled in MCeLE.\n\n### Access your CSC course\n\n1. Sign in to MCeLE and check whether CSC appears under **My Courses**.\n2. If CSC is listed, open Moodle by selecting the **Instructor-Led Courses (Moodle)** circle on the Portal page, or select **My Learning** and then **Instructor-Led Courses**.\n3. In Moodle, open **My Courses** and set the drop-down to **All** to display all your Moodle courses.\n4. Open CSC when it appears.\n\n### CSC appears in MCeLE but is missing in Moodle\n\nIf CSC appears under MCeLE **My Courses** but is still missing from Moodle **My Courses** with **All** selected, contact the appropriate **Region first** to have the Moodle-side enrollment checked and any required enrollment action coordinated.\n\n### CSC is missing from MCeLE My Courses\n\nIf CSC does not appear under MCeLE **My Courses** at all, contact the **Help Desk first** to check your account, course visibility, and apparent enrollment.\n\nIf that review confirms that an enrollment action is required, contact the appropriate **Region** to handle that action.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Access steps were adapted from verified Atlas Moodle and enrolled-course guidance. The Region-first and Help-Desk-first escalation branches were confirmed by the user."
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}
