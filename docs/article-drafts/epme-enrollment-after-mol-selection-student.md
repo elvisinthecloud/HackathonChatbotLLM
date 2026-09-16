@@ -31,9 +31,6 @@ For **EPME5500** and **EPME6800**, request enrollment in MCeLE, attach a command
 If the Marine cannot enroll or recently received a new rank or select grade:
 
 - Contact the **MCeLE Help Desk** to verify the rank or select status reflected in MCTFS and receive enrollment assistance.
-- For EPME5500 or EPME6800 seminar enrollment, contact the appropriate **CDET regional point of contact** in MARADMIN 110/26.
-
-Some course work may open in Moodle after enrollment, but enrollment assistance begins with MCeLE.
 
 ## Editorial and retrieval notes
 
@@ -44,3 +41,4 @@ Some course work may open in Moodle after enrollment, but enrollment assistance 
 - Do not treat EPME6000 select eligibility as eligibility for EPME6800; the seminar is limited to Staff Sergeants and Gunnery Sergeants who completed EPME6000.
 - Direct rank/status verification to the MCeLE Help Desk, which can check the rank reflected in MCTFS and provide further enrollment assistance.
 - Keep promotion-completion policy separate from the enrollment-eligibility answer unless the user asks about promotion requirements.
+- Deferred implementation: when a user selects or names one EPME course, return only that course's requirement plus any directly relevant enrollment assistance instead of the complete six-course policy.
