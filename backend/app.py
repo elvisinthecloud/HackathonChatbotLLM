@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from db import DEMO_CONFIG, close_pool, get_connection, init_pool
 from demo_dataset import load_dataset, validate_taxonomy
-from demo_policy import PROFILES, COURSES
+from demo_policy import PROFILES, COURSES, TICKET_COURSES
 from demo_sessions import create_session, load_session, save_turn, owns_trace, SessionMissing, SessionCapacity
 from rag import (
     OllamaError,
@@ -34,6 +34,7 @@ class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     session_id: str = Field(pattern=r"^[A-Za-z0-9_-]{43}$")
     course_id: str | None = Field(default=None, max_length=160)
+    system_area: Literal["MCeLE", "Moodle"] | None = None
     message: str = Field(min_length=1, max_length=4000)
     image: str | None = Field(default=None, max_length=5_592_408)
 
@@ -192,7 +193,7 @@ class SessionRequest(BaseModel):
 
 @app.get("/api/profiles")
 async def profiles():
-    return {"profiles":list(PROFILES.values()),"courses":list(COURSES.values()),"identity_mode":"demo-profile-selection"}
+    return {"profiles":list(PROFILES.values()),"courses":list(COURSES.values()),"ticket_courses":list(TICKET_COURSES),"identity_mode":"demo-profile-selection"}
 
 
 @app.post("/api/sessions")
@@ -217,7 +218,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
     async with chat_lock:
         try:
             session=load_session(request.session_id)
-            result = await answer_question(message, session=session, selected_course_id=request.course_id, image=request.image)
+            result = await answer_question(message, session=session, selected_course_id=request.course_id, image=request.image, selected_system=request.system_area)
             save_turn(session,request.course_id,result["context"],result.pop("_context_changed"),message,
                       result.pop("_image_text"),request.image is not None,result)
             return ChatResponse(**result,session_id=request.session_id)
@@ -251,3 +252,39 @@ async def score(request: ScoreRequest):
         return {"ok": True}
     except Exception:
         raise HTTPException(status_code=502, detail="Demo feedback could not be recorded.") from None
+
+
+class TicketDraftRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    session_id: str = Field(pattern=r"^[A-Za-z0-9_-]{43}$")
+    course_id: str = Field(min_length=1, max_length=160)
+    system_area: Literal["MCeLE", "Moodle"]
+    current_issue: str = Field(default="", max_length=4000)
+
+    @field_validator("course_id")
+    @classmethod
+    def nonblank_course(cls, value):
+        if not value.strip():
+            raise ValueError("Course cannot be blank")
+        return value.strip()
+
+
+
+@app.post("/api/ticket-draft")
+async def ticket_draft(request: TicketDraftRequest):
+    from demo_tickets import prepare_draft
+    if chat_lock.locked():
+        raise HTTPException(status_code=429, detail="The assistant is busy. Please try again shortly.")
+    async with chat_lock:
+        try:
+            session = load_session(request.session_id)
+            return await prepare_draft(session, request.course_id, request.system_area,
+                                       request.current_issue, settings, langfuse)
+        except SessionMissing:
+            raise HTTPException(status_code=404, detail="Your session expired. Start a new conversation.") from None
+        except SessionCapacity:
+            raise HTTPException(status_code=409, detail="Start a new conversation to prepare a ticket.") from None
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Describe your issue for the selected course and site before preparing a ticket.") from None
+        except Exception:
+            raise HTTPException(status_code=503, detail="Could not prepare the mock ticket. Please retry.") from None

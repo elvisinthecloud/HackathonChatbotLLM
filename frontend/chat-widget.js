@@ -17,7 +17,14 @@
   const chatImagePreview = document.getElementById("chatImagePreview");
   const profileSelect = document.getElementById("profileSelect");
   const courseSelect = document.getElementById("courseSelect");
-  const courseSuggestions = document.getElementById("courseSuggestions");
+  const systemSelect = document.getElementById("systemSelect");
+  const otherCourse = document.getElementById("otherCourse");
+  const otherCourseRow = document.getElementById("otherCourseRow");
+  const clarifyPanel = document.getElementById("clarifyPanel");
+  const ticketPage = document.getElementById("ticketPage");
+  let selectedSystem = null;
+  let queuedRequest = null;
+  let ticketPending = false;
   const profileDescription = document.getElementById("profileDescription");
   const resolvedContext = document.getElementById("resolvedContext");
   const sessionError = document.getElementById("sessionError");
@@ -362,6 +369,10 @@
 
   function setSending(nextValue) {
     isSending = nextValue;
+    systemSelect.disabled = nextValue || !sessionId;
+    otherCourse.disabled = nextValue;
+    btnSupport.disabled = nextValue || !sessionId;
+    clarifyPanel.querySelectorAll("button").forEach(button => { button.disabled = nextValue; });
     chatInput.disabled = nextValue;
     chatSend.disabled = nextValue;
     chatImageBtn.disabled = nextValue;
@@ -426,11 +437,16 @@
 
   function clearChat() {
     if (isSending) return;
+    resetTicket();
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
     clearImage();
     showGreeting();
+    queuedRequest = null;
+    ticketPending = false;
+    chatInput.value = "";
+    clarifyPanel.hidden = true;
     createSession();
     chatInput.focus();
   }
@@ -444,6 +460,7 @@
         session_id: sessionId,
         message: text,
         course_id: selectedCourseId,
+        system_area: selectedSystem,
         ...(image ? { image } : {}),
       })
     });
@@ -490,7 +507,16 @@
     sessionError.hidden = !message;
   }
 
+  function resetTicket() {
+    document.getElementById("ticketForm").reset();
+    document.getElementById("ticketEvidence").textContent = "";
+    document.getElementById("draftMode").textContent = "";
+    document.getElementById("ticketConfirmation").textContent = "";
+    document.getElementById("ticketConfirmation").hidden = true;
+  }
+
   function resetTranscript() {
+    resetTicket();
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
@@ -509,24 +535,14 @@
       option.textContent = `${profile.name} · ${profile.display_role || profile.role}`;
       profileSelect.appendChild(option);
     });
-    courseSuggestions.replaceChildren();
-    courses.forEach((course) => {
+    courseSelect.replaceChildren();
+    const coursePlaceholder = document.createElement("option");
+    coursePlaceholder.value = ""; coursePlaceholder.textContent = "Choose a course…";
+    courseSelect.append(coursePlaceholder);
+    [...courses, "__other__"].forEach(code => {
       const option = document.createElement("option");
-      option.value = course.id || "";
-      option.label = course.title || course.id || "";
-      courseSuggestions.appendChild(option);
-      if (course.title && course.title !== course.id) {
-        const titleOption = document.createElement("option");
-        titleOption.value = course.title;
-        courseSuggestions.appendChild(titleOption);
-      }
-      if (course.aliases && Array.isArray(course.aliases)) {
-        course.aliases.forEach((alias) => {
-          const aliasOption = document.createElement("option");
-          aliasOption.value = alias;
-          courseSuggestions.appendChild(aliasOption);
-        });
-      }
+      option.value = code; option.textContent = code === "__other__" ? "Course not listed" : code;
+      courseSelect.append(option);
     });
     profileSelect.disabled = false;
     courseSelect.disabled = false;
@@ -547,6 +563,8 @@
     const generation = ++sessionGeneration;
     if (!selectedProfile) return;
     sessionId = null;
+    btnSupport.disabled = true;
+    systemSelect.disabled = true;
     showSessionError("");
     chatInput.disabled = true;
     chatSend.disabled = true;
@@ -565,6 +583,8 @@
       if (!response.ok) throw new Error(data.detail || `Session failed with status ${response.status}`);
       if (generation !== sessionGeneration) return;
       sessionId = data.session_id;
+      systemSelect.disabled = false;
+      btnSupport.disabled = false;
       chatInput.disabled = false;
       chatSend.disabled = false;
       chatImageBtn.disabled = false;
@@ -589,7 +609,7 @@
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !Array.isArray(data.profiles)) throw new Error(data.detail || "Profiles unavailable");
       profiles = data.profiles;
-      courses = Array.isArray(data.courses) ? data.courses : [];
+      courses = Array.isArray(data.ticket_courses) ? data.ticket_courses : [];
       if (!profiles.length) throw new Error("No demo profiles available");
       populateControls();
       selectedProfile = null;
@@ -608,20 +628,29 @@
     }
   }
 
-  async function sendMessage(rawText) {
+  async function sendMessage(rawText, queued = null) {
     const text = (rawText || "").trim();
     if (!text || isSending || !sessionId) return;
+    showSessionError("");
 
-    if (pendingImagePreviewSrc) {
-      appendUserWithImage(text, pendingImagePreviewSrc);
-    } else {
-      appendUser(text);
+    if (!queued) {
+      queued = {text, image: pendingImage, preview: pendingImagePreviewSrc};
+      if (queued.preview) appendUserWithImage(text, queued.preview);
+      else appendUser(text);
+      clearImage();
     }
+    if (!selectedSystem || !selectedCourseId) {
+      queuedRequest = queued;
+      showClarification();
+      return;
+    }
+    queuedRequest = null;
+    clarifyPanel.hidden = true;
 
     setSending(true);
     const typing = appendTyping();
 
-    const imageToSend = pendingImage;
+    const imageToSend = queued.image;
     clearImage();
 
     try {
@@ -635,6 +664,7 @@
       updateResolvedContext(data.context);
     } catch (error) {
       typing.remove();
+      queuedRequest = queued;
       appendRequestError(error);
     } finally {
       setSending(false);
@@ -655,22 +685,128 @@
   profileSelect.addEventListener("change", () => {
     if (isSending) return;
     selectedProfile = profiles.find((profile) => profile.id === profileSelect.value) || null;
+    sessionId = null;
+    ++sessionGeneration;
     selectedCourseId = null;
+    selectedSystem = null;
+    systemSelect.value = "";
+    otherCourse.value = "";
+    otherCourseRow.hidden = true;
+    queuedRequest = null;
+    ticketPending = false;
+    clarifyPanel.hidden = true;
+    ticketPage.hidden = true;
     courseSelect.value = "";
     chatInput.value = "";
     resetTranscript();
     updateProfileDescription();
     if (selectedProfile) createSession();
+    else {
+      chatInput.disabled = true; chatSend.disabled = true; chatImageBtn.disabled = true;
+      courseSelect.disabled = true; systemSelect.disabled = true; btnSupport.disabled = true;
+      btnClear.disabled = true; chatStatus.textContent = "Choose a demo profile";
+    }
   });
   function updateSelectedCourse() {
-    if (isSending) return;
-    selectedCourseId = courseSelect.value.trim().slice(0, 160) || null;
+    selectedCourseId = courseSelect.value === "__other__"
+      ? (otherCourse.value.trim().slice(0, 160) || "Course not listed")
+      : (courseSelect.value || null);
+    otherCourseRow.hidden = courseSelect.value !== "__other__";
     clearResolvedContext();
   }
-  courseSelect.addEventListener("input", updateSelectedCourse);
-  courseSelect.addEventListener("change", updateSelectedCourse);
-  btnSupport.addEventListener("click", () => {
-    setSupportPanelOpen(supportPanel.hidden);
+  courseSelect.addEventListener("change", () => { updateSelectedCourse(); if (queuedRequest || ticketPending) showClarification(); });
+  otherCourse.addEventListener("input", updateSelectedCourse);
+  systemSelect.addEventListener("change", () => {
+    selectedSystem = systemSelect.value || null;
+    clearResolvedContext();
+    if (queuedRequest || ticketPending) showClarification();
+  });
+  function choice(label, action) {
+    const button = document.createElement("button");
+    button.type = "button"; button.textContent = label;
+    button.addEventListener("click", action); clarifyPanel.append(button);
+  }
+  function showClarification() {
+    clarifyPanel.replaceChildren(); clarifyPanel.hidden = false;
+    const heading = document.createElement("p"); clarifyPanel.append(heading);
+    if (!selectedSystem) {
+      heading.textContent = "Which site are you having trouble with?";
+      ["MCeLE", "Moodle"].forEach(site => choice(site, () => {
+        selectedSystem = site; systemSelect.value = site; showClarification();
+      }));
+    } else if (!selectedCourseId) {
+      heading.textContent = "Which course is this about?";
+      [...courses, "__other__"].forEach(code => choice(code === "__other__" ? "Course not listed" : code, () => {
+        courseSelect.value = code; updateSelectedCourse();
+        if (code === "__other__") {
+          heading.textContent = "Enter the course above if known, or continue with Course not listed.";
+          clarifyPanel.querySelectorAll("button").forEach(button => button.remove());
+          choice("Continue", resumeRequest); otherCourse.focus();
+        } else resumeRequest();
+      }));
+    } else {
+      heading.textContent = `${selectedSystem} · ${selectedCourseId}`;
+      choice("Continue", resumeRequest);
+    }
+  }
+  function resumeRequest() {
+    clarifyPanel.hidden = true;
+    if (ticketPending) { ticketPending = false; prepareTicket(); }
+    else if (queuedRequest) sendMessage(queuedRequest.text, queuedRequest);
+  }
+  async function prepareTicket() {
+    if (isSending || !sessionId) return;
+    if (!selectedSystem || !selectedCourseId) {
+      ticketPending = true; showClarification(); return;
+    }
+    const generation = sessionGeneration;
+    showSessionError("");
+    setSending(true); chatStatus.textContent = "Preparing your mock ticket…";
+    try {
+      const response = await fetch("/api/ticket-draft", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({session_id: sessionId, course_id: selectedCourseId,
+          system_area: selectedSystem, current_issue: queuedRequest?.text || chatInput.value.trim()})
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || "Unable to prepare the ticket. Please retry.");
+      if (generation !== sessionGeneration) return;
+      document.getElementById("ticketUsername").value = data.username;
+      document.getElementById("ticketSummary").value = data.summary;
+      document.getElementById("ticketCourse").value = data.course;
+      document.getElementById("ticketType").value = data.issue_type;
+      document.getElementById("ticketDescription").value = data.description;
+      document.getElementById("ticketEvidence").textContent = data.reported_details;
+      document.getElementById("draftMode").textContent = data.mode === "ai-draft"
+        ? "Your AI draft is ready. Review and edit every field before creating the mock ticket."
+        : "AI summarization was unavailable. Your reported details are prefilled for review.";
+      document.getElementById("ticketConfirmation").hidden = true;
+      document.getElementById("ticketForm").hidden = false;
+      ticketPage.hidden = false;
+      document.querySelector(".demo-shell").hidden = true;
+      chatPanel.hidden = true; chatFab.hidden = true;
+      history.pushState({mockTicket: true}, "", "#ticket");
+      document.getElementById("ticketTitle").focus();
+    } catch (error) { showSessionError(error.message); }
+    finally { if (generation === sessionGeneration) setSending(false); }
+  }
+  function closeTicket() {
+    ticketPage.hidden = true;
+    document.querySelector(".demo-shell").hidden = false;
+    chatPanel.hidden = false; chatFab.hidden = false;
+    chatInput.focus();
+  }
+  btnSupport.addEventListener("click", prepareTicket);
+  document.getElementById("ticketBack").addEventListener("click", () => { history.back(); });
+  window.addEventListener("popstate", closeTicket);
+  document.getElementById("ticketForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const confirmation = document.getElementById("ticketConfirmation");
+    confirmation.textContent = "Mock ticket created for this demonstration. Nothing was sent to Jira or the Help Desk. You can return to the conversation or edit this form.";
+    confirmation.hidden = false;
+    confirmation.scrollIntoView({behavior: "smooth", block: "nearest"});
   });
   supportPanelClose.addEventListener("click", () => {
     setSupportPanelOpen(false);
@@ -706,6 +842,6 @@
     sendMessage(value);
   });
 
-  loadSupportInfo();
+  btnSupport.disabled = true;
   loadProfiles();
 })();
