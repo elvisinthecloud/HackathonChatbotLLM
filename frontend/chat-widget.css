@@ -730,3 +730,10 @@ h1 {
     justify-content: center;
     padding: 0;
 }
+
+/* Neutral issue intake shown after a demo profile is selected. */
+[hidden] { display: none !important; }
+.clarify-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 0 0 16px; padding: 0; }
+.clarify-panel button { display: flex; align-items: center; gap: 8px; max-width: 100%; padding: 11px 14px; border: 1px solid #b9cde0; border-radius: 16px 16px 16px 4px; background: #edf4fc; color: #123647; font: inherit; text-align: left; cursor: pointer; }
+.clarify-panel button:hover { background: #dcecf5; border-color: #3976b8; }
+.clarify-panel button:focus-visible { outline: 2px solid #1467ce; outline-offset: 2px; }
