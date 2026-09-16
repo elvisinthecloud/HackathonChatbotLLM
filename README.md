@@ -16,14 +16,15 @@ The curated dataset contains nine scenarios:
 8. Training Manager — verify a Marine's enrollment status.
 9. Student — determine whether a completed course can earn Reserve Retirement Credits again.
 
-Submission-ready Markdown articles are in [`hackathon-dataset`](hackathon-dataset). These files contain only an Article record and Knowledge content; internal editorial and retrieval notes are excluded.
+Submission-ready text articles are in [`hackathon-dataset`](hackathon-dataset), with a ready-to-upload [`hackathon-dataset.zip`](hackathon-dataset.zip). The archive contains nine `.txt` files with only an Article record and Knowledge content; internal editorial and retrieval notes are excluded.
 
 ## Project structure
 
 - `backend/` — FastAPI chatbot, role policy, retrieval, grounding, and ingestion.
 - `frontend/` — Browser-based demo interface.
 - `knowledge/curated/` — Runtime JSON dataset and taxonomy.
-- `hackathon-dataset/` — Markdown-only dataset prepared for hackathon upload.
+- `hackathon-dataset/` — Plain-text dataset prepared for hackathon upload.
+- `hackathon-dataset.zip` — Zip archive containing the nine upload-ready `.txt` articles.
 - `tests/` — Offline routing, grounding, session, and dataset checks.
 - `scripts/` — Guarded deployment and verification tools for the isolated demo.
 
