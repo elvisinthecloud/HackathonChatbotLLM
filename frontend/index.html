@@ -38,6 +38,7 @@
         <label for="profileSelect">Profile</label>
         <select id="profileSelect" disabled><option>Loading profiles…</option></select>
       </div>
+      <details><summary>Optional course and site context</summary>
       <div class="control-row">
         <label for="courseSelect">Course context</label>
         <select id="courseSelect" disabled><option value="">Choose a course…</option></select>
@@ -50,6 +51,7 @@
         <label for="systemSelect">Issue site</label>
         <select id="systemSelect" disabled><option value="">Choose a site…</option><option>MCeLE</option><option>Moodle</option></select>
       </div>
+      </details>
       <div id="profileDescription" class="profile-description" role="status"></div>
       <div id="resolvedContext" class="resolved-context" hidden></div>
       <div id="sessionError" class="session-error" role="alert" hidden></div>
@@ -62,7 +64,7 @@
         <strong id="supportPanelTitle">MCeLE Help Desk</strong>
         <button type="button" class="support-panel-close" id="supportPanelClose" aria-label="Close Help Desk information">&times;</button>
       </div>
-      <p id="supportMessage">Prepare an editable mock ticket from this conversation. Nothing is sent to the real Help Desk.</p>
+      <p id="supportMessage">Contact your Help Desk for further assistance.</p>
     </aside>
     <form class="chat-input" id="chatForm">
       <input type="file" id="chatImageInput" accept="image/png,image/jpeg,image/webp" style="display:none" />
@@ -72,35 +74,10 @@
       <button id="chatSend" type="submit">Send</button>
     </form>
     <footer class="chat-footer">
-      <button type="button" class="support" id="btnSupport" aria-expanded="false" aria-controls="supportPanel">Submit a trouble ticket</button>
+      <button type="button" class="support" id="btnSupport" aria-expanded="false" aria-controls="supportPanel">Contact Help Desk</button>
     </footer>
   </section>
 
-  <section id="ticketPage" class="ticket-page" aria-labelledby="ticketTitle" hidden>
-    <header class="ticket-brand">MCeLE Help Center <span>Demo</span></header>
-    <main class="ticket-card">
-      <p class="ticket-breadcrumb">MCeLE Help Center / Support requests</p>
-      <h1 id="ticketTitle" tabindex="-1">Courseware Issues</h1>
-      <p class="mock-notice"><strong>Mock ticket · review before creating</strong><br>This demonstration does not submit to Jira or the Help Desk.</p>
-      <p id="draftMode" role="status"></p>
-      <form id="ticketForm">
-        <label for="ticketUsername">Username <span>*</span></label>
-        <input id="ticketUsername" required maxlength="160" />
-        <label for="ticketSummary">Summary <span>*</span></label>
-        <input id="ticketSummary" required maxlength="180" />
-        <div class="ticket-columns">
-          <div><label for="ticketCourse">Course <span>*</span></label><input id="ticketCourse" required maxlength="160" /></div>
-          <div><label for="ticketType">Issue type <span>*</span></label><select id="ticketType" required><option>MCeLE</option><option>Moodle</option></select></div>
-        </div>
-        <label for="ticketDescription">Issue description <span>*</span></label>
-        <textarea id="ticketDescription" required maxlength="16000" rows="9"></textarea>
-        <details><summary>Review the reported chat details</summary><pre id="ticketEvidence"></pre></details>
-        <p class="ticket-hint">Check the draft for accuracy. Screenshot text may contain recognition errors; image attachments are not transferred.</p>
-        <div class="ticket-actions"><button type="submit">Create mock ticket</button><button type="button" id="ticketBack">Back to conversation</button></div>
-      </form>
-      <p id="ticketConfirmation" role="status" hidden></p>
-    </main>
-  </section>
-  <script src="./chat-widget.js?v=jira-ticket-1"></script>
+  <script src="./chat-widget.js?v=neutral-intake-2"></script>
 </body>
 </html>

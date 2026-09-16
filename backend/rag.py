@@ -635,11 +635,11 @@ def build_retrieval_query(
     history: list[dict[str, str]] | None = None,
 ) -> str:
     parts: list[str] = []
-    for item in (history or [])[-4:]:
+    for item in (history or []):
         role = item.get("role")
         content = (item.get("content") or "").strip()
         if role in {"user", "assistant"} and content:
-            parts.append(f"{role}: {content[:700]}")
+            parts.append(f"{role}: {content}")
     parts.append(f"user: {question}")
     return "\n".join(parts)
 
@@ -687,19 +687,17 @@ async def retrieve_chunks(
     """
     Returns (chunks, matched_bucket_id, confidence_score, clarification_options).
     """
-    question_embedding = await embed_text(question)
+    retrieval_query = build_retrieval_query(question, history)
+    if image_context and image_context.get("description"):
+        retrieval_query += "\nScreenshot details: " + image_context["description"]
+    question_embedding = await embed_text(retrieval_query)
 
     matched_bucket_id: str | None = None
     confidence: float = 0.0
     bucket_ids_to_search: list[str] | None = None
     context_embedding: list[float] | None = None
 
-    if image_context and image_context.get("description"):
-        context_query = f"{question}\n{image_context['description']}"
-        context_embedding = await embed_text(context_query)
-    elif history and is_context_dependent_followup(question):
-        context_query = build_retrieval_query(question, history)
-        context_embedding = await embed_text(context_query)
+    context_embedding = question_embedding
 
     routing_embedding = context_embedding or question_embedding
     top_buckets = classify_question_bucket(routing_embedding, top_n=2)
@@ -800,21 +798,7 @@ async def retrieve_chunks(
             }
         )
 
-    if not history and not image_context:
-        return question_chunks, matched_bucket_id, confidence, []
-
-    if context_embedding is None:
-        context_query = build_retrieval_query(question, history)
-        context_embedding = await embed_text(context_query)
-    context_chunks = search_chunks(context_embedding, bucket_ids=bucket_ids_to_search)
-
-    limit = settings.top_k + 3
-    if is_context_dependent_followup(question):
-        merged = merge_chunks(context_chunks, question_chunks, limit)
-    else:
-        merged = merge_chunks(question_chunks, context_chunks, limit)
-
-    return merged, matched_bucket_id, confidence, []
+    return question_chunks, matched_bucket_id, confidence, []
 
 
 
@@ -864,7 +848,8 @@ def ground_answer(answer: str, chunks: list[dict[str, Any]]) -> str:
 
 # Main entry point. Every retrieval call runs inside server-derived access context.
 async def answer_question(question: str, session: dict, selected_course_id: str | None,
-                          image: str | None = None, selected_system: str | None = None) -> dict[str, Any]:
+                          image: str | None = None, selected_system: str | None = None,
+                          issue_category: str | None = None) -> dict[str, Any]:
     access_token = None
     with langfuse.start_as_current_span(name="rag_answer", input={"question": question, "has_image": image is not None}) as trace:
         try:
@@ -896,7 +881,16 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
             elif not access.article_ids:
                 answer="I don't have an approved article for this request under your selected demo profile and course context. Please check the selected profile/course or contact the Helpdesk."
             else:
-                chunks, matched_bucket, confidence, options = await retrieve_chunks(question, history=history,
+                # Search the full retained conversation within the current access context.
+                # Category is a tentative intake choice, never an access/routing rule.
+                retrieval_history = []
+                if issue_category:
+                    retrieval_history.append({"role": "user", "content": "Tentative initial category (may be mistaken): " + issue_category})
+                for report, reply, screenshot, version, _ in session["turns"]:
+                    if not changed and version == session["version"]:
+                        retrieval_history.extend([{"role": "user", "content": report + ("\nScreenshot details: " + screenshot if screenshot else "")},
+                                                  {"role": "assistant", "content": reply}])
+                chunks, matched_bucket, confidence, options = await retrieve_chunks(question, history=retrieval_history,
                     image_context={"description":image_text} if image_text else None)
                 if options:
                     chunks=[]

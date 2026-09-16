@@ -21,10 +21,9 @@
   const otherCourse = document.getElementById("otherCourse");
   const otherCourseRow = document.getElementById("otherCourseRow");
   const clarifyPanel = document.getElementById("clarifyPanel");
-  const ticketPage = document.getElementById("ticketPage");
+  let selectedIssueCategory = null;
   let selectedSystem = null;
   let queuedRequest = null;
-  let ticketPending = false;
   const profileDescription = document.getElementById("profileDescription");
   const resolvedContext = document.getElementById("resolvedContext");
   const sessionError = document.getElementById("sessionError");
@@ -55,8 +54,19 @@
 
   function updateSupportInfo(info) {
     if (!info || typeof info !== "object") return;
-    if (info.hours) {
-      supportMessage.textContent = info.hours;
+    supportMessage.replaceChildren();
+    const details = [info.hours, info.email, info.phone].filter(Boolean);
+    supportMessage.textContent = details.join(" · ") || "Contact your Help Desk for further assistance.";
+    if (info.ticket_url) {
+      try {
+        const url = new URL(info.ticket_url);
+        if (["https:", "http:"].includes(url.protocol)) {
+          const link = document.createElement("a");
+          link.href = url.href; link.target = "_blank"; link.rel = "noopener noreferrer";
+          link.textContent = "Open Help Desk";
+          supportMessage.append(document.createElement("br"), link);
+        }
+      } catch (_) { /* Ignore an unconfigured contact URL. */ }
     }
   }
 
@@ -422,7 +432,8 @@
     if (hasGreeted) return;
     if (!selectedProfile) return;
     hasGreeted = true;
-    appendBot(`You are using the ${selectedProfile.display_role || selectedProfile.role} demo profile. Ask a support question and I’ll answer with citations when available.`);
+    appendBot("Hi! I’m the MCeLE Support Assistant. What kind of issue can I help you with?");
+    showIssueChoices();
   }
 
   function openChat() {
@@ -437,16 +448,15 @@
 
   function clearChat() {
     if (isSending) return;
-    resetTicket();
+    selectedIssueCategory = null;
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
     clearImage();
     showGreeting();
     queuedRequest = null;
-    ticketPending = false;
     chatInput.value = "";
-    clarifyPanel.hidden = true;
+    showIssueChoices();
     createSession();
     chatInput.focus();
   }
@@ -461,6 +471,7 @@
         message: text,
         course_id: selectedCourseId,
         system_area: selectedSystem,
+        issue_category: selectedIssueCategory,
         ...(image ? { image } : {}),
       })
     });
@@ -507,16 +518,8 @@
     sessionError.hidden = !message;
   }
 
-  function resetTicket() {
-    document.getElementById("ticketForm").reset();
-    document.getElementById("ticketEvidence").textContent = "";
-    document.getElementById("draftMode").textContent = "";
-    document.getElementById("ticketConfirmation").textContent = "";
-    document.getElementById("ticketConfirmation").hidden = true;
-  }
-
   function resetTranscript() {
-    resetTicket();
+    selectedIssueCategory = null;
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
@@ -639,11 +642,6 @@
       else appendUser(text);
       clearImage();
     }
-    if (!selectedSystem || !selectedCourseId) {
-      queuedRequest = queued;
-      showClarification();
-      return;
-    }
     queuedRequest = null;
     clarifyPanel.hidden = true;
 
@@ -693,9 +691,7 @@
     otherCourse.value = "";
     otherCourseRow.hidden = true;
     queuedRequest = null;
-    ticketPending = false;
     clarifyPanel.hidden = true;
-    ticketPage.hidden = true;
     courseSelect.value = "";
     chatInput.value = "";
     resetTranscript();
@@ -714,99 +710,35 @@
     otherCourseRow.hidden = courseSelect.value !== "__other__";
     clearResolvedContext();
   }
-  courseSelect.addEventListener("change", () => { updateSelectedCourse(); if (queuedRequest || ticketPending) showClarification(); });
+  courseSelect.addEventListener("change", () => { updateSelectedCourse(); });
   otherCourse.addEventListener("input", updateSelectedCourse);
   systemSelect.addEventListener("change", () => {
     selectedSystem = systemSelect.value || null;
     clearResolvedContext();
-    if (queuedRequest || ticketPending) showClarification();
+
   });
   function choice(label, action) {
     const button = document.createElement("button");
     button.type = "button"; button.textContent = label;
     button.addEventListener("click", action); clarifyPanel.append(button);
   }
-  function showClarification() {
-    clarifyPanel.replaceChildren(); clarifyPanel.hidden = false;
-    const heading = document.createElement("p"); clarifyPanel.append(heading);
-    if (!selectedSystem) {
-      heading.textContent = "Which site are you having trouble with?";
-      ["MCeLE", "Moodle"].forEach(site => choice(site, () => {
-        selectedSystem = site; systemSelect.value = site; showClarification();
-      }));
-    } else if (!selectedCourseId) {
-      heading.textContent = "Which course is this about?";
-      [...courses, "__other__"].forEach(code => choice(code === "__other__" ? "Course not listed" : code, () => {
-        courseSelect.value = code; updateSelectedCourse();
-        if (code === "__other__") {
-          heading.textContent = "Enter the course above if known, or continue with Course not listed.";
-          clarifyPanel.querySelectorAll("button").forEach(button => button.remove());
-          choice("Continue", resumeRequest); otherCourse.focus();
-        } else resumeRequest();
-      }));
-    } else {
-      heading.textContent = `${selectedSystem} · ${selectedCourseId}`;
-      choice("Continue", resumeRequest);
-    }
-  }
-  function resumeRequest() {
-    clarifyPanel.hidden = true;
-    if (ticketPending) { ticketPending = false; prepareTicket(); }
-    else if (queuedRequest) sendMessage(queuedRequest.text, queuedRequest);
-  }
-  async function prepareTicket() {
-    if (isSending || !sessionId) return;
-    if (!selectedSystem || !selectedCourseId) {
-      ticketPending = true; showClarification(); return;
-    }
-    const generation = sessionGeneration;
-    showSessionError("");
-    setSending(true); chatStatus.textContent = "Preparing your mock ticket…";
-    try {
-      const response = await fetch("/api/ticket-draft", {
-        method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({session_id: sessionId, course_id: selectedCourseId,
-          system_area: selectedSystem, current_issue: queuedRequest?.text || chatInput.value.trim()})
+  function showIssueChoices() {
+    clarifyPanel.replaceChildren();
+    clarifyPanel.hidden = false;
+    ["Account/Profile Issue", "Courseware Issue", "Roles and Permissions", "Other"].forEach(category => {
+      choice(category, () => {
+        if (isSending || !sessionId) return;
+        selectedIssueCategory = category;
+        appendUser(category);
+        clarifyPanel.hidden = true;
+        appendBot("Please tell me more about what’s happening and what you’re trying to do.");
+        chatInput.focus();
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.detail || "Unable to prepare the ticket. Please retry.");
-      if (generation !== sessionGeneration) return;
-      document.getElementById("ticketUsername").value = data.username;
-      document.getElementById("ticketSummary").value = data.summary;
-      document.getElementById("ticketCourse").value = data.course;
-      document.getElementById("ticketType").value = data.issue_type;
-      document.getElementById("ticketDescription").value = data.description;
-      document.getElementById("ticketEvidence").textContent = data.reported_details;
-      document.getElementById("draftMode").textContent = data.mode === "ai-draft"
-        ? "Your AI draft is ready. Review and edit every field before creating the mock ticket."
-        : "AI summarization was unavailable. Your reported details are prefilled for review.";
-      document.getElementById("ticketConfirmation").hidden = true;
-      document.getElementById("ticketForm").hidden = false;
-      ticketPage.hidden = false;
-      document.querySelector(".demo-shell").hidden = true;
-      chatPanel.hidden = true; chatFab.hidden = true;
-      history.pushState({mockTicket: true}, "", "#ticket");
-      document.getElementById("ticketTitle").focus();
-    } catch (error) { showSessionError(error.message); }
-    finally { if (generation === sessionGeneration) setSending(false); }
+    });
   }
-  function closeTicket() {
-    ticketPage.hidden = true;
-    document.querySelector(".demo-shell").hidden = false;
-    chatPanel.hidden = false; chatFab.hidden = false;
-    chatInput.focus();
-  }
-  btnSupport.addEventListener("click", prepareTicket);
-  document.getElementById("ticketBack").addEventListener("click", () => { history.back(); });
-  window.addEventListener("popstate", closeTicket);
-  document.getElementById("ticketForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (!form.reportValidity()) return;
-    const confirmation = document.getElementById("ticketConfirmation");
-    confirmation.textContent = "Mock ticket created for this demonstration. Nothing was sent to Jira or the Help Desk. You can return to the conversation or edit this form.";
-    confirmation.hidden = false;
-    confirmation.scrollIntoView({behavior: "smooth", block: "nearest"});
+  btnSupport.addEventListener("click", async () => {
+    await loadSupportInfo();
+    setSupportPanelOpen(true);
   });
   supportPanelClose.addEventListener("click", () => {
     setSupportPanelOpen(false);

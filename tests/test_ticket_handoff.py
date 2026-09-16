@@ -1,26 +1,26 @@
-"""Standalone ticket tests; no dependency on USB-lost test helpers or live services."""
+"""Offline tests for neutral intake and conversation retrieval."""
 import asyncio
-import json
 import os
 from pathlib import Path
 import sys
 import unittest
-from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'backend'))
+def import_api():
+    password = 'a' * 48  # Deliberately fake offline-only configuration.
+    env = {'DEMO_INSTANCE_ID':'mcele-hackathon-demo','DEMO_DB_PASSWORD':password,
+        'DATABASE_URL':f'postgresql://mcele_demo:{password}@demo-db:5432/mcele_demo',
+        'OLLAMA_BASE_URL':'http://192.168.50.212:11434','OLLAMA_CHAT_MODEL':'qwen3:30b-a3b-instruct-2507-q4_K_M',
+        'OLLAMA_VISION_MODEL':'qwen2.5vl:7b','OLLAMA_EMBED_MODEL':'nomic-embed-text',
+        'LANGFUSE_HOST':'http://host.docker.internal:3000','LANGFUSE_PUBLIC_KEY':'offline-public',
+        'LANGFUSE_SECRET_KEY':'offline-secret','LANGFUSE_PROJECT_ID':'offline-project',
+        'LANGFUSE_TRACING_ENABLED':'false','DEMO_DATASET_MANIFEST':'/knowledge/manifest.json','TAXONOMY_PATH':'/knowledge/taxonomy.json'}
+    with patch.dict(os.environ, env):
+        import app
+    return app
+
+
 from demo_policy import PROFILES, resolve_context, resolve_access, TICKET_COURSES
-from demo_tickets import relevant_reports, prepare_draft
-
-
-def session(profile='student'):
-    return {'id': 'offline-session', 'profile': PROFILES[profile], 'version': 2,
-            'context': {}, 'selected_course_id': None, 'turns': [
-        ('Old private report', 'Old answer', '', 1, {'course_id': '5500', 'system_area': 'MCeLE'}),
-        ('Cannot open lesson', 'Try rebooting', '', 2, {'course_id': 'EPME4000', 'system_area': 'MCeLE'}),
-        ('I already rebooted', 'Invented claim not user evidence', '', 2, {'course_id': 'EPME4000', 'system_area': 'MCeLE'}),
-    ]}
-
 
 class ContextTests(unittest.TestCase):
     def test_requested_choices_only(self):
@@ -43,79 +43,48 @@ class ContextTests(unittest.TestCase):
         self.assertTrue(changed)
         self.assertIsNone(conflict)
 
-    def test_reports_exclude_old_course_version_and_assistant_claims(self):
-        reports = relevant_reports(session(), 'EPME4000', 'MCeLE')
-        self.assertEqual(reports, ['Cannot open lesson', 'I already rebooted'])
-        with self.assertRaises(ValueError): relevant_reports(session(), '5500', 'MCeLE')
-        with self.assertRaises(ValueError): relevant_reports(session(), 'EPME4000', 'Moodle')
 
-    def test_unlisted_course_and_unsent_issue(self):
-        self.assertEqual(relevant_reports(session(), 'Course not listed', 'Moodle', 'My course is missing'), ['My course is missing'])
-
-
-class DraftTests(unittest.IsolatedAsyncioTestCase):
-    async def test_model_failure_falls_back_without_losing_report(self):
-        settings = SimpleNamespace(chat_model='offline', ollama_base_url='http://offline.invalid', num_ctx=16384)
-        client = AsyncMock(); client.__aenter__.return_value = client
-        client.post.side_effect = ValueError('invalid model JSON')
-        with patch('demo_tickets.httpx.AsyncClient', return_value=client):
-            draft = await prepare_draft(session('instructor'), 'EPME4000', 'MCeLE', '', settings, MagicMock())
-        self.assertEqual(draft['username'], 'username.instructor')
-        self.assertEqual(draft['mode'], 'reported-text')
-        self.assertTrue(draft['mock'])
-        self.assertIn('I already rebooted', draft['description'])
-        self.assertNotIn('Old private', draft['description'])
-        self.assertNotIn('Try rebooting', draft['description'])
-
-    async def test_ai_draft_preserves_server_controlled_fields(self):
-        settings = SimpleNamespace(chat_model='offline', ollama_base_url='http://offline.invalid', num_ctx=16384)
-        response = MagicMock()
-        response.json.return_value = {'message': {'content': json.dumps({'summary': 'Lesson fails', 'description': 'User reports a failed lesson.', 'username': 'attacker'})}}
-        client = AsyncMock(); client.__aenter__.return_value = client; client.post.return_value = response
-        with patch('demo_tickets.httpx.AsyncClient', return_value=client):
-            draft = await prepare_draft(session('ao'), 'EPME4000', 'MCeLE', '', settings, MagicMock())
-        self.assertEqual(draft['mode'], 'ai-draft')
-        self.assertEqual(draft['username'], 'username.ao')
-        self.assertEqual(draft['course'], 'EPME4000')
-        self.assertEqual(draft['issue_type'], 'MCeLE')
-
-
-def import_api():
-    password = 'a' * 48  # Deliberately fake offline-only configuration.
-    env = {'DEMO_INSTANCE_ID':'mcele-hackathon-demo','DEMO_DB_PASSWORD':password,
-        'DATABASE_URL':f'postgresql://mcele_demo:{password}@demo-db:5432/mcele_demo',
-        'OLLAMA_BASE_URL':'http://192.168.50.212:11434','OLLAMA_CHAT_MODEL':'qwen3:30b-a3b-instruct-2507-q4_K_M',
-        'OLLAMA_VISION_MODEL':'qwen2.5vl:7b','OLLAMA_EMBED_MODEL':'nomic-embed-text',
-        'LANGFUSE_HOST':'http://host.docker.internal:3000','LANGFUSE_PUBLIC_KEY':'offline-public',
-        'LANGFUSE_SECRET_KEY':'offline-secret','LANGFUSE_PROJECT_ID':'offline-project',
-        'LANGFUSE_TRACING_ENABLED':'false','DEMO_DATASET_MANIFEST':'/knowledge/manifest.json','TAXONOMY_PATH':'/knowledge/taxonomy.json'}
-    with patch.dict(os.environ, env):
-        import app
-    return app
-
-
-class EndpointTests(unittest.IsolatedAsyncioTestCase):
+class IntakeTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.api = import_api()
         self.api.chat_lock = asyncio.Lock()
 
-    def test_request_cannot_override_identity_or_use_invalid_site(self):
+    def test_no_ticket_endpoint(self):
+        self.assertNotIn('/api/ticket-draft', [r.path for r in self.api.app.routes])
+
+    def test_category_is_optional_and_validated(self):
         from pydantic import ValidationError
-        base = {'session_id':'s'*43,'course_id':'5500','system_area':'MCeLE'}
-        for extra in ({'username':'attacker'}, {'profile_id':'ao'}, {'system_area':'Other'}, {'course_id':' '}):
-            with self.subTest(extra=extra), self.assertRaises(ValidationError): self.api.TicketDraftRequest(**(base | extra))
+        base = dict(session_id='s'*43, message='My course will not open')
+        self.assertIsNone(self.api.ChatRequest(**base).issue_category)
+        self.assertIsNone(self.api.ChatRequest(**base).course_id)
+        with self.assertRaises(ValidationError):
+            self.api.ChatRequest(**base, issue_category='Invented')
+        with self.assertRaises(ValidationError):
+            self.api.ChatRequest(**base, profile_id='ao')
 
-    async def test_expired_session_cannot_prepare_draft(self):
-        request = self.api.TicketDraftRequest(session_id='s'*43,course_id='5500',system_area='MCeLE')
-        with patch.object(self.api,'load_session',side_effect=self.api.SessionMissing()), patch('demo_tickets.prepare_draft',new_callable=AsyncMock) as draft:
-            with self.assertRaises(self.api.HTTPException) as error: await self.api.ticket_draft(request)
-            self.assertEqual(error.exception.status_code,404);draft.assert_not_called()
+    async def test_category_does_not_replace_report(self):
+        request = self.api.ChatRequest(session_id='s'*43, message='My course will not open', issue_category='Account/Profile Issue')
+        result = dict(answer='Article answer', sources=[], retrieved_count=0, trace_id=None, context={}, _context_changed=False, _image_text='')
+        with patch.object(self.api, 'load_session', return_value={'id':'stored'}), patch.object(self.api, 'save_turn'), patch.object(self.api, 'answer_question', new_callable=AsyncMock, return_value=result) as answer:
+            await self.api.chat(request)
+            self.assertEqual(answer.call_args.args[0], 'My course will not open')
+            self.assertIsNone(answer.call_args.kwargs['selected_course_id'])
+            self.assertEqual(answer.call_args.kwargs['issue_category'], 'Account/Profile Issue')
 
-    async def test_endpoint_uses_the_token_session(self):
-        request = self.api.TicketDraftRequest(session_id='s'*43,course_id='EPME4000',system_area='MCeLE')
-        stored = session('student')
-        with patch.object(self.api,'load_session',return_value=stored), patch('demo_tickets.prepare_draft',new_callable=AsyncMock,return_value={'mock':True}) as draft:
-            self.assertEqual(await self.api.ticket_draft(request), {'mock':True})
-            self.assertIs(draft.call_args.args[0], stored)
+    async def test_retrieval_embeds_full_history_before_search(self):
+        import rag
+        history = [{'role':'user','content':f'Report {i}: ' + 'x'*900} for i in range(10)]
+        events=[]
+        async def embed(query):
+            events.append('embed')
+            for item in history: self.assertIn(item['content'], query)
+            self.assertIn('Current issue', query)
+            self.assertIn('Screenshot evidence', query)
+            return [0.1]*3
+        def search(*args, **kwargs):
+            events.append('search'); return []
+        with patch.object(rag, 'embed_text', side_effect=embed), patch.object(rag, 'classify_question_bucket', return_value=[]), patch.object(rag, 'search_chunks', side_effect=search):
+            await rag.retrieve_chunks('Current issue', history=history, image_context={'description':'Screenshot evidence'}, selected_bucket_id='test')
+        self.assertEqual(events, ['embed','search'])
 
 if __name__ == '__main__': unittest.main()
