@@ -1,5 +1,5 @@
 {
-  "status": "deployed-and-ao-copy-verified",
+  "status": "deployed-and-seven-article-set-verified",
   "release_id": "fab13e75b00fb0ab",
   "validated_on": "2026-09-16",
   "isolated_project": "mcele-hackathon-demo",
@@ -20,6 +20,22 @@
       "question": "How do I copy a course in Moodle?",
       "source_path": "MOODLE-COPY-001",
       "trace_id": "ee09b1c16873211e67e2454ae03731c0",
+      "passed": true
+    },
+    "training_manager_enrollment_report": {
+      "question": "I want to verify a Marine’s enrollment status. How can I do that?",
+      "source_path": "MCELE-ENROLLMENT-REPORT-001",
+      "source_title": "Verify a Marine's enrollment status with the Enrollment Report",
+      "source_score": 0.852,
+      "trace_id": "44f304a84742df8fb0f3793e27180f27",
+      "passed": true
+    },
+    "student_repeat_course_rrc": {
+      "question": "Good morning, I am currently trying to complete courses to receive Reserve Retirement Credits in order to get a SAT year. Can I redo a course I completed a few months ago and received points for again to get more points since I’m in a new anniversary year, or does it go by calendar year?",
+      "source_path": "MCELE-RRC-001",
+      "source_title": "Can I repeat a completed course for additional Reserve Retirement Credits?",
+      "source_score": 0.8491,
+      "trace_id": "793f7e64dfd321ba0ff1c0a323641f78",
       "passed": true
     }
   },
