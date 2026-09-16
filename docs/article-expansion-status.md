@@ -9,8 +9,8 @@ The clean GitHub recovery began with four deployed curated articles. This work e
 | AO normal Moodle copy | `MOODLE-COPY-001` | Included | Previously approved | None |
 | TM ECDEP Recommend/Deny | `MCELE-ECDEP-001` | Included | Previously approved | None |
 | AO slow/stuck Moodle copy | `MOODLE-COPY-003` | Included and live-tested | Verified Atlas article | None |
-| TM verify enrollment status | `MCELE-ENROLLMENT-REPORT-001` | Included and deployed | Verified Atlas report article plus approved scenario | Live scenario test pending |
-| Student repeat course for RRC | `MCELE-RRC-001` | Included and deployed | Confirmed Help Desk answer plus verified catalog guidance | Live scenario test pending |
+| TM verify enrollment status | `MCELE-ENROLLMENT-REPORT-001` | Included and live-tested | Verified Atlas report article plus approved scenario | None |
+| Student repeat course for RRC | `MCELE-RRC-001` | Included and live-tested | Confirmed Help Desk answer plus verified catalog guidance | None |
 | Student CSC missing enrollment | `MCELE-CSC-001` | Excluded | Verified access sources plus user routing requirements | Choose Moodle-side escalation order |
 | Student EPME after MOL selection | `MCELE-EPME-001` | Excluded | No dedicated source found | Supply prerequisites, owner, action, and escalation path |
 
