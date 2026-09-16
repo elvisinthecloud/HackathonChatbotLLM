@@ -4,12 +4,18 @@
     "articles/mcele-course-launch-sts1-student.json",
     "articles/moodle-copy-permission-instructor.json",
     "articles/moodle-copy-course-ao.json",
-    "articles/mcele-ecdep-request-tm.json"
+    "articles/moodle-copy-stuck-ao.json",
+    "articles/mcele-ecdep-request-tm.json",
+    "articles/mcele-enrollment-report-tm.json",
+    "articles/mcele-rrc-repeat-student.json"
   ],
   "article_ids": [
     "MCELE-LAUNCH-001",
     "MOODLE-COPY-002",
     "MOODLE-COPY-001",
-    "MCELE-ECDEP-001"
+    "MOODLE-COPY-003",
+    "MCELE-ECDEP-001",
+    "MCELE-ENROLLMENT-REPORT-001",
+    "MCELE-RRC-001"
   ]
 }

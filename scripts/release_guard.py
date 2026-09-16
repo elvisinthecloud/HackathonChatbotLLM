@@ -21,7 +21,9 @@ ALLOWLIST = (
     "frontend/index.html", "frontend/chat-widget.css", "frontend/chat-widget.js", "frontend/nginx.conf",
     "database/schema.sql", "knowledge/curated/articles/mcele-course-launch-sts1-student.json",
     "knowledge/curated/articles/moodle-copy-permission-instructor.json", "knowledge/curated/articles/moodle-copy-course-ao.json",
-    "knowledge/curated/articles/mcele-ecdep-request-tm.json", "knowledge/curated/manifest.json", "knowledge/curated/taxonomy.json",
+    "knowledge/curated/articles/moodle-copy-stuck-ao.json", "knowledge/curated/articles/mcele-ecdep-request-tm.json",
+    "knowledge/curated/articles/mcele-enrollment-report-tm.json", "knowledge/curated/articles/mcele-rrc-repeat-student.json",
+    "knowledge/curated/manifest.json", "knowledge/curated/taxonomy.json",
     "scripts/deploy.py", "scripts/configure_runtime.py", "scripts/rollback.py", "scripts/release_guard.py",
     "scripts/atlas_release.py", "scripts/verify_deployment.py", "scripts/verify_scenarios.py", "verification/synthetic-sts1.png",
 )

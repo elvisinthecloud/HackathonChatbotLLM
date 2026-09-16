@@ -13,7 +13,15 @@ import re
 INSTANCE_ID = "mcele-hackathon-demo"
 DATASET_ID = "mcele-curated-v1"
 DATABASE_NAME = "mcele_demo"
-ARTICLE_IDS = ("MCELE-LAUNCH-001", "MOODLE-COPY-002", "MOODLE-COPY-001", "MCELE-ECDEP-001")
+ARTICLE_IDS = (
+    "MCELE-LAUNCH-001",
+    "MOODLE-COPY-002",
+    "MOODLE-COPY-001",
+    "MOODLE-COPY-003",
+    "MCELE-ECDEP-001",
+    "MCELE-ENROLLMENT-REPORT-001",
+    "MCELE-RRC-001",
+)
 
 
 class DemoConfigurationError(RuntimeError):

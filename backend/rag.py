@@ -851,7 +851,7 @@ def ground_answer(answer: str, chunks: list[dict[str, Any]]) -> str:
     if not chunks:
         return fallback_answer()
     article_ids = {chunk.get("source_path") for chunk in chunks}
-    if article_ids in ({"MOODLE-COPY-002"}, {"MOODLE-COPY-001"}):
+    if article_ids in ({"MOODLE-COPY-002"}, {"MOODLE-COPY-001"}, {"MOODLE-COPY-003"}):
         # These complete curated excerpts define both the permission boundary and
         # exact procedure. Model paraphrasing must not expand or omit either.
         return source_excerpt_answer(chunks)
