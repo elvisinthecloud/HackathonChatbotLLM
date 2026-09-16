@@ -17,6 +17,9 @@
     },
     "mcele-epme": {
       "label": "MCeLE EPME eligibility and enrollment"
+    },
+    "mcele-csc": {
+      "label": "CSC access from MCeLE to Moodle"
     }
   },
   "articles": []

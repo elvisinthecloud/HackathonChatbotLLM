@@ -18,7 +18,7 @@ def routed(profile_id: str, question: str, course: str | None = None):
 
 
 class ExpandedDatasetTests(unittest.TestCase):
-    def test_manifest_loads_exactly_eight_curated_articles(self):
+    def test_manifest_loads_exactly_nine_curated_articles(self):
         documents = load_dataset(ROOT / "knowledge/curated/manifest.json")
         self.assertEqual(
             [document["source_path"] for document in documents],
@@ -31,9 +31,10 @@ class ExpandedDatasetTests(unittest.TestCase):
                 "MCELE-ENROLLMENT-REPORT-001",
                 "MCELE-RRC-001",
                 "MCELE-EPME-001",
+                "MCELE-CSC-001",
             ],
         )
-        self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 6)
+        self.assertEqual(len(validate_taxonomy(ROOT / "knowledge/curated/taxonomy.json")), 7)
         by_id = {document["source_path"]: document for document in documents}
         for article_id in ("MOODLE-COPY-001", "MOODLE-COPY-003"):
             self.assertTrue(by_id[article_id]["retrieval_text"])
@@ -114,6 +115,36 @@ class ExpandedDatasetTests(unittest.TestCase):
         self.assertNotIn("source of truth", article["content"].lower())
         self.assertIn("Sergeant selects cannot enroll", article["content"])
         self.assertIn("Staff Sergeant selects and above", article["content"])
+
+    def test_csc_access_routes_both_missing_course_branches(self):
+        cases = (
+            "How do I access my CSC course?",
+            "CSC appears in MCeLE but is missing in Moodle My Courses.",
+            "CSC does not appear under MCeLE My Courses at all.",
+        )
+        for question in cases:
+            with self.subTest(question=question):
+                context, access = routed("student", question)
+                self.assertEqual(context["course_id"], "CSC")
+                self.assertEqual(context["activity"], "enrollment")
+                self.assertEqual(context["system_area"], "MCeLE")
+                self.assertEqual(access.article_ids, ("MCELE-CSC-001",))
+
+        selected_context, selected_access = routed(
+            "student",
+            "It appears in MCeLE but is missing from Moodle.",
+            "CSC",
+        )
+        self.assertEqual(selected_context["course_id"], "CSC")
+        self.assertEqual(selected_access.article_ids, ("MCELE-CSC-001",))
+
+        documents = load_dataset(ROOT / "knowledge/curated/manifest.json")
+        article = next(document for document in documents if document["source_path"] == "MCELE-CSC-001")
+        self.assertIn("Region first", article["content"])
+        self.assertIn("Help Desk first", article["content"])
+
+        _, instructor_access = routed("instructor", "How do I access my CSC course?")
+        self.assertEqual(instructor_access.article_ids, ())
 
 
 if __name__ == "__main__":

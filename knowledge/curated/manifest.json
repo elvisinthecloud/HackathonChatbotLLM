@@ -8,7 +8,8 @@
     "articles/mcele-ecdep-request-tm.json",
     "articles/mcele-enrollment-report-tm.json",
     "articles/mcele-rrc-repeat-student.json",
-    "articles/mcele-epme-eligibility-student.json"
+    "articles/mcele-epme-eligibility-student.json",
+    "articles/mcele-csc-access-student.json"
   ],
   "article_ids": [
     "MCELE-LAUNCH-001",
@@ -18,6 +19,7 @@
     "MCELE-ECDEP-001",
     "MCELE-ENROLLMENT-REPORT-001",
     "MCELE-RRC-001",
-    "MCELE-EPME-001"
+    "MCELE-EPME-001",
+    "MCELE-CSC-001"
   ]
 }
