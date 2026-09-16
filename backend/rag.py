@@ -56,6 +56,13 @@ class RagSettings:
 
 settings = RagSettings()
 
+# Each article in these small curated families is a complete, independently
+# approved answer. After role/system/task access filtering, semantic similarity
+# chooses one article so unrelated procedures are not mixed in the model prompt.
+SINGLE_ARTICLE_FAMILIES = (
+    frozenset({"MOODLE-COPY-001", "MOODLE-COPY-003"}),
+)
+
 
 class OllamaError(RuntimeError):
     pass
@@ -91,6 +98,17 @@ def cosine_similarity(a: list[float], b: list[float]) -> float:
     if denom == 0:
         return 0.0
     return float(np.dot(arr_a, arr_b) / denom)
+
+
+def select_semantic_article(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    access = ACCESS.get()
+    if not chunks or access is None:
+        return chunks
+    allowed = frozenset(access.article_ids)
+    if allowed not in SINGLE_ARTICLE_FAMILIES:
+        return chunks
+    winning_article = chunks[0].get("source_path")
+    return [chunk for chunk in chunks if chunk.get("source_path") == winning_article]
 
 
 def classify_question_bucket(
@@ -786,7 +804,9 @@ async def retrieve_chunks(
                 else "unfiltered_article_results"
             )
 
-    question_chunks = search_chunks(question_embedding, bucket_ids=bucket_ids_to_search)
+    question_chunks = select_semantic_article(
+        search_chunks(question_embedding, bucket_ids=bucket_ids_to_search)
+    )
 
     with langfuse.start_as_current_span(
         name="retrieval_route",
@@ -814,7 +834,7 @@ async def retrieve_chunks(
     else:
         merged = merge_chunks(question_chunks, context_chunks, limit)
 
-    return merged, matched_bucket_id, confidence, []
+    return select_semantic_article(merged), matched_bucket_id, confidence, []
 
 
 

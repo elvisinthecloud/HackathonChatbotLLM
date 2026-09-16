@@ -17,6 +17,7 @@ from test_backend import test_env
 
 with patch.dict(os.environ, test_env()):
     import rag
+    from demo_policy import RetrievalAccess
 
 
 def article(article_id: str) -> dict:
@@ -43,6 +44,25 @@ def chunk(article_id: str) -> dict:
 
 
 class GroundingTests(unittest.IsolatedAsyncioTestCase):
+    def test_ao_copy_family_uses_only_the_semantically_best_article(self):
+        token = rag.ACCESS.set(RetrievalAccess(
+            "Academics Officer",
+            "Moodle",
+            None,
+            ("MOODLE-COPY-001", "MOODLE-COPY-003"),
+        ))
+        try:
+            chunks = [
+                {"source_path": "MOODLE-COPY-003", "score": 0.91, "content": "stuck copy"},
+                {"source_path": "MOODLE-COPY-001", "score": 0.72, "content": "normal copy"},
+            ]
+            self.assertEqual(
+                [item["source_path"] for item in rag.select_semantic_article(chunks)],
+                ["MOODLE-COPY-003"],
+            )
+        finally:
+            rag.ACCESS.reset(token)
+
     def test_instructor_answer_is_rendered_from_its_permission_excerpt(self):
         source = chunk("MOODLE-COPY-002")
         malicious = (

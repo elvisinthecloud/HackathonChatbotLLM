@@ -168,7 +168,6 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
 def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAccess:
     role=profile['role']
     area,course=context.get('system_area'),context.get('course_id')
-    slow_copy=bool(re.search(r'\b(?:slow|stuck|keeps? loading|never submits?|times? out|fails?|failed|performance)\b',evidence,re.I))
     enrollment_report=bool(re.search(r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b',evidence,re.I))
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
                 'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
@@ -178,8 +177,6 @@ def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAcce
               if role==grant and area==delivery and not context.get('unresolved')
               and context.get('activity')==activities[aid]
               and (scope=='general' or course in courses or (course is None and not context.get('course_query')))
-              and (aid!='MOODLE-COPY-003' or slow_copy)
-              and (aid!='MOODLE-COPY-001' or not slow_copy)
               and (aid!='MCELE-ENROLLMENT-REPORT-001' or enrollment_report)
               and (aid!='MCELE-ECDEP-001' or not enrollment_report)
               and (aid!='MCELE-LAUNCH-001' or exact_error(evidence)))
