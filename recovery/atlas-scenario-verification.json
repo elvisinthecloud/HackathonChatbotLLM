@@ -1,0 +1,29 @@
+{
+  "vague_launch": "asks-for-error-or-screenshot",
+  "student": {
+    "passed": true,
+    "trace_id": "346dbcd62dace87e98c190314c2ec94f"
+  },
+  "student_restricted_request": "denied-before-model",
+  "5500_launch": "Moodle-content-MCeLE-solution-excluded",
+  "instructor": {
+    "passed": true,
+    "trace_id": "34d359b70a857f1d11593222ef51f453",
+    "grounding": "permission-guidance-only"
+  },
+  "ao": {
+    "passed": true,
+    "trace_id": "29f50cb9b05418f867ad7e9c14c741f1"
+  },
+  "training_manager": {
+    "passed": true,
+    "trace_id": "8b5c2eefb2bd4fcf04d37348fbdeb71f",
+    "course_change": "old-model-context-cleared"
+  },
+  "regional_director": "placeholder-no-articles",
+  "synthetic_screenshot": {
+    "passed": true,
+    "trace_id": "3f0ed4ea4a33ad479a7bd04cb6cedf55",
+    "fixture": "synthetic browser error, not a real user screenshot"
+  }
+}

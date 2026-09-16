@@ -1,0 +1,21 @@
+{
+  "article_id": "MCELE-LAUNCH-001",
+  "title": "MCeLE course launch error: \"sts1.auth.ecuf.deas.mil refused to connect\"",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this guidance when a course delivered in **MCeLE**, such as **CYBERM0000**, displays **\"sts1.auth.ecuf.deas.mil refused to connect\"** in its course window, pop-up, or embedded content frame.\n\nThis guidance does **not** apply to courses delivered in **Moodle**.\n\nTo troubleshoot this error:\n\n1. Log in to **MCeLE**.\n2. Open the browser menu in the upper-right corner. It may appear as **three dots**.\n3. Select **Delete browsing data**.\n4. Set the time range to **Last 24 hours**.\n5. Select **Cookies and other site data** and **Cached images and files**.\n6. Select **Delete from this device**.\n7. After the browsing data has been cleared, **restart your computer**.\n8. Log back in to **MCeLE** and try launching the course content again.\n\nIf the same error continues, contact the **Helpdesk** for further assistance.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from approved course-launch troubleshooting guidance; the original troubleshooting sequence was preserved and the MCeLE delivery and error scope were clarified for the demo."
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review",
+  "excluded_delivery_areas": [
+    "Moodle"
+  ],
+  "required_error": "sts1.auth.ecuf.deas.mil refused to connect"
+}

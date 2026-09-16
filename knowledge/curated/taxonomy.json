@@ -1,0 +1,14 @@
+{
+  "clarification_buckets": {
+    "mcele-launch": {
+      "label": "MCeLE course launch error"
+    },
+    "moodle-copy": {
+      "label": "Moodle course copying"
+    },
+    "mcele-ecdep": {
+      "label": "MCeLE ECDEP enrollment requests"
+    }
+  },
+  "articles": []
+}
