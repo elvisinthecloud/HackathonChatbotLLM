@@ -7,7 +7,7 @@ import re
 import subprocess
 
 PROJECT = "mcele-hackathon-demo"
-HOST = "demo@demo-host.example.invalid"
+HOST = "demo@private-host.example.invalid"
 ROOT = Path("/home/demo/mcele-hackathon-demo")
 RUNTIME = Path("/home/demo/.config/mcele-hackathon-demo/runtime.env")
 SERVICES = ("demo-db", "demo-backend", "demo-frontend", "demo-tunnel")
