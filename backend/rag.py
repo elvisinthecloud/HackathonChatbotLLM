@@ -13,6 +13,7 @@ from db import DEMO_CONFIG, get_connection
 from demo_dataset import validate_taxonomy
 from demo_policy import ACCESS, ACCESS_FILTER_SQL, access_parameters, resolve_context, resolve_access, clarification
 from demo_sessions import context_memory
+from conversation import conversational_reply
 from prompts import build_messages
 
 
@@ -924,6 +925,31 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
             profile = session["profile"]
             langfuse.update_current_trace(tags=["mcele-hackathon-demo", "curated-demo"],
                                           session_id=session["id"], user_id=profile["id"])
+            social_answer = conversational_reply(question) if image is None else None
+            if social_answer is not None:
+                # Social turns do not resolve pending support ambiguities. A changed
+                # course selection must still invalidate the previous evidence.
+                selection = (selected_course_id or "").strip() or None
+                previous_selection = (session["selected_course_id"] or "").strip() or None
+                context = dict(session["context"])
+                changed = selection != previous_selection
+                if changed:
+                    context, _, _ = resolve_context(selection, context, previous_selection, "")
+                result = {"answer": social_answer, "response_kind": "conversation",
+                          "sources": [], "retrieved_count": 0,
+                          "trace_id": langfuse.get_current_trace_id(),
+                          "needs_clarification": False, "clarification_options": [],
+                          "matched_bucket_id": None, "context": context,
+                          "_image_text": "", "_context_changed": changed}
+                trace.update(metadata={"demo_instance": "mcele-hackathon-demo",
+                    "dataset_id": "mcele-curated-v1", "phase": "curated-demo",
+                    "profile_id": profile["id"], "role": profile["role"],
+                    "response_kind": "conversation", "context_changed": changed,
+                    "course_id": context.get("course_id"), "issue_category": issue_category,
+                    "system_area": context.get("system_area"), "activity": context.get("activity"),
+                    "allowed_article_ids": [], "retrieval_skipped": True},
+                    output={k: v for k, v in result.items() if not k.startswith("_")})
+                return result
             image_text = (await extract_image_context(image)).get("description", "") if image else ""
             context, conflict, changed = resolve_context(selected_course_id, session["context"], session["selected_course_id"], question, image_text)
             history, previous_evidence = context_memory(session, changed)
@@ -937,7 +963,7 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
                 "phase":"curated-demo", "profile_id":profile["id"], "role":profile["role"],
                 "course_id":context.get("course_id"), "delivery_area":context.get("delivery_area"), "system_area":context.get("system_area"), "activity":context.get("activity"),
                 "discovery_portal":context.get("discovery_portal"), "context_changed":changed,
-                "issue_category":issue_category,
+                "issue_category":issue_category, "response_kind":"support",
                 "allowed_article_ids":list(access.article_ids), "model":settings.chat_model,
                 "embed_model":settings.embed_model})
             with langfuse.start_as_current_span(name="access_filter", input={"role":profile["role"], "context":context}) as filtering:
@@ -966,7 +992,7 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
                     answer=await generate_answer(grounded_question,chunks,history=history,bucket_context=server_context)
                     answer=ground_answer(strip_redundant_support_footer(answer),chunks)
             cited=cited_source_indexes(answer)
-            result={"answer":answer,"sources":source_payload(chunks,cited_indexes=cited or None) if chunks and not answer_indicates_missing_information(answer) else [],
+            result={"answer":answer,"response_kind":"support","sources":source_payload(chunks,cited_indexes=cited or None) if chunks and not answer_indicates_missing_information(answer) else [],
                     "retrieved_count":len(chunks),"trace_id":langfuse.get_current_trace_id(),
                     "needs_clarification":bool(prompt),"clarification_options":[],"matched_bucket_id":matched_bucket,
                     "context":context,"_image_text":image_text,"_context_changed":changed}

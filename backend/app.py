@@ -71,6 +71,7 @@ class ClarificationOption(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    response_kind: Literal["support", "conversation"] = "support"
     context: dict = Field(default_factory=dict)
     session_id: str
     answer: str

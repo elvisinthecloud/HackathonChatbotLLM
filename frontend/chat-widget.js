@@ -666,7 +666,7 @@
       );
 
       typing.remove();
-      selectedIssueCategory = null;
+      if (data.response_kind !== "conversation") selectedIssueCategory = null;
       appendBot(data.answer, data.sources);
       updateResolvedContext(data.context);
     } catch (error) {
