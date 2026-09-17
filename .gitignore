@@ -21,3 +21,9 @@ verification.json
 # Local discovery notes include unselected source material.
 docs/article-discovery.md
 recovery/partial-documents/initial-inspection-and-article-discovery.partial.md
+
+# Local live-test transcripts, generated reports, and overnight execution state.
+output/
+tmp/
+docs/live-conversation-*.json
+docs/overnight-validation-checkpoint.md

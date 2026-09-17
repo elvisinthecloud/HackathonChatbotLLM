@@ -26,6 +26,14 @@ Submission-ready text articles are in [`hackathon-dataset`](hackathon-dataset), 
 4. The local chat model answers from the permitted excerpts and adds citations.
 5. Grounding checks citations and links before returning the answer. Demo conversations can be traced with Langfuse.
 
+Before support routing, a small server-side recognizer answers approved greetings,
+thanks, acknowledgements, and general capability questions without searching or
+calling a model. Mixed support requests and screenshots continue through the
+normal protected pipeline. Social turns remain in the transcript without
+displacing support history, and preserve a pending intake category until the next
+support turn. See [conversation handling](docs/conversation-handling.md) for scope,
+validation, and known limitations.
+
 ## Project structure
 
 - `backend/` — FastAPI chatbot, role policy, retrieval, grounding, and ingestion.
@@ -42,6 +50,7 @@ Run the offline checks from the repository root:
 
 ```bash
 python -m unittest discover -s tests -v
+node tests/test_intake_conversation.js
 python backend/ingest.py --manifest knowledge/curated/manifest.json --validate-only
 ```
 

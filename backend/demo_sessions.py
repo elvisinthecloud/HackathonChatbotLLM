@@ -69,7 +69,10 @@ def load_session(token):
 def context_memory(session, changed):
     if changed:
         return [], ''
-    current=[t for t in session['turns'] if t[3]==session['version']]
+    # Filter before bounding history so social turns cannot evict support answers.
+    # Unmarked historical turns retain their existing behavior.
+    current=[t for t in session['turns'] if t[3]==session['version']
+             and t[4].get('_response_kind') != 'conversation']
     history=[]
     for question,answer,_,_,_ in current[-6:]:
         history.extend([{'role':'user','content':question[:4000]}, {'role':'assistant','content':answer[:6000]}])
@@ -90,9 +93,10 @@ def context_memory(session, changed):
 def save_turn(session, selected_course_id, context, changed, question, image_text, had_image, result):
     from psycopg.types.json import Jsonb
     version=session['version']+int(changed)
+    turn_context={**context, '_response_kind':result.get('response_kind','support')}
     with get_connection() as conn:
         conn.execute('INSERT INTO demo_turns(session_id,context_version,question,answer,image_text,had_image,trace_id,context) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)',
-                     (session['id'],version,question,result['answer'],image_text[:8000],had_image,result.get('trace_id'),Jsonb(context)))
+                     (session['id'],version,question,result['answer'],image_text[:8000],had_image,result.get('trace_id'),Jsonb(turn_context)))
         conn.execute('UPDATE demo_sessions SET selected_course_id=%s,context=%s,context_version=%s WHERE id=%s',
                      (selected_course_id,Jsonb(context),version,session['id']))
 

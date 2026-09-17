@@ -17,7 +17,7 @@ VOLUME = PROJECT + "-postgres-data"
 ALLOWLIST = (
     "compose.demo.yml", "backend/Dockerfile", "backend/.dockerignore",
     "backend/app.py", "backend/db.py", "backend/ingest.py", "backend/demo_config.py", "backend/demo_dataset.py", "backend/demo_policy.py", "backend/demo_sessions.py",
-    "backend/prompts.py", "backend/rag.py", "backend/requirements.txt", "backend/requirements.lock", "backend/text_utils.py",
+    "backend/prompts.py", "backend/rag.py", "backend/conversation.py", "backend/requirements.txt", "backend/requirements.lock", "backend/text_utils.py",
     "frontend/index.html", "frontend/chat-widget.css", "frontend/chat-widget.js", "frontend/nginx.conf",
     "database/schema.sql", "knowledge/curated/articles/mcele-course-launch-sts1-student.json",
     "knowledge/curated/articles/moodle-copy-permission-instructor.json", "knowledge/curated/articles/moodle-copy-course-ao.json",

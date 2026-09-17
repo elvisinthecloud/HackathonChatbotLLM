@@ -12,3 +12,4 @@
 !Dockerfile
 !demo_policy.py
 !demo_sessions.py
+!conversation.py
