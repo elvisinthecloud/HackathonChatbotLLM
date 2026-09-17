@@ -413,7 +413,8 @@
     if (hasGreeted) return;
     if (!selectedProfile) return;
     hasGreeted = true;
-    appendBot("Hi! I’m the MCeLE Support Assistant. What kind of issue can I help you with?");
+    const greeting = selectedProfile.greeting_name ? `Hello, ${selectedProfile.greeting_name}!` : "Hello!";
+    appendBot(`${greeting} I’m the MCeLE Support Assistant. What kind of issue can I help you with?`);
     showIssueChoices();
   }
 
@@ -571,7 +572,8 @@
     const areas = Array.isArray(selectedProfile.delivery_areas) && selectedProfile.delivery_areas.length
       ? ` Coverage: ${selectedProfile.delivery_areas.join(", ")}.`
       : " No curated support coverage is listed for this profile.";
-    profileDescription.textContent = `${selectedProfile.name} simulates ${selectedProfile.display_role || selectedProfile.role}.${areas}`;
+    const identity = [selectedProfile.username, selectedProfile.pay_grade].filter(Boolean).join(" · ");
+    profileDescription.textContent = `Fictional profile: ${selectedProfile.name}${identity ? ` · ${identity}` : ""}. Role: ${selectedProfile.display_role || selectedProfile.role}.${areas}`;
   }
 
   async function createSession() {
