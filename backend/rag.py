@@ -710,12 +710,18 @@ async def retrieve_chunks(
     """
     Returns (chunks, matched_bucket_id, confidence_score, clarification_options).
     """
-    # The intake category is a weak semantic hint. It improves the search query,
-    # but never participates in access control or replaces the user's report.
+    # Keep the user's report dominant. The broad intake category contributes a
+    # small vector weight and never participates in access control.
     semantic_query = question
+    question_embedding = await embed_text(question)
+    category_embedding = None
     if issue_category:
-        semantic_query = f"Tentative support category: {issue_category}\nUser report: {question}"
-    question_embedding = await embed_text(semantic_query)
+        category_embedding = await embed_text(f"Support category: {issue_category}")
+        if len(category_embedding) == len(question_embedding):
+            question_embedding = [
+                (0.92 * report_value) + (0.08 * category_value)
+                for report_value, category_value in zip(question_embedding, category_embedding)
+            ]
 
     matched_bucket_id: str | None = None
     confidence: float = 0.0
@@ -729,6 +735,12 @@ async def retrieve_chunks(
     elif history and is_context_dependent_followup(question):
         context_query = build_retrieval_query(semantic_query, history)
         context_embedding = await embed_text(context_query)
+
+    if context_embedding is not None and category_embedding is not None and len(category_embedding) == len(context_embedding):
+        context_embedding = [
+            (0.92 * context_value) + (0.08 * category_value)
+            for context_value, category_value in zip(context_embedding, category_embedding)
+        ]
 
     routing_embedding = context_embedding or question_embedding
     top_buckets = classify_question_bucket(routing_embedding, top_n=2)
@@ -841,6 +853,11 @@ async def retrieve_chunks(
     if context_embedding is None:
         context_query = build_retrieval_query(semantic_query, history)
         context_embedding = await embed_text(context_query)
+        if category_embedding is not None and len(category_embedding) == len(context_embedding):
+            context_embedding = [
+                (0.92 * context_value) + (0.08 * category_value)
+                for context_value, category_value in zip(context_embedding, category_embedding)
+            ]
     context_chunks = search_chunks(context_embedding, bucket_ids=bucket_ids_to_search)
 
     limit = settings.top_k + 3

@@ -67,9 +67,10 @@ class GroundingTests(unittest.IsolatedAsyncioTestCase):
                 issue_category="Courseware Issue",
             )
 
-        self.assertEqual(len(queries), 1)
-        self.assertIn("Tentative support category: Courseware Issue", queries[0])
-        self.assertIn("User report: My Moodle course is missing", queries[0])
+        self.assertEqual(queries, [
+            "My Moodle course is missing",
+            "Support category: Courseware Issue",
+        ])
 
     def test_ao_copy_family_uses_only_the_semantically_best_article(self):
         token = rag.ACCESS.set(RetrievalAccess(
