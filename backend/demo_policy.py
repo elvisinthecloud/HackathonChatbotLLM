@@ -17,11 +17,11 @@ COURSES = {
 }
 
 PROFILES = {
-    'student': {'id':'student','name':'Demo Student','role':'Student','display_role':'Student','course_ids':['CYBERM0000'],'delivery_areas':['MCeLE']},
-    'instructor': {'id':'instructor','name':'Demo Instructor','role':'Adjunct Faculty','display_role':'Instructor','course_ids':[],'delivery_areas':['Moodle']},
-    'ao': {'id':'ao','name':'Demo Academics Officer','role':'Academics Officer','display_role':'Academics Officer (AO)','course_ids':[],'delivery_areas':['Moodle']},
-    'training-manager': {'id':'training-manager','name':'Demo Training Manager','role':'Training Manager','display_role':'Training Manager','course_ids':['5500','6800'],'delivery_areas':['MCeLE']},
-    'regional-director': {'id':'regional-director','name':'Demo Regional Director','role':'Regional Director','display_role':'Regional Director','course_ids':[],'delivery_areas':[]},
+    'student': {'id':'student','name':'Sgt Mateo A. Rodriguez','username':'mateo.a.rodriguez','rank':'Sgt','rank_name':'Sergeant','pay_grade':'E-5','greeting_name':'Sgt Rodriguez','role':'Student','display_role':'Student','course_ids':['CYBERM0000'],'delivery_areas':['MCeLE']},
+    'instructor': {'id':'instructor','name':'MSgt James Thompson','username':'james.thompson','rank':'MSgt','rank_name':'Master Sergeant','pay_grade':'E-8','greeting_name':'MSgt Thompson','role':'Adjunct Faculty','display_role':'Instructor','course_ids':[],'delivery_areas':['Moodle']},
+    'ao': {'id':'ao','name':'LtCol Daniel R. Walker','username':'daniel.r.walker','rank':'LtCol','rank_name':'Lieutenant Colonel','pay_grade':'O-5','greeting_name':'LtCol Walker','role':'Academics Officer','display_role':'Academics Officer (AO)','course_ids':[],'delivery_areas':['Moodle']},
+    'training-manager': {'id':'training-manager','name':'GySgt Alicia M. Bennett','username':'alicia.m.bennett','rank':'GySgt','rank_name':'Gunnery Sergeant','pay_grade':'E-7','greeting_name':'GySgt Bennett','role':'Training Manager','display_role':'Training Manager','course_ids':['5500','6800'],'delivery_areas':['MCeLE']},
+    'regional-director': {'id':'regional-director','name':'Col Rebecca Mitchell','username':'rebecca.mitchell','rank':'Col','rank_name':'Colonel','pay_grade':'O-6','greeting_name':'Col Mitchell','role':'Regional Director','display_role':'Regional Director','course_ids':[],'delivery_areas':[]},
 }
 # These are independent grants. Profile course associations are context hints only.
 ARTICLE_POLICY = {

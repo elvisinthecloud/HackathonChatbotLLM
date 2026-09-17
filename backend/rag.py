@@ -927,6 +927,8 @@ async def answer_question(question: str, session: dict, selected_course_id: str 
                                           session_id=session["id"], user_id=profile["id"])
             social_answer = conversational_reply(question) if image is None else None
             if social_answer is not None:
+                if social_answer == "Hello! What would you like help with?" and profile.get("greeting_name"):
+                    social_answer = f"Hello, {profile['greeting_name']}! What would you like help with?"
                 # Social turns do not resolve pending support ambiguities. A changed
                 # course selection must still invalidate the previous evidence.
                 selection = (selected_course_id or "").strip() or None

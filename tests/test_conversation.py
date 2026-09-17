@@ -62,6 +62,27 @@ class ConversationalReplyTests(unittest.TestCase):
 
 
 class ConversationRoutingTests(unittest.IsolatedAsyncioTestCase):
+    async def test_personalized_greetings_use_only_server_profile_and_skip_retrieval(self):
+        expected = {
+            "student": ("Sgt Rodriguez", "mateo.a.rodriguez", "E-5", "Student"),
+            "instructor": ("MSgt Thompson", "james.thompson", "E-8", "Adjunct Faculty"),
+            "ao": ("LtCol Walker", "daniel.r.walker", "O-5", "Academics Officer"),
+            "training-manager": ("GySgt Bennett", "alicia.m.bennett", "E-7", "Training Manager"),
+            "regional-director": ("Col Mitchell", "rebecca.mitchell", "O-6", "Regional Director"),
+        }
+        with patch.object(rag, "langfuse", self.fake_langfuse()), \
+             patch.object(rag, "retrieve_chunks", new_callable=AsyncMock) as retrieve, \
+             patch.object(rag, "generate_answer", new_callable=AsyncMock) as generate:
+            for profile_id, (greeting, username, grade, role) in expected.items():
+                with self.subTest(profile=profile_id):
+                    profile = PROFILES[profile_id]
+                    self.assertEqual((profile['username'], profile['pay_grade'], profile['role']), (username, grade, role))
+                    result = await rag.answer_question("Hello!", session(profile_id), None)
+                    self.assertEqual(result['answer'], f"Hello, {greeting}! What would you like help with?")
+                    self.assertEqual(result['sources'], [])
+            retrieve.assert_not_called()
+            generate.assert_not_called()
+
     @contextmanager
     def fake_span(self, *args, **kwargs):
         yield MagicMock()
