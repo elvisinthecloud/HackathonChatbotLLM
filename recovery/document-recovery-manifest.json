@@ -76,12 +76,12 @@
   },
   {
     "file": "docs/curated-validation.json",
-    "source": "deployment host verification reports",
+    "source": "the deployment host verification reports",
     "status": "reconstructed summary"
   },
   {
     "file": "docs/atlas-deployment-record.json",
-    "source": "deployment host reports and recorded runtime inspection",
+    "source": "the deployment host reports and recorded runtime inspection",
     "status": "reconstructed summary"
   }
 ]

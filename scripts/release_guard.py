@@ -5,11 +5,12 @@ import json
 import os
 import re
 import subprocess
+import socket
 
 PROJECT = "mcele-hackathon-demo"
-HOST = "demo@private-host.example.invalid"
-ROOT = Path("/home/demo/mcele-hackathon-demo")
-RUNTIME = Path("/home/demo/.config/mcele-hackathon-demo/runtime.env")
+HOST = os.environ.get("MCELE_DEMO_SSH_HOST", "mcele-demo")
+ROOT = Path.home() / PROJECT
+RUNTIME = Path.home() / ".config" / PROJECT / "runtime.env"
 SERVICES = ("demo-db", "demo-backend", "demo-frontend", "demo-tunnel")
 CONTAINERS = tuple(PROJECT + "-" + name for name in ("db", "backend", "frontend", "tunnel"))
 NETWORK = PROJECT + "-network"
@@ -34,6 +35,14 @@ ALLOWLIST = (
 def reject_symlinks(path: Path) -> None:
     if any(p.is_symlink() for p in (path, *path.parents)):
         raise ValueError("Symlinks are forbidden in deployment paths")
+
+
+def require_deployment_host():
+    """Check a private host identity file instead of publishing the machine name."""
+    identity = RUNTIME.parent / "hostname"
+    reject_symlinks(identity)
+    if not identity.is_file() or identity.read_text().strip() != socket.gethostname():
+        raise RuntimeError("Configure the private deployment hostname file on the approved host first")
 
 
 def release_id(hashes: dict) -> str:

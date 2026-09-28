@@ -32,12 +32,12 @@ services:
     container_name: mcele-hackathon-demo-backend
     restart: unless-stopped
     env_file:
-      - ${DEMO_RUNTIME_FILE:-/home/demo/.config/mcele-hackathon-demo/runtime.env}
+      - ${DEMO_RUNTIME_FILE:-${HOME}/.config/mcele-hackathon-demo/runtime.env}
     environment:
       DATABASE_URL: postgresql://mcele_demo:${DEMO_DB_PASSWORD:?DEMO_DB_PASSWORD must be set in runtime.env}@demo-db:5432/mcele_demo
       DEMO_DB_PASSWORD: ${DEMO_DB_PASSWORD:?DEMO_DB_PASSWORD must be set in runtime.env}
       DEMO_INSTANCE_ID: mcele-hackathon-demo
-      OLLAMA_BASE_URL: http://private-host.example.invalid:11434
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:?Set OLLAMA_BASE_URL in the private runtime.env}
       OLLAMA_CHAT_MODEL: qwen3:30b-a3b-instruct-2507-q4_K_M
       OLLAMA_VISION_MODEL: qwen2.5vl:7b
       OLLAMA_EMBED_MODEL: nomic-embed-text

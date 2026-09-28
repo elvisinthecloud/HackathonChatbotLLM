@@ -37,6 +37,6 @@
     "langfuse": true,
     "original_chunk_count": 315
   },
-  "public_url": "https://demo-host.example.invalid",
+  "public_url": "https://demo.example.invalid",
   "recovery_note": "Reconstructed from verified records; not an exact copy of the former USB document."
 }

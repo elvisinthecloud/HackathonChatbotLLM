@@ -9,6 +9,7 @@ import sys
 import sys
 sys.dont_write_bytecode = True
 
+from release_guard import require_deployment_host
 from release_guard import ROOT, PROJECT, CONTAINERS, NETWORK, VOLUME, reject_symlinks, run
 
 
@@ -20,8 +21,9 @@ def main():
         print(json.dumps({'plan_only':True,'remove_containers':list(reversed(CONTAINERS)), 'remove_network':NETWORK,
                           'preserve_volume':VOLUME,'preserve_files':str(ROOT)},indent=2))
         return
-    if sys.platform!='linux' or socket.gethostname()!='demo-host':
-        raise SystemExit('Rollback apply must run on deployment host.')
+    if sys.platform!='linux':
+        raise SystemExit('Rollback apply must run on the deployment host.')
+    require_deployment_host()
     reject_symlinks(ROOT)
     if json.loads((ROOT/'.demo-root.json').read_text()) != {'project':PROJECT}:
         raise RuntimeError('Missing demo root identity')

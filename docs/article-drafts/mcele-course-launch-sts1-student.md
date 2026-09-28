@@ -11,7 +11,7 @@
 - Excluded delivery area: Moodle, including Moodle courses found through the MCeLE catalog or My Courses
 - Issue trigger: User-provided error text or readable screenshot showing `sts1.auth.ecuf.deas.mil refused to connect`
 - Content type: Adapted existing troubleshooting guidance, not synthetic
-- Provenance: Live deployment host `/home/demo/ChatBotLLM/knowledge/rag-source-documents/converted/manual/course-content-sts1-auth-refused-to-connect.md`, selectively read during live-first inspection; corresponding local reference article re-read during drafting. Delivery scope and screenshot/course-context behavior were specified by the user.
+- Provenance: Live the deployment host `/home/demo/ChatBotLLM/knowledge/rag-source-documents/converted/manual/course-content-sts1-auth-refused-to-connect.md`, selectively read during live-first inspection; corresponding local reference article re-read during drafting. Delivery scope and screenshot/course-context behavior were specified by the user.
 - Adaptation: Original eight-step troubleshooting sequence preserved; scope and trigger clarified; Helpdesk fallback proposed for unresolved issues
 - External source URL: None embedded in the original article
 - Redistribution status: To be confirmed before public packaging; no license inferred

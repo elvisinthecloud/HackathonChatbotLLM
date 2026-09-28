@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply a verified demo release on deployment host; never targets existing application resources."""
+"""Apply a verified demo release on the deployment host; never targets existing application resources."""
 import argparse
 import fcntl
 import json
@@ -11,6 +11,7 @@ import sys
 import time
 import urllib.request
 
+from release_guard import require_deployment_host
 from release_guard import (PROJECT, ROOT, RUNTIME, SERVICES, CONTAINERS, NETWORK, VOLUME,
                            compose_args, reject_symlinks, render_and_validate, run, verify_release)
 
@@ -61,7 +62,7 @@ def collision_check():
 def runtime_values():
     reject_symlinks(RUNTIME)
     if not RUNTIME.is_file() or RUNTIME.stat().st_mode & 0o077 or RUNTIME.parent.stat().st_mode & 0o077:
-        raise RuntimeError('Provision the dedicated private runtime file on deployment host first')
+        raise RuntimeError('Provision the dedicated private runtime file on the deployment host first')
     values = {}
     for line in RUNTIME.read_text().splitlines():
         if not line or line.startswith('#'):
@@ -80,8 +81,9 @@ def main():
     if not args.apply:
         print('Plan: verified demo release only; --apply requires prior deployment approval.')
         return
-    if sys.platform != 'linux' or socket.gethostname() != 'demo-host':
-        raise SystemExit('Apply must run on deployment host.')
+    if sys.platform != 'linux':
+        raise SystemExit('Apply must run on the deployment host.')
+    require_deployment_host()
     release = Path(__file__).resolve().parents[1]
     hashes = verify_release(release)
     values = runtime_values()

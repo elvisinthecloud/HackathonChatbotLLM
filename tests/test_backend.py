@@ -20,7 +20,7 @@ def test_env():
         "DEMO_INSTANCE_ID": "mcele-hackathon-demo",
         "DEMO_DB_PASSWORD": password,
         "DATABASE_URL": f"postgresql://mcele_demo:{password}@demo-db:5432/mcele_demo",
-        "OLLAMA_BASE_URL": "http://private-host.example.invalid:11434",
+        "OLLAMA_BASE_URL": "http://model-service:11434",
         "OLLAMA_CHAT_MODEL": "qwen3:30b-a3b-instruct-2507-q4_K_M",
         "OLLAMA_VISION_MODEL": "qwen2.5vl:7b",
         "OLLAMA_EMBED_MODEL": "nomic-embed-text",

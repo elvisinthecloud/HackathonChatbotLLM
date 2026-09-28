@@ -1,4 +1,4 @@
-"""Fail-closed configuration for the isolated deployment host baseline.
+"""Fail-closed configuration for the isolated demo baseline.
 
 This module uses only the standard library so validation can run before dependencies
 or network connections are initialized. Error messages never include config values.
@@ -30,6 +30,25 @@ class DemoConfigurationError(RuntimeError):
     pass
 
 
+def validate_ollama_url(value: str) -> str:
+    """Require an explicit private endpoint; never fall back to a personal host."""
+    try:
+        parsed = urlsplit(value)
+        valid = (
+            bool(value) and not any(c.isspace() for c in value)
+            and parsed.scheme in ("http", "https") and bool(parsed.hostname)
+            and not parsed.hostname.endswith(".invalid")
+            and parsed.username is None and parsed.password is None
+            and parsed.path in ("", "/") and not parsed.query and not parsed.fragment
+        )
+        parsed.port  # Reject malformed or out-of-range ports.
+    except ValueError:
+        valid = False
+    if not valid:
+        raise DemoConfigurationError("Configure OLLAMA_BASE_URL privately with an HTTP(S) service origin")
+    return value
+
+
 @dataclass(frozen=True)
 class DemoConfig:
     database_url: str = field(repr=False)
@@ -41,7 +60,6 @@ def validate_runtime(env: Mapping[str, str] | None = None) -> DemoConfig:
     env = os.environ if env is None else env
     required = {
         "DEMO_INSTANCE_ID": INSTANCE_ID,
-        "OLLAMA_BASE_URL": "http://private-host.example.invalid:11434",
         "OLLAMA_CHAT_MODEL": "qwen3:30b-a3b-instruct-2507-q4_K_M",
         "OLLAMA_VISION_MODEL": "qwen2.5vl:7b",
         "OLLAMA_EMBED_MODEL": "nomic-embed-text",
@@ -52,6 +70,7 @@ def validate_runtime(env: Mapping[str, str] | None = None) -> DemoConfig:
     for key, expected in required.items():
         if env.get(key) != expected:
             raise DemoConfigurationError(f"Missing or unexpected demo setting: {key}")
+    validate_ollama_url(env.get("OLLAMA_BASE_URL", ""))
     for key in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"):
         value = env.get(key, "")
         if not value or any(c.isspace() for c in value) or value.upper().startswith(("REPLACE", "CHANGE", "YOUR_")):
