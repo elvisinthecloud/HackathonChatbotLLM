@@ -7,6 +7,7 @@ from pathlib import Path
 import socket
 import time
 from verify_deployment import fetch, verify_trace, trace_headers
+from release_guard import require_deployment_host
 from release_guard import ROOT, reject_symlinks
 
 BASE='http://127.0.0.1:8081'
@@ -41,9 +42,9 @@ def main():
     parser.add_argument('--synthetic-screenshot',type=Path)
     args=parser.parse_args()
     if not args.run:
-        print('Plan only: serial Student, AO, TM, profile-denial and course-change checks. Use --run on deployment host after approval.')
+        print('Plan only: serial Student, AO, TM, profile-denial and course-change checks. Use --run on the deployment host after approval.')
         return
-    if socket.gethostname()!='demo-host':raise RuntimeError('Scenario verification must run on deployment host')
+    require_deployment_host()
     report={}
     student=session('student','CYBERM0000')
     vague=chat(student,'I cannot launch my course.','CYBERM0000')

@@ -5,15 +5,15 @@
 The source-of-truth USB workspace was disconnected before the final grounding fix could be made.
 
 - Local source-of-truth: `/Volumes/USB_64_A/HackathonChatbot`
-- Original deployment host chatbot (strictly read-only): `/home/demo/ChatBotLLM`
-- Isolated demo root on deployment host: `/home/demo/mcele-hackathon-demo`
+- Original the deployment host chatbot (strictly read-only): `/home/demo/ChatBotLLM`
+- Isolated demo root on the deployment host: `/home/demo/mcele-hackathon-demo`
 - SSH target: `demo@demo-host.example.invalid`
 - Current deployed demo release recorded in the prior thread: `c0e172cd39238e51`
 - Separate Langfuse project ID: `REDACTED_DEMO_PROJECT_ID`
-- Public URL recorded in the thread: `https://demo-host.example.invalid` (Cloudflare Quick Tunnel; verify because it can change)
+- Public URL recorded in the thread: `https://demo.example.invalid` (Cloudflare Quick Tunnel; verify because it can change)
 - No Git repository had been initialized or pushed at the stopping point.
 
-The hosted demo and original chatbot were healthy after the USB was disconnected. Do not edit the staged deployment host release directly. Reconnect the USB and make all source changes there.
+The hosted demo and original chatbot were healthy after the USB was disconnected. Do not edit the staged the deployment host release directly. Reconnect the USB and make all source changes there.
 
 ## Current implemented state
 
@@ -43,7 +43,7 @@ Course/task mapping is task-specific, not course-only:
 
 A final manual browser check found that the Instructor answer correctly excluded the AO procedure but fabricated an unsupported tutorial link (`example.com/moodle-copy-tutorial`) and mentioned AO training that is not present in the Instructor article. The model output then received a citation, making unsupported text appear sourced.
 
-No fix was applied because the USB disconnected. The current deployment host release may still produce that bad Instructor response.
+No fix was applied because the USB disconnected. The current the deployment host release may still produce that bad Instructor response.
 
 ## First actions for the new agent
 
@@ -171,8 +171,8 @@ git log --oneline -3
 
 ## Ready-to-paste instruction for the next AI agent
 
-> Continue the existing MCeLE hackathon demo; do not rebuild it. The source of truth is `/Volumes/USB_64_A/HackathonChatbot`, which must be mounted before edits. Read `AGENTS.md`, `README.md`, `docs/curated-validation.json`, `docs/atlas-deployment-record.json`, `docs/profiles-courses-and-access.md`, `docs/demo-decisions.md`, and `docs/deployment-review.md` first. The original deployment host project `/home/demo/ChatBotLLM` is strictly read-only. The isolated demo root is `/home/demo/mcele-hackathon-demo`; the currently recorded release is `c0e172cd39238e51`.
+> Continue the existing MCeLE hackathon demo; do not rebuild it. The source of truth is `/Volumes/USB_64_A/HackathonChatbot`, which must be mounted before edits. Read `AGENTS.md`, `README.md`, `docs/curated-validation.json`, `docs/atlas-deployment-record.json`, `docs/profiles-courses-and-access.md`, `docs/demo-decisions.md`, and `docs/deployment-review.md` first. The original the deployment host project `/home/demo/ChatBotLLM` is strictly read-only. The isolated demo root is `/home/demo/mcele-hackathon-demo`; the currently recorded release is `c0e172cd39238e51`.
 >
-> The next task is one known grounding bug: a manual browser check showed that the Instructor answer fabricated `example.com/moodle-copy-tutorial` and mentioned AO training, although the Instructor source contains only permission guidance. No fix was applied because the USB disconnected. Fix this in the USB source, not on deployment host. Enforce that generated URLs and related tutorial/training claims must appear in the permission-filtered retrieved source. Add tests proving Instructor output contains no AO steps, tutorial, training reminder, or unsupported link, while AO output retains the approved tutorial and MClearn links. Review `ensure_citations` because blanket citation insertion can make unsupported claims look sourced.
+> The next task is one known grounding bug: a manual browser check showed that the Instructor answer fabricated `example.com/moodle-copy-tutorial` and mentioned AO training, although the Instructor source contains only permission guidance. No fix was applied because the USB disconnected. Fix this in the USB source, not on the deployment host. Enforce that generated URLs and related tutorial/training claims must appear in the permission-filtered retrieved source. Add tests proving Instructor output contains no AO steps, tutorial, training reminder, or unsupported link, while AO output retains the approved tutorial and MClearn links. Review `ensure_citations` because blanket citation insertion can make unsupported claims look sourced.
 >
 > Run all local tests, ingestion validation, JavaScript syntax validation, and `scripts/deploy.py --plan`; deploy only with the existing isolated workflow; rerun `verify_scenarios.py`; manually compare Instructor versus AO responses; and verify the original app remains healthy with 315 chunks. Do not expose secrets, edit the original app, restart original services, run prune/cleanup commands, or load-test the shared GPU. No Git repository existed at the stopping point; create only a local checkpoint unless I explicitly approve a reviewed private remote.

@@ -1,6 +1,6 @@
 # Test recovery report
 
-Source: Codex session records dated 2026-09-16 for `/Volumes/USB_64_A/HackathonChatbot`; no deployment host, network, deployment, or credential access was used.
+Source: Codex session records dated 2026-09-16 for `/Volumes/USB_64_A/HackathonChatbot`; no the deployment host, network, deployment, or credential access was used.
 
 ## Recovered exactly
 
