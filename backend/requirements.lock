@@ -1,4 +1,4 @@
-# Exact installed backend versions read from deployment host on 2026-09-14.
+# Exact installed backend versions read from the deployment host on 2026-09-14.
 # Install with: python -m pip install -r backend/requirements.lock
 annotated-doc==0.0.5
 annotated-types==0.8.0

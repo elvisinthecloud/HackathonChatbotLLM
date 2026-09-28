@@ -21,3 +21,10 @@ verification.json
 # Local discovery notes include unselected source material.
 docs/article-discovery.md
 recovery/partial-documents/initial-inspection-and-article-discovery.partial.md
+
+# Private deployment details and newly generated operational records.
+deployment.local.*
+*.local.env
+hostname
+runtime-verification.json
+scenario-verification.json

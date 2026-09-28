@@ -15,9 +15,9 @@ These AGENTS.md instructions replace all previously provided AGENTS.md instructi
 ## Authoritative source and workspace
 
 - Initial scaffolding source: live deployment host project `/home/demo/ChatBotLLM`. Inspect deployed container code/mounts/configuration before copying. Local reference `/Users/elvis/All Projects/ChatBotLLMPrototypeUSMCU` is not authoritative.
-- Verified SSH entry point: `ssh demo@private-host.example.invalid`. deployment host hostname: `demo-host.example.invalid`. Inspection found deployment host reports Tailscale IP `private-host.example.invalid`; resolve the discrepancy before binding or documenting access.
+- Verified SSH entry point: `ssh demo@demo-host.example.invalid`. the deployment host hostname: `demo-host.example.invalid`. Inspection found the deployment host reports Tailscale IP `demo-host.example.invalid`; resolve the discrepancy before binding or documenting access.
 - This USB project becomes the source of truth after scaffolding. Edit here and deploy through a reviewed, repeatable allowlist. No untracked VM code edits.
-- Use portable project-relative paths. USB is exFAT: keep virtual environments, permission-sensitive dependencies, and caches on a native local filesystem; document their locations. Exclude macOS `._*` and `.DS_Store` metadata from deployments and submission. Runtime services and persistent storage belong on deployment host.
+- Use portable project-relative paths. USB is exFAT: keep virtual environments, permission-sensitive dependencies, and caches on a native local filesystem; document their locations. Exclude macOS `._*` and `.DS_Store` metadata from deployments and submission. Runtime services and persistent storage belong on the deployment host.
 - Do not initialize or publish a new repository until the user says the working demo is ready for that step. Walkthrough and submission packaging are also deferred until requested.
 
 ## Protect the existing deployment
@@ -26,7 +26,7 @@ These AGENTS.md instructions replace all previously provided AGENTS.md instructi
 - Never stop, restart, rebuild, or reconfigure existing application, database, Langfuse, or model containers.
 - Never modify/delete existing databases, tables, indexes, volumes, networks, knowledge files, proxy routes, tunnels, DNS, firewall settings, or port assignments.
 - No Docker prune commands, broad deletion syncs, or Compose shutdown against existing services.
-- Reuse Ollama at `http://private-host.example.invalid:11434` from deployment host. Do not provision a replacement LLM stack, change model configuration, or download/replace models.
+- Reuse Ollama at `http://ollama.example.invalid:11434` from the deployment host. Do not provision a replacement LLM stack, change model configuration, or download/replace models.
 - Preserve chat `qwen3:30b-a3b-instruct-2507-q4_K_M`, embedding `nomic-embed-text`, and vision `qwen2.5vl:7b` unless the user explicitly approves a change.
 - Existing Langfuse API use and creation of a separate demo project are allowed; changing its infrastructure or existing project settings is prohibited.
 - Never place secrets in prompts, source files, logs, documentation, or the eventual repository. Do not copy production secrets wholesale. Provision only required demo credentials outside tracked files.
@@ -34,11 +34,11 @@ These AGENTS.md instructions replace all previously provided AGENTS.md instructi
 
 ## Deployment approval and isolation
 
-- Initial inspection is read-only on deployment host. USB implementation is permitted, but first deployment requires the user's approval of a concrete, reviewable configuration.
+- Initial inspection is read-only on the deployment host. USB implementation is permitted, but first deployment requires the user's approval of a concrete, reviewable configuration.
 - Before that approval, prepare destination directory, Compose project and service/container names, ports, CPU/RAM/disk needs, access method, mounts/volumes/networks, credentials plan, isolation checks, resource inventory, and demo-only rollback.
 - Inspect current host capacity, occupied ports, original service health, and shared GPU considerations. Avoid disruptive load tests.
 - Ask whether attendee access must be public or Tailscale-only before external exposure. Do not change original access routes.
-- Use a separate deployment host deployment directory, distinct Compose project, demo-specific names/network/volumes, and dedicated demo database/vector index. Keep database and backend ports internal where practical.
+- Use a separate the deployment host deployment directory, distinct Compose project, demo-specific names/network/volumes, and dedicated demo database/vector index. Keep database and backend ports internal where practical.
 - Deployment must use an explicit file allowlist or exclusions, no broad deletion, and a destination guard rejecting the original path. Inspect copied scripts/Compose for hardcoded production names, paths, external volumes, or destructive operations before running anything.
 - Missing demo configuration must fail clearly. Ingestion must validate that it can target only demo storage, never default to original resources.
 - After the first isolated deployment is approved, routine updates are allowed only within that approved scope. Any required change to an existing service must stop for explanation and user direction.
@@ -66,9 +66,9 @@ These AGENTS.md instructions replace all previously provided AGENTS.md instructi
 
 ## Current checkpoint
 
-Current release `150982c95159b944` is running on the isolated deployment host demo services. Original app health and 315 chunks are unchanged. First deployment/public tunnel approval was granted on 2026-09-14; routine updates within the reviewed isolated resources remain approved. Limits: combined 2.75 CPUs / 2.25 GiB RAM. Public URL remains https://demo-host.example.invalid (random Quick Tunnel; may change on restart).
+Current release `150982c95159b944` is running on the isolated deployment host demo services. Original app health and 315 chunks are unchanged. First deployment/public tunnel approval was granted on 2026-09-14; routine updates within the reviewed isolated resources remain approved. Limits: combined 2.75 CPUs / 2.25 GiB RAM. Public URL remains https://demo.example.invalid (random Quick Tunnel; may change on restart).
 
-Five server-controlled profiles, four approved articles, task-specific course mappings, role-filtered retrieval, and server-side session transcripts are implemented. 55 offline tests and serial real scenario checks passed, including synthetic screenshot recognition and dedicated Langfuse traces. Article record/editorial metadata is not embedded. The two synthetic baseline articles are retired from demo storage and excluded from the current release; no original corpus/data/secrets were copied. Separate Langfuse project `REDACTED_DEMO_PROJECT_ID` is configured with private demo keys on deployment host.
+Five server-controlled profiles, four approved articles, task-specific course mappings, role-filtered retrieval, and server-side session transcripts are implemented. 55 offline tests and serial real scenario checks passed, including synthetic screenshot recognition and dedicated Langfuse traces. Article record/editorial metadata is not embedded. The two synthetic baseline articles are retired from demo storage and excluded from the current release; no original corpus/data/secrets were copied. Separate Langfuse project `REDACTED_DEMO_PROJECT_ID` is configured with private demo keys on the deployment host.
 
 IMPORTANT user correction: course alone does not determine system. 5500, CSC and EWS course content is Moodle, enrollment MCeLE. CDETBAIC01 Basic AI Course is MCeLE for both. CYBERM0000 content is MCeLE. 6800 enrollment is MCeLE; course content platform remains unconfirmed. The course field accepts codes/names; unknown mappings and unclear tasks require clarification. See `docs/profiles-courses-and-access.md` for the current policy, superseding older single-platform assumptions.
 
@@ -78,7 +78,7 @@ User's actual screenshot still needs checking when supplied. Ticket page/fields 
 
 ## Grounding and access checkpoint — 2026-09-16
 
-Instructor and AO copying answers now reproduce only their permission-filtered curated excerpts. Generated HTTP links for other articles must exactly match a permitted source; unsupported links trigger source-excerpt fallback. Blanket automatic citations were removed. Expanded serial scenarios, including Instructor grounding and both AO links, passed on release `150982c95159b944`. Use `scripts/deploy.py --apply --transport tailscale` with the existing approval flag from this Mac. deployment host is confirmed at `private-host.example.invalid`; the user added the needed Tailscale SSH rule. GitHub destination is `elvisinthecloud/HackathonChatbotLLM`, with push deferred until the project is completely finished.
+Instructor and AO copying answers now reproduce only their permission-filtered curated excerpts. Generated HTTP links for other articles must exactly match a permitted source; unsupported links trigger source-excerpt fallback. Blanket automatic citations were removed. Expanded serial scenarios, including Instructor grounding and both AO links, passed on release `150982c95159b944`. Use `scripts/deploy.py --apply --transport tailscale` with the existing approval flag from this Mac. the deployment host is confirmed at `demo-host.example.invalid`; the user added the needed Tailscale SSH rule. GitHub destination is `elvisinthecloud/HackathonChatbotLLM`, with push deferred until the project is completely finished.
 
 ## Repository checkpoint — 2026-09-16
 
@@ -86,4 +86,8 @@ The user explicitly requested uploading the current project to `https://github.c
 
 ## USB recovery — 2026-09-16
 
-The USB volume is unavailable. The user requested saving the project to Desktop. This recovery folder contains the exact 34-file deployed source snapshot plus recovered documentation/tests; consult `recovery/RECOVERY.md` before assuming completeness. Recovery made no deployment host changes and did not copy secrets or raw conversations. Use this Desktop folder for further local work; do not require the failed USB.
+The USB volume is unavailable. The user requested saving the project to Desktop. This recovery folder contains the exact 34-file deployed source snapshot plus recovered documentation/tests; consult `recovery/RECOVERY.md` before assuming completeness. Recovery made no the deployment host changes and did not copy secrets or raw conversations. Use this Desktop folder for further local work; do not require the failed USB.
+
+## Network privacy — 2026-09-28
+
+Network identifiers in historical notes below are sanitized examples, not deployment instructions. Use the private configuration described in README.md. Do not put actual hostnames, tailnet addresses, home LAN addresses, runtime environment files, or operational inventories into Git. The recovered GitHub checkout on the native Mac filesystem supersedes the unavailable USB workspace.

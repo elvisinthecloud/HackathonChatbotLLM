@@ -90,6 +90,6 @@
     "mcele-hackathon-demo-backend:ed7ce6d5a051864e",
     "mcele-hackathon-demo-backend:717fbd98c639da62"
   ],
-  "public_url": "https://demo-host.example.invalid",
-  "runtime_dependency_check": "All source/config mounts and database storage are on deployment host; no workstation or USB mounts"
+  "public_url": "https://demo.example.invalid",
+  "runtime_dependency_check": "All source/config mounts and database storage are on the deployment host; no workstation or USB mounts"
 }

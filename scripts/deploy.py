@@ -46,7 +46,7 @@ def stage(blob, tag, transport='ssh'):
     # validated before any directory creation. No extractall or shell interpolation.
     remote_code = r'''
 import hashlib,io,json,pathlib,sys,tarfile
-root=pathlib.Path('/home/demo/mcele-hackathon-demo')
+root=pathlib.Path.home()/'mcele-hackathon-demo'
 expected=set(json.loads(sys.argv[2]))
 tag=sys.argv[1]
 assert len(tag)==16 and all(c in '0123456789abcdef' for c in tag)
@@ -102,7 +102,7 @@ def main():
     tag = release_id(hashes)
     render_and_validate(LOCAL, LOCAL / 'config/runtime.env.example', tag, local=True)
     blob = archive(hashes)
-    print(json.dumps({'project': PROJECT, 'host': HOST, 'destination': str(ROOT / 'releases' / tag),
+    print(json.dumps({'project': PROJECT, 'host': HOST, 'destination': '~/' + PROJECT + '/releases/' + tag,
                       'release_id': tag, 'allowlisted_files': len(hashes), 'archive_bytes': len(blob)}, indent=2))
     if not args.stage and not args.apply:
         print('Local plan only: no SSH, filesystem writes, containers, or secret reads.')
@@ -111,7 +111,7 @@ def main():
         raise SystemExit('Explicit first-deployment approval is required; then set MCELE_DEMO_DEPLOY_APPROVED=1.')
     stage(blob, tag, args.transport)
     if args.apply:
-        command = 'python3 ' + shlex.quote(str(ROOT / 'releases' / tag / 'scripts/atlas_release.py')) + ' --apply'
+        command = 'python3 "$HOME"/' + shlex.quote(PROJECT + '/releases/' + tag + '/scripts/atlas_release.py') + ' --apply'
         subprocess.run(ssh_command(args.transport) + [command], check=True)
 
 
