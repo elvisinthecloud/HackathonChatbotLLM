@@ -18,7 +18,7 @@ This does not claim general semantic verification of all generated prose for Stu
 
 The documented native-filesystem Python 3.12 environment was recreated at `/private/tmp/mcele-demo-venv`, using `backend/requirements.lock`. Dependencies and caches are not stored on the USB.
 
-Tailscale resolves deployment host to `private-host.example.invalid`. The user added an SSH rule for this account, and authorized Tailscale access now succeeds. `scripts/deploy.py --transport tailscale` uses Tailscale authentication and host verification; ordinary SSH remains the default for existing users. No credentials were added to project files.
+Tailscale resolves the deployment host to `demo-host.example.invalid`. The user added an SSH rule for this account, and authorized Tailscale access now succeeds. `scripts/deploy.py --transport tailscale` uses Tailscale authentication and host verification; ordinary SSH remains the default for existing users. No credentials were added to project files.
 
 Once access is available, use the existing guarded deployment workflow within the already-approved isolated resources. Recheck the live release and original health before applying. Run the expanded serial verifier (now explicitly comparing Instructor and AO content), verify dedicated Langfuse traces, compare both roles in the public UI, verify profile switching, and check original health and 315 chunks. Until then, retain the prior release and live-validation records as historical evidence, not evidence for this correction.
 

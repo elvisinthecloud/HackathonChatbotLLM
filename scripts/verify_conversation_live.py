@@ -13,20 +13,19 @@ import subprocess
 import sys
 import time
 
-ROOT = Path('/home/demo/mcele-hackathon-demo')
+ROOT = Path.home() / 'mcele-hackathon-demo'
 BASE = 'http://127.0.0.1:8081'
 WORK = {'embed_text', 'article_candidate_search', 'vector_search', 'ollama_chat'}
 
 
 def main():
-    if socket.gethostname() != 'demo-host':
-        raise RuntimeError('Run only on deployment host against the isolated demo')
     inventory = json.loads((ROOT / 'inventory.json').read_text())
     release = Path(inventory['release'])
     if release.parent != ROOT / 'releases' or inventory['phase'] != 'running':
         raise RuntimeError('Expected running isolated release')
     sys.path.insert(0, str(release / 'scripts'))
-    from release_guard import verify_release
+    from release_guard import require_deployment_host, verify_release
+    require_deployment_host()
     from verify_deployment import fetch, trace_headers
     from atlas_release import original_health
     verify_release(release)

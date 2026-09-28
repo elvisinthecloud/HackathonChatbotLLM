@@ -6,6 +6,7 @@ import json
 import socket
 import time
 import urllib.request
+from release_guard import require_deployment_host
 from release_guard import ROOT, RUNTIME, reject_symlinks
 
 
@@ -43,8 +44,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--conversation',action='store_true')
     args=parser.parse_args()
-    if socket.gethostname()!='demo-host':
-        raise SystemExit('Run this verifier on deployment host after approved deployment.')
+    require_deployment_host()
     for port in (8000,8081):
         result=fetch(f'http://127.0.0.1:{port}/api/health')
         if result.get('ok') is not True:

@@ -10,9 +10,7 @@ import time
 
 
 def main():
-    root = Path('/home/demo/mcele-hackathon-demo')
-    if socket.gethostname() != 'demo-host':
-        raise RuntimeError('deployment host only')
+    root = Path.home() / 'mcele-hackathon-demo'
     inv = json.loads((root / 'inventory.json').read_text())
     release = Path(inv['release'])
     if release.parent != root / 'releases' or inv['phase'] != 'running':
@@ -20,7 +18,8 @@ def main():
     sys.path.insert(0, str(release / 'scripts'))
     from verify_deployment import fetch, trace_headers
     from atlas_release import original_health
-    from release_guard import verify_release
+    from release_guard import require_deployment_host, verify_release
+    require_deployment_host()
     verify_release(release)
     baseline = root / 'releases/a06c622a9646366f'
     before = original_health()

@@ -133,7 +133,7 @@
         "database": true,
         "ollama": true,
         "chunk_count": 315,
-        "ollama_base_url": "http://private-host.example.invalid:11434",
+        "ollama_base_url": "http://ollama.example.invalid:11434",
         "chat_model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
         "vision_model": "qwen2.5vl:7b",
         "embedding_model": "nomic-embed-text",

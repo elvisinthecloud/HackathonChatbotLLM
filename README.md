@@ -59,3 +59,27 @@ The demo requires Python 3.12 for the application environment. Dependencies are 
 ## Isolation
 
 The hackathon demo uses its own containers, database, vector data, sessions, configuration, and tracing project. Runtime credentials are not stored in this repository. The separate operational chatbot and its knowledge base are outside this project's deployment scope.
+
+## Private deployment configuration
+
+Public files use reserved `.invalid` example hosts. They are not working endpoints.
+Set the existing Ollama origin in the private runtime file using `OLLAMA_BASE_URL`;
+Compose forwards that value and the backend rejects missing or placeholder origins.
+Existing runtime files already containing the endpoint need no credential changes.
+
+Configure a local SSH alias named `mcele-demo` outside this repository, or set
+`MCELE_DEMO_SSH_HOST` privately. For `--transport tailscale`, set that variable to
+the approved Tailscale SSH target; OpenSSH aliases apply only to `--transport ssh`.
+The remote account's home directory determines the fixed demo root
+`~/mcele-hackathon-demo` and runtime path
+`~/.config/mcele-hackathon-demo/runtime.env`.
+Before using the deployment or verification tools, record the approved server's
+hostname in `~/.config/mcele-hackathon-demo/hostname` on that server (outside Git).
+The tools compare it to the current hostname before operating. Keep the original
+application read-only; all existing demo identity, resource, and path guards apply.
+
+Recovery documents and historical inventories have been sanitized. Their example
+addresses and account paths must not be used for deployment. Historical hash
+manifests describe the original recovery, not the sanitized files. Never commit
+private runtime files, host identity files, SSH configuration, or fresh operational
+inventories. This repository cleanup does not modify the running deployment.
