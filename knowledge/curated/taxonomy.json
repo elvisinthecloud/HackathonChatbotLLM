@@ -20,6 +20,36 @@
     },
     "mcele-csc": {
       "label": "CSC access from MCeLE to Moodle"
+    },
+    "mcele-login": {
+      "label": "MCeLE login methods"
+    },
+    "mcele-cac": {
+      "label": "MCeLE CAC login troubleshooting"
+    },
+    "mcele-recovery": {
+      "label": "MCeLE credential recovery"
+    },
+    "mcele-launch-general": {
+      "label": "MCeLE enrolled-course launch"
+    },
+    "moodle-access": {
+      "label": "Moodle browser access and support"
+    },
+    "moodle-app": {
+      "label": "Moodle app access and support"
+    },
+    "mcele-unlock": {
+      "label": "MCeLE temporary account lockout"
+    },
+    "mcele-cac-association": {
+      "label": "MCeLE CAC association"
+    },
+    "mcele-find-courses": {
+      "label": "MCeLE own non-PME course enrollment"
+    },
+    "mcele-view-courses": {
+      "label": "MCeLE own courses and records"
     }
   },
   "articles": []

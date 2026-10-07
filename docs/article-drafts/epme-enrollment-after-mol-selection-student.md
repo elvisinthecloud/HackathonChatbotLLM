@@ -34,11 +34,11 @@ If the Marine cannot enroll or recently received a new rank or select grade:
 
 ## Editorial and retrieval notes
 
-- A general EPME eligibility question should provide the complete course comparison without leading with MOL or MCTFS.
+- A general EPME eligibility question first asks which course in the guided conversation. An explicit comparison or overview request provides the complete approved course comparison without leading with MOL or MCTFS.
 - When the user names one course, answer with that course's rule and only the shared MOL/MCTFS or enrollment context needed to answer the question.
 - Mention MOL only when the user asks whether a selection shown there permits enrollment. Never state that MOL selection automatically enrolls the Marine or creates eligibility for every EPME course.
 - Preserve the difference between EPME5000, which does not accept Sergeant selects, and EPME6000, which expressly accepts Staff Sergeant selects.
 - Do not treat EPME6000 select eligibility as eligibility for EPME6800; the seminar is limited to Staff Sergeants and Gunnery Sergeants who completed EPME6000.
 - Direct rank/status verification to the MCeLE Help Desk, which can check the rank reflected in MCTFS and provide further enrollment assistance.
 - Keep promotion-completion policy separate from the enrollment-eligibility answer unless the user asks about promotion requirements.
-- Deferred implementation: when a user selects or names one EPME course, return only that course's requirement plus any directly relevant enrollment assistance instead of the complete six-course policy.
+- Implemented offline: when a user selects or names one EPME course, select that course's requirement or directly relevant enrollment assistance from the approved source. Live passage selection remains unverified.

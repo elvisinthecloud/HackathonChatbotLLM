@@ -21,17 +21,29 @@ def http_json(url):
         return json.load(response)
 
 
-def original_health():
+def original_health(*, allow_model_unavailable=False):
     with urllib.request.urlopen('http://127.0.0.1:8080/', timeout=8) as response:
         if response.status != 200:
             raise RuntimeError('Original frontend health failed')
     backend = http_json('http://127.0.0.1:8000/api/health')
-    if backend.get('ok') is not True:
+    if backend.get('ok') is not True and not (allow_model_unavailable and backend.get('database') is True and backend.get('chunk_count', 0) > 0):
         raise RuntimeError('Original backend health failed')
     with urllib.request.urlopen('http://127.0.0.1:3000/api/public/health', timeout=8) as response:
         if response.status != 200:
             raise RuntimeError('Existing Langfuse health failed')
-    return {'frontend': True, 'backend': True, 'langfuse': True, 'original_chunk_count': backend.get('chunk_count')}
+    return {'frontend': True, 'backend': backend.get('ok') is True, 'database': backend.get('database'),
+            'langfuse': True, 'original_chunk_count': backend.get('chunk_count')}
+
+
+def prepare_index(compose, env, *, reindex=False):
+    """Finish index preparation before stopping the serving application."""
+    run(compose+['up','-d','demo-db'], env=env)
+    command = compose+['run','--rm','demo-backend','python','ingest.py','--manifest','/knowledge/manifest.json']
+    if reindex:
+        run(command, env=env)
+    # Default code deployments do not write knowledge data or call embeddings.
+    # A stale index fails here while the previous application is still running.
+    run(command+['--check-only'], env=env)
 
 
 def collision_check():
@@ -77,6 +89,8 @@ def runtime_values():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--reindex', action='store_true', help='Explicitly update reviewed article index before code activation')
+    parser.add_argument('--allow-model-unavailable', action='store_true', help='Permit code activation with a healthy index while inference is unavailable')
     args = parser.parse_args()
     if not args.apply:
         print('Plan: verified demo release only; --apply requires prior deployment approval.')
@@ -100,7 +114,7 @@ def main():
         mem = next(int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))
         if mem < 2_500_000:
             raise RuntimeError('Insufficient available RAM for conservative demo startup')
-        before = original_health()
+        before = original_health(allow_model_unavailable=args.allow_model_unavailable)
         inventory = {'project': PROJECT, 'release': str(release), 'release_id': release.name,
                      'containers': list(CONTAINERS), 'network': NETWORK, 'volume': VOLUME,
                      'image': PROJECT+'-backend:'+release.name, 'runtime_file': str(RUNTIME),
@@ -115,35 +129,39 @@ def main():
             # Build the new demo image before interrupting a previous demo release.
             print('Building isolated demo backend image...', flush=True)
             run(compose+['build', 'demo-backend'], env=env)
+            print('Checking the reviewed article index before interrupting the running demo...', flush=True)
+            prepare_index(compose, env, reindex=args.reindex)
             stopping = [service for service, name in zip(SERVICES, CONTAINERS) if name in previous and service not in ('demo-db', 'demo-tunnel')]
             if stopping:
                 run(compose+['--profile','public','stop',*stopping], env=env)
-            print('Starting dedicated demo database and ingesting four approved articles...', flush=True)
-            run(compose+['up','-d','demo-db'], env=env)
-            run(compose+['run','--rm','demo-backend','python','ingest.py','--manifest','/knowledge/manifest.json'], env=env)
             run(compose+['up','-d','--no-deps','demo-backend','demo-frontend'], env=env)
             healthy = False
             for _ in range(30):
                 try:
-                    healthy = http_json('http://127.0.0.1:8081/api/health').get('ok') is True
+                    healthy = http_json('http://127.0.0.1:8081/api/ready').get('ready') is True
                     if healthy: break
                 except Exception:
                     pass
                 time.sleep(2)
             if not healthy:
                 raise RuntimeError('Demo failed readiness; public tunnel has not been started')
-            print('Checking one demo conversation and Langfuse trace...', flush=True)
-            run([sys.executable,str(release/'scripts/verify_deployment.py'),'--conversation'])
+            model_ready = http_json('http://127.0.0.1:8081/api/health').get('ok') is True
+            if model_ready:
+                print('Checking one demo conversation and Langfuse trace...', flush=True)
+                run([sys.executable,str(release/'scripts/verify_deployment.py'),'--conversation'])
+            elif not args.allow_model_unavailable:
+                raise RuntimeError('Model unavailable; activation requires explicit degraded-service mode')
+            inventory['conversation_verification'] = 'passed' if model_ready else 'blocked_model_unavailable'
             # Preserve the existing demo Quick Tunnel process/URL on routine code updates.
             running_names=set(run(['docker','ps','--format','{{.Names}}']).splitlines())
             if PROJECT+'-tunnel' not in running_names:
                 run(compose+['--profile','public','up','-d','--no-deps','demo-tunnel'], env=env)
-            inventory['original_after'] = original_health()
+            inventory['original_after'] = original_health(allow_model_unavailable=args.allow_model_unavailable)
             if inventory['original_after'] != before:
                 raise RuntimeError('Original health/data snapshot changed; investigate without modifying original resources')
-            inventory['phase'] = 'running'
+            inventory['phase'] = 'running' if model_ready else 'running-model-unavailable'
             inventory_path.write_text(json.dumps(inventory,indent=2)+'\n')
-            print('Isolated curated demo running; original health unchanged. Inventory saved. Verify the public URL separately.')
+            print('Isolated demo code is ready; original health unchanged. Conversation verification: '+inventory['conversation_verification']+'.')
         except Exception:
             inventory['phase'] = 'needs-attention'
             inventory_path.write_text(json.dumps(inventory,indent=2)+'\n')

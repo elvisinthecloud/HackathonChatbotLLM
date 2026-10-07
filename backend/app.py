@@ -14,12 +14,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from db import DEMO_CONFIG, close_pool, get_connection, init_pool
 from demo_dataset import load_dataset, validate_taxonomy
 from demo_policy import PROFILES, COURSES
-from demo_sessions import create_session, load_session, save_turn, owns_trace, SessionMissing, SessionCapacity
+from ingest import index_status
+from demo_sessions import create_session, load_session, save_turn, owns_trace, ensure_schema, SessionMissing, SessionCapacity, SessionConflict
 from rag import (
     OllamaError,
     answer_question,
-    is_valid_bucket_id,
-    precompute_bucket_embeddings,
     settings,
     langfuse,
 )
@@ -65,13 +64,9 @@ class Source(BaseModel):
     category_path: list[str] = []
 
 
-class ClarificationOption(BaseModel):
-    bucket_id: str
-    label: str
-
-
 class ChatResponse(BaseModel):
     response_kind: Literal["support", "conversation"] = "support"
+    suggested_replies: list[str] = Field(default_factory=list, max_length=3)
     context: dict = Field(default_factory=dict)
     session_id: str
     answer: str
@@ -79,7 +74,6 @@ class ChatResponse(BaseModel):
     retrieved_count: int
     trace_id: str | None = None
     needs_clarification: bool = False
-    clarification_options: list[ClarificationOption] = Field(default_factory=list)
     matched_bucket_id: str | None = None
 
 
@@ -120,12 +114,13 @@ async def lifespan(_: FastAPI):
         validate_taxonomy(DEMO_CONFIG.taxonomy)
         init_pool()
         with get_connection() as conn:
-            rows = conn.execute("SELECT source_path, content_sha256, metadata FROM articles ORDER BY source_path").fetchall()
-            expected = sorted((d["source_path"], d["content_sha256"], d["metadata"]) for d in documents)
-            if rows != expected:
+            ensure_schema(conn)
+            rows = conn.execute('SELECT a.source_path,a.content_sha256,a.metadata,count(c.id) FROM articles a LEFT JOIN article_chunks c ON c.article_id=a.id GROUP BY a.id').fetchall()
+            if not index_status(documents, rows, settings.embed_model)['current']:
                 raise RuntimeError("Demo index must contain exactly the current curated articles; run demo ingestion first")
         await verify_langfuse_project()
-        await precompute_bucket_embeddings()
+        # The active dialogue path embeds only its retrieval query. Legacy
+        # bucket classification must not make code startup depend on inference.
     except Exception:
         close_pool()
         raise RuntimeError("Demo startup verification failed; check dataset, database identity and dedicated Langfuse project") from None
@@ -174,15 +169,35 @@ async def health() -> dict[str, object]:
         db_ok = False
 
     ollama_ok, ollama_models = await check_ollama()
+    available = {name.removesuffix(':latest') for name in ollama_models}
+    chat_available = settings.chat_model.removesuffix(':latest') in available
+    embed_available = settings.embed_model.removesuffix(':latest') in available
 
     return {
-        "ok": db_ok and ollama_ok and chunk_count > 0,
+        "ok": db_ok and ollama_ok and chat_available and embed_available and chunk_count > 0,
+        "application_ready": db_ok and chunk_count > 0,
         "database": db_ok,
         "ollama": ollama_ok,
+        "chat_model_available": chat_available,
+        "embedding_model_available": embed_available,
+        "inference_verified": False,
         "chunk_count": chunk_count,
         "dataset_id": "mcele-curated-v1",
         "phase": "curated-demo",
     }
+
+
+@app.get('/api/ready')
+async def ready():
+    """Code/index readiness, deliberately independent of model availability."""
+    try:
+        with get_connection() as conn:
+            chunks = conn.execute('SELECT count(*) FROM article_chunks').fetchone()[0]
+        if chunks > 0:
+            return {'ready': True, 'inference_verified': False}
+    except Exception:
+        pass
+    return JSONResponse(status_code=503, content={'ready': False})
 
 
 
@@ -233,6 +248,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
             raise HTTPException(status_code=404,detail="This demo session is missing or expired. Start a new conversation.") from None
         except SessionCapacity:
             raise HTTPException(status_code=409,detail="This conversation has reached its limit. Start a new conversation.") from None
+        except SessionConflict:
+            raise HTTPException(status_code=409,detail="This conversation changed while I was replying. Please send your message again.") from None
         except OllamaError:
             raise HTTPException(status_code=502, detail="The model service could not complete the response. Please retry.") from None
         except Exception:

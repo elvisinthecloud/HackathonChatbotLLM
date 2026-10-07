@@ -1,79 +1,33 @@
 """Explicit approved curated allowlist; no directory crawling or Markdown import."""
 import hashlib
+import copy
+from functools import lru_cache
 import json
 from pathlib import Path
 
 from demo_config import ARTICLE_IDS, DATASET_ID
 
-ARTICLE_FILES = (
-    "articles/mcele-course-launch-sts1-student.json",
-    "articles/moodle-copy-permission-instructor.json",
-    "articles/moodle-copy-course-ao.json",
-    "articles/moodle-copy-stuck-ao.json",
-    "articles/mcele-ecdep-request-tm.json",
-    "articles/mcele-enrollment-report-tm.json",
-    "articles/mcele-rrc-repeat-student.json",
-    "articles/mcele-epme-eligibility-student.json",
-    "articles/mcele-csc-access-student.json",
-)
-BUCKETS = {"mcele-launch":"MCeLE course launch error", "moodle-copy":"Moodle course copying",
-           "mcele-ecdep":"MCeLE ECDEP enrollment requests",
-           "mcele-enrollment-report":"MCeLE enrollment reporting",
-           "mcele-rrc":"MCeLE Reserve Retirement Credits",
-           "mcele-epme":"MCeLE EPME eligibility and enrollment",
-           "mcele-csc":"CSC access from MCeLE to Moodle"}
-ARTICLE_BUCKETS = dict(zip(ARTICLE_IDS, (
-    "mcele-launch", "moodle-copy", "moodle-copy", "moodle-copy",
-    "mcele-ecdep", "mcele-enrollment-report", "mcele-rrc", "mcele-epme", "mcele-csc",
-)))
+from article_registry import (ARTICLE_FILES, BUCKETS, ARTICLE_BUCKETS, DatasetError, read_json_file, read_registry)
 
 
-class DatasetError(ValueError):
-    pass
-
-
-def read_json_file(path: Path, root: Path) -> dict:
-    if path.is_symlink() or any(p.is_symlink() for p in path.parents if p != root.parent):
-        raise DatasetError("Dataset symlinks are not allowed")
-    if not path.resolve().is_relative_to(root.resolve()) or not path.is_file():
-        raise DatasetError("Dataset file must be inside the configured root")
-    if path.stat().st_size > 32_768:
-        raise DatasetError("Curated file exceeds size limit")
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (ValueError, UnicodeError) as exc:
-        raise DatasetError("Invalid dataset JSON") from exc
-    if not isinstance(data, dict):
-        raise DatasetError("Dataset record must be an object")
-    return data
-
-
-def load_dataset(manifest_path: Path) -> list[dict]:
+def _load_dataset(manifest_path: Path) -> list[dict]:
     root = manifest_path.parent
-    manifest = read_json_file(manifest_path, root)
-    if manifest != {"dataset_id": DATASET_ID, "article_files": list(ARTICLE_FILES), "article_ids": list(ARTICLE_IDS)}:
-        raise DatasetError("Curated manifest differs from the explicit file/ID allowlist")
-    expected = {"article_id", "title", "service_area", "allowed_roles", "course_scope", "course_ids", "content", "provenance", "synthetic", "redistribution"}
+    manifest = read_registry(manifest_path)
     documents = []
-    for rel, article_id in zip(ARTICLE_FILES, ARTICLE_IDS):
+    expected = {"article_id", "title", "service_area", "allowed_roles", "course_scope", "course_ids", "content", "provenance", "synthetic", "redistribution"}
+    for entry in manifest['articles']:
+        rel, article_id = entry['file'], entry['article_id']
         article = read_json_file(root / rel, root)
-        from demo_policy import ARTICLE_POLICY
-        role, area, scope, courses = ARTICLE_POLICY[article_id]
-        extras = set()
-        if article_id == "MCELE-LAUNCH-001":
-            extras.update({"excluded_delivery_areas", "required_error"})
-        if article_id in {"MOODLE-COPY-001", "MOODLE-COPY-003"}:
-            extras.add("retrieval_text")
-        if set(article) != expected | extras:
-            raise DatasetError("Article fields do not match curated schema")
-        if not (article["article_id"] == article_id and article["allowed_roles"] == [role]
-                and article["synthetic"] is False and article["service_area"] == area
-                and article["course_scope"] == scope and article["course_ids"] == list(courses)
-                and article["redistribution"] == "pending-submission-review"
-                and isinstance(article["provenance"], dict) and article["provenance"].get("type") == "adapted"):
-            raise DatasetError("Curated article differs from its explicit access/scope policy")
-        if article_id == "MCELE-LAUNCH-001" and (article["excluded_delivery_areas"] != ["Moodle"] or article["required_error"] != "sts1.auth.ecuf.deas.mil refused to connect"):
-            raise DatasetError("Student article requires the approved error and Moodle exclusion")
+        if hashlib.sha256((root / rel).read_bytes()).hexdigest() != entry['file_sha256']:
+            raise DatasetError('Article differs from reviewed release hash')
+        if not expected <= set(article) or set(article)-expected-{'retrieval_text','excluded_delivery_areas','required_error','section_conditions'}:
+            raise DatasetError('Article fields do not match curated schema')
+        if any(article[k] != entry[k] for k in ('article_id','allowed_roles','service_area','course_scope','course_ids')):
+            raise DatasetError('Article differs from reviewed grants')
+        if article['synthetic'] is not False or article['redistribution'] != 'pending-submission-review' or not isinstance(article['provenance'],dict) or article['provenance'].get('type') != 'adapted':
+            raise DatasetError('Invalid reviewed source provenance')
+        if article.get('required_error') != entry['applicability']['required_error'] or article.get('excluded_delivery_areas',[]) != entry['applicability']['excluded_delivery_areas']:
+            raise DatasetError('Article applicability differs from registry')
         if not isinstance(article["title"], str) or not 1 <= len(article["title"]) <= 160:
             raise DatasetError("Invalid article title")
         content = article["content"]
@@ -81,16 +35,41 @@ def load_dataset(manifest_path: Path) -> list[dict]:
             raise DatasetError("Invalid curated article content")
         if any(marker in content for marker in ("## Article record", "## Editorial and retrieval notes", "## Knowledge content")):
             raise DatasetError("Authoring sections cannot be embedded")
+        from evidence_conditions import validate_metadata
+        try:
+            validate_metadata(content, article.get("section_conditions", []))
+        except ValueError as exc:
+            raise DatasetError(str(exc)) from exc
         retrieval_text = article.get("retrieval_text")
         if retrieval_text is not None and (not isinstance(retrieval_text, str) or not 1 <= len(retrieval_text) <= 1000):
             raise DatasetError("Invalid retrieval text")
         metadata = {k: v for k, v in article.items() if k not in {"content", "retrieval_text"}}
-        metadata.update(dataset_id=DATASET_ID, clarification_bucket_id=ARTICLE_BUCKETS[article_id], bucket_label=BUCKETS[ARTICLE_BUCKETS[article_id]])
+        metadata.update(dataset_id=DATASET_ID, clarification_bucket_id=entry['bucket_id'], bucket_label=manifest['buckets'][entry['bucket_id']], release_id=manifest['release_id'], release_sha256=manifest['release_sha256'], applicability=entry['applicability'])
         documents.append({"title": article["title"], "source_path": article_id,
                           "content": content, "metadata": metadata,
                           "retrieval_text": retrieval_text,
                           "content_sha256": hashlib.sha256(content.encode()).hexdigest()})
     return documents
+
+
+@lru_cache(maxsize=4)
+def _cached_dataset(path, manifest_stamp, article_stamps):
+    return _load_dataset(Path(path))
+
+@lru_cache(maxsize=4)
+def _registry_files(path, stamp):
+    return tuple(a['file'] for a in read_registry(Path(path))['articles'])
+
+def load_dataset(manifest_path: Path) -> list[dict]:
+    """Cache a validated snapshot; stat changes invalidate hashes before reuse."""
+    path=Path(manifest_path)
+    def stamp(p):
+        st=p.stat()
+        return (st.st_mtime_ns,st.st_ctime_ns,st.st_size,st.st_ino,p.is_symlink())
+    manifest_stamp=stamp(path)
+    files=_registry_files(str(path),manifest_stamp)
+    article_stamps=tuple(stamp(path.parent / rel) for rel in files)
+    return copy.deepcopy(_cached_dataset(str(path),manifest_stamp,article_stamps))
 
 
 def validate_taxonomy(path: Path) -> dict[str, str]:

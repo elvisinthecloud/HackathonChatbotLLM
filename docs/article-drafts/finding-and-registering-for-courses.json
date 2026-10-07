@@ -1,0 +1,35 @@
+{
+  "type": "knowledge_article_draft",
+  "status": "reviewed_and_integrated_in_curated_source",
+  "title": "Finding and Registering for Courses",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "access_review_status": "confirmed",
+  "course_scope_description": "Own enrollment in non-PME self-paced MCeLE courses and curricula; PME eligibility and staff approval workflows remain separate.",
+  "content": "Use this guidance to find and enroll yourself in non-PME, self-paced MCeLE courses and curricula. PME courses have separate enrollment requirements and guidance.\n\n### Find and enroll in a course\n\n1. Find the course through **Course Catalog** or **Catalog Search**.\n2. Select **View** to open the Course Details page.\n3. Read the course details and check the green or red **Eligibility** information to see whether you meet the enrollment requirements.\n4. If available, select **Enroll Now**. If you previously completed the course and want to take it again, select **Re-Enroll Now** when available.\n5. After you enroll, the course appears in **My Courses**.\n\nSome courses require a course request. Use the following steps to open an available request form.\n\n### Open a course request form\n\n1. Go to **My Courses** and find the course.\n2. Select **Launch** or **View** for that course.\n3. Open the **Enrollment** tab.\n4. Look in the **Overview** section for any available request forms.\n5. Select **Request** for the form you need to open it.\n",
+  "indexed": true,
+  "provenance": {
+    "type": "adapted",
+    "source_page_id": "403636307",
+    "source_html": "EKB/Finding-and-Registering-for-Courses_403636307.html",
+    "source_updated": "2026-07-14",
+    "user_corrections": [
+      {
+        "date": "2026-10-02",
+        "description": "Enrolled courses appear in My Courses. Course request forms are reached through My Courses > Launch or View > Enrollment tab > Overview > Request. Use plain wording such as open the form."
+      }
+    ]
+  },
+  "remaining_content_limits": [
+    "Opening a request form does not establish that the request has been submitted or approved. Form-specific fields and submission instructions were not provided."
+  ],
+  "access_decision_source": "User answered YES on 2026-10-02 to the pending all-five-role audience question while VM reconnection proceeded in parallel.",
+  "curated_source": "knowledge/curated/articles/mcele-find-courses-all.json",
+  "indexed_record_note": "The referenced curated source is indexed; this authoring draft is not separately ingested."
+}

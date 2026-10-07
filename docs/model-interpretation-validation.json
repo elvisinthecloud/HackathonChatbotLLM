@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-02",
+  "type": "live_model_interpretation_acceptance",
+  "release_id": "eb5a3023f35c3283",
+  "articles": 19,
+  "synthetic_conversations": 16,
+  "chat_turns": 37,
+  "http_200": 37,
+  "traces_inspected": 37,
+  "interpretation_model_generations": 37,
+  "accepted_interpretations": 37,
+  "fatal_rejections": 0,
+  "component_rejections": [
+    {
+      "case": "request-already-overview",
+      "turn": 1,
+      "reasons": [
+        "duplicate_or_excess_progress"
+      ]
+    }
+  ],
+  "source_access_inconsistencies": 0,
+  "models": [
+    "qwen3:30b-a3b-instruct-2507-q4_K_M"
+  ],
+  "manual_case_verdicts": {
+    "catalog-natural-progress": "pass",
+    "request-partial-progress": "pass",
+    "retake-unknown-type": "pass",
+    "retake-known-course": "pass",
+    "account-pin-correction": "pass",
+    "instructor-role-claim": "pass",
+    "selected-course-conflict": "pass",
+    "unknown-selected-course": "pass",
+    "unconfirmed-6800-content": "pass",
+    "moodle-method-change": "pass",
+    "cac-recovery-resume": "pass",
+    "hypothetical-completion": "pass",
+    "contradictory-success": "pass",
+    "staff-to-own-enrollment-correction": "pass",
+    "moodle-method-generic-progress": "pass",
+    "request-already-overview": "pass"
+  },
+  "offline_python_checks": 199,
+  "offline_javascript_checks": 6,
+  "limitations": "Manually reviewed, prewritten synthetic text API replays over nineteen selected articles. These checks do not establish real-user accuracy, full-corpus retrieval quality, screenshot interpretation, frontend end-to-end behavior or concurrent-user capacity. Profile selection remains simulated identity. Calls were serialized; no model or resource limits changed.",
+  "previous_rounds": [
+    {
+      "round": "round-1",
+      "conversations": 13,
+      "turns": 32,
+      "accepted": 22,
+      "fatal_rejections": 10,
+      "result": "Partial: rejected valid intents and repeated or selected wrong steps."
+    },
+    {
+      "round": "round-2",
+      "conversations": 14,
+      "turns": 34,
+      "accepted": 34,
+      "fatal_rejections": 0,
+      "result": "Partial: unsupported mobile guesses and an unanchored false completion."
+    },
+    {
+      "round": "round-3",
+      "conversations": 16,
+      "turns": 37,
+      "accepted": 37,
+      "fatal_rejections": 0,
+      "result": "Partial: initial symptom counted as progress, method question lost after Done, and broad PIN clarification."
+    }
+  ],
+  "synthetic_inputs": true,
+  "source_release_files": 56,
+  "source_parity": true,
+  "indexed_chunks": 24,
+  "original_service_health_unchanged": true,
+  "original_index_chunks": 315,
+  "manual_case_verdicts_are_bounded": true
+}

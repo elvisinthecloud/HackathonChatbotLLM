@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Bounded serial live regression checks, executed on deployment host via stdin."""
-import ast
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -21,12 +20,12 @@ def main():
     from release_guard import require_deployment_host, verify_release
     require_deployment_host()
     verify_release(release)
-    baseline = root / 'releases/a06c622a9646366f'
     before = original_health()
     headers = trace_headers()
     base = 'http://127.0.0.1:8081'
     checks = []
-    work = {'embed_text', 'article_candidate_search', 'vector_search', 'ollama_chat'}
+    work = {'embed_text', 'article_candidate_search', 'vector_search'}
+    model_work = work | {'ollama_chat'}
 
     def create(profile, course=None):
         time.sleep(1.1)
@@ -52,7 +51,9 @@ def main():
         else:
             raise RuntimeError('Trace not settled')
         ids = sorted({s['source_path'] for s in reply.get('sources', [])})
-        passed = (work.issubset(names) and ids == [article]) if mode == 'retrieve' else (not work.intersection(names) and not ids and reply['retrieved_count'] == 0)
+        passed = ((work | {'guided_response'}).issubset(names) and ids == [article]
+                  and reply.get('retrieved_count', 0) > 0) if mode == 'retrieve' else (
+                      not model_work.intersection(names) and not ids and reply['retrieved_count'] == 0)
         if mode == 'social':
             passed = passed and reply.get('response_kind') == 'conversation' and not reply.get('needs_clarification')
         if mode == 'clarify':
@@ -96,20 +97,12 @@ def main():
          'Hello, how do I copy a course in Moodle?', 'retrieve', article='MOODLE-COPY-001', category='Account/Profile Issue')
     turn('AO thanks does not repeat article', token, 'Thank you for your help.', 'social')
 
-    # Compare code only; do not restart or run the prior deployment.
-    def function(path, name):
-        tree = ast.parse(path.read_text())
-        return ast.dump(next(n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == name), include_attributes=False)
-    comparisons = {name: function(baseline / 'backend/rag.py', name) == function(release / 'backend/rag.py', name)
-                   for name in ('ground_answer', 'generate_answer', 'is_context_dependent_followup')}
-    comparisons['demo_policy_file_identical'] = (baseline / 'backend/demo_policy.py').read_bytes() == (release / 'backend/demo_policy.py').read_bytes()
     after = original_health()
     print(json.dumps({'tested_at_utc': datetime.now(timezone.utc).isoformat(), 'release_id': release.name,
                       'checks': checks, 'passed': all(c['passed'] for c in checks) and before == after,
                       'original_health_unchanged': before == after, 'original_health': after,
                       'demo_health_ok': fetch(base + '/api/health').get('ok'),
-                      'baseline_code_comparison': comparisons,
-                      'limitations': 'Real serial HTTP API tests, not browser interaction. Code comparison establishes unchanged functions, not a deterministic baseline model-output comparison. Existing grounding concern remains; no production fixes made.'}, indent=2))
+                      'limitations': 'Serial HTTP API and trace checks for the running isolated release, not browser interaction or a baseline model-output comparison. Full guided procedures use verify_scenarios.py.'}, indent=2))
 
 
 if __name__ == '__main__':

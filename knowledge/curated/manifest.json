@@ -1,25 +1,462 @@
 {
+  "schema_version": 1,
   "dataset_id": "mcele-curated-v1",
-  "article_files": [
-    "articles/mcele-course-launch-sts1-student.json",
-    "articles/moodle-copy-permission-instructor.json",
-    "articles/moodle-copy-course-ao.json",
-    "articles/moodle-copy-stuck-ao.json",
-    "articles/mcele-ecdep-request-tm.json",
-    "articles/mcele-enrollment-report-tm.json",
-    "articles/mcele-rrc-repeat-student.json",
-    "articles/mcele-epme-eligibility-student.json",
-    "articles/mcele-csc-access-student.json"
-  ],
-  "article_ids": [
-    "MCELE-LAUNCH-001",
-    "MOODLE-COPY-002",
-    "MOODLE-COPY-001",
-    "MOODLE-COPY-003",
-    "MCELE-ECDEP-001",
-    "MCELE-ENROLLMENT-REPORT-001",
-    "MCELE-RRC-001",
-    "MCELE-EPME-001",
-    "MCELE-CSC-001"
+  "release_id": "curated-20261005.1",
+  "buckets": {
+    "mcele-launch": "MCeLE course launch error",
+    "moodle-copy": "Moodle course copying",
+    "mcele-ecdep": "MCeLE ECDEP enrollment requests",
+    "mcele-enrollment-report": "MCeLE enrollment reporting",
+    "mcele-rrc": "MCeLE Reserve Retirement Credits",
+    "mcele-epme": "MCeLE EPME eligibility and enrollment",
+    "mcele-csc": "CSC access from MCeLE to Moodle",
+    "mcele-login": "MCeLE login methods",
+    "mcele-cac": "MCeLE CAC login troubleshooting",
+    "mcele-recovery": "MCeLE credential recovery",
+    "mcele-launch-general": "MCeLE enrolled-course launch",
+    "moodle-access": "Moodle browser access and support",
+    "moodle-app": "Moodle app access and support",
+    "mcele-unlock": "MCeLE temporary account lockout",
+    "mcele-cac-association": "MCeLE CAC association",
+    "mcele-find-courses": "MCeLE own non-PME course enrollment",
+    "mcele-view-courses": "MCeLE own courses and records"
+  },
+  "articles": [
+    {
+      "article_id": "MCELE-LAUNCH-001",
+      "file": "articles/mcele-course-launch-sts1-student.json",
+      "file_sha256": "2d251a03fdf13d0db6a4b4ed7838318b689e4f519efe423909e29f1b619782d4",
+      "allowed_roles": [
+        "Student"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-launch",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": "sts1.auth.ecuf.deas.mil refused to connect",
+        "excluded_delivery_areas": [
+          "Moodle"
+        ],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MOODLE-COPY-002",
+      "file": "articles/moodle-copy-permission-instructor.json",
+      "file_sha256": "7a63621fa5b68b9a6e46602aa6d1aced74cb8b1dd7f4da647f999489531fac7d",
+      "allowed_roles": [
+        "Adjunct Faculty"
+      ],
+      "service_area": "Moodle",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "moodle-copy",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MOODLE-COPY-001",
+      "file": "articles/moodle-copy-course-ao.json",
+      "file_sha256": "a260674ed66559f879c5815299786d36c10f0a3ab95cefa308b7b31a71b76939",
+      "allowed_roles": [
+        "Academics Officer"
+      ],
+      "service_area": "Moodle",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "moodle-copy",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MOODLE-COPY-003",
+      "file": "articles/moodle-copy-stuck-ao.json",
+      "file_sha256": "66b5902920484111b3724eece66a5de83a573dc01682b21286dc17c750a5f5d0",
+      "allowed_roles": [
+        "Academics Officer"
+      ],
+      "service_area": "Moodle",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "moodle-copy",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-ECDEP-001",
+      "file": "articles/mcele-ecdep-request-tm.json",
+      "file_sha256": "88bddbf20a93b9a3202c553754c81d210b9066d78b21216fbdc816858e5e6a76",
+      "allowed_roles": [
+        "Training Manager"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "courses",
+      "course_ids": [
+        "5500",
+        "6800"
+      ],
+      "bucket_id": "mcele-ecdep",
+      "applicability": {
+        "course_ids": [
+          "5500",
+          "6800"
+        ],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-ENROLLMENT-REPORT-001",
+      "file": "articles/mcele-enrollment-report-tm.json",
+      "file_sha256": "228018ecf4d3370bf4f22a35138b330428185785785c3009487bc2d3753e6c11",
+      "allowed_roles": [
+        "Training Manager"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-enrollment-report",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-RRC-001",
+      "file": "articles/mcele-rrc-repeat-student.json",
+      "file_sha256": "be28ccebc7c6f6c8bcb9728b67240c1d09ca07629599cc8b746b792bb0869620",
+      "allowed_roles": [
+        "Student"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-rrc",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-EPME-001",
+      "file": "articles/mcele-epme-eligibility-student.json",
+      "file_sha256": "ffbf53137bf019d5811aea1cce364f87db4ac099789aefb09e62d5c42aee7110",
+      "allowed_roles": [
+        "Student"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "courses",
+      "course_ids": [
+        "EPME3000",
+        "EPME4000",
+        "EPME5000",
+        "EPME6000",
+        "5500",
+        "6800"
+      ],
+      "bucket_id": "mcele-epme",
+      "applicability": {
+        "course_ids": [
+          "EPME3000",
+          "EPME4000",
+          "EPME5000",
+          "EPME6000",
+          "5500",
+          "6800"
+        ],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-CSC-001",
+      "file": "articles/mcele-csc-access-student.json",
+      "file_sha256": "621f75774a00af17bb7ee797950fd3ee952b52f84c9bc7ee34608aae5240bf41",
+      "allowed_roles": [
+        "Student"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "courses",
+      "course_ids": [
+        "CSC"
+      ],
+      "bucket_id": "mcele-csc",
+      "applicability": {
+        "course_ids": [
+          "CSC"
+        ],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-LOGIN-001",
+      "file": "articles/mcele-login-all.json",
+      "file_sha256": "166e31b3588868463fd17a34eed3c9a2246ce66fd711cf5eb6db94d18317123f",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-login",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-CAC-001",
+      "file": "articles/mcele-cac-login-all.json",
+      "file_sha256": "9fb6ef149a184ad2a53d3d8f41792bac315408bdd9d597fb97cdb906fd3f9183",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-cac",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-RECOVERY-001",
+      "file": "articles/mcele-credential-recovery-all.json",
+      "file_sha256": "22e1955bc386e4b6be5568b2ea1c1821333422120d88e79d2c7695abffab0ca3",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-recovery",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-LAUNCH-002",
+      "file": "articles/mcele-course-launch-all.json",
+      "file_sha256": "f33196415b7c304d905f275541f555386e37d4b3f0397fc944c4da5b900cfbdb",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-launch-general",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MOODLE-ACCESS-001",
+      "file": "articles/moodle-access-all.json",
+      "file_sha256": "64f56f322caec7a33cd6b543267983c3ad182c824325669840966d969fd72e08",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "Moodle",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "moodle-access",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": "browser"
+      }
+    },
+    {
+      "article_id": "MOODLE-APP-001",
+      "file": "articles/moodle-app-access-all.json",
+      "file_sha256": "09c00f5de576fa8c410e3b5304b68abffb990f0437196c6661d70b281478f586",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "Moodle",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "moodle-app",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": "app"
+      }
+    },
+    {
+      "article_id": "MCELE-UNLOCK-001",
+      "file": "articles/mcele-unlock-all.json",
+      "file_sha256": "d39819c1106bb294d6d35d900506111fca9b78e139a842a9a5cc137a6fb719da",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-unlock",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-CAC-ASSOC-001",
+      "file": "articles/mcele-cac-association-all.json",
+      "file_sha256": "8fb0b93d92f5ac185ee4a7adce8459487a1201658e5bffa8a3f2c7dc9b9d48dc",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-cac-association",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-FIND-001",
+      "file": "articles/mcele-find-courses-all.json",
+      "file_sha256": "c5075a7d4021bc745431319cb508cefbd8fdbf29cbbc52a32c7d6a04cb408711",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-find-courses",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [
+          "5500",
+          "6800",
+          "CSC",
+          "EWS",
+          "EPME3000",
+          "EPME4000",
+          "EPME5000",
+          "EPME6000"
+        ],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    },
+    {
+      "article_id": "MCELE-COURSES-001",
+      "file": "articles/mcele-view-courses-all.json",
+      "file_sha256": "880b112f8037f10c6d393fc1eb6cdb381d3d5becc034e38154bd0122e520181d",
+      "allowed_roles": [
+        "Student",
+        "Adjunct Faculty",
+        "Academics Officer",
+        "Training Manager",
+        "Regional Director"
+      ],
+      "service_area": "MCeLE",
+      "course_scope": "general",
+      "course_ids": [],
+      "bucket_id": "mcele-view-courses",
+      "applicability": {
+        "course_ids": [],
+        "excluded_course_ids": [],
+        "required_error": null,
+        "excluded_delivery_areas": [],
+        "access_method": null
+      }
+    }
   ]
 }

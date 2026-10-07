@@ -1,0 +1,349 @@
+{
+  "date": "2026-10-03",
+  "architecture": "understanding before retrieval; LLM-selected exact passages; constrained neutral questions",
+  "release_id": "95476e195b49ce1b",
+  "conversation_count": 12,
+  "turn_count": 34,
+  "verdicts": {
+    "partial": 3,
+    "pass": 6,
+    "fail": 3
+  },
+  "assessment": "The reported article dump is fixed: vague course help receives a goal question before article retrieval. The wider conversation flow remains uneven; three cases still fail the stricter behavior review.",
+  "limitations": "These are bounded synthetic tests, not a general accuracy guarantee. Eight final cases are exact comparisons using earlier adaptive inputs; four role/course cases were newly adaptive. Later scripted recovery input sometimes supplies a step the chatbot omitted. A separate two-turn mobile browser check covers the reported case. No real users, screenshot understanding, concurrent load or unseen corpus were tested. Demo profile selection is not production authentication.",
+  "changes": [
+    "Qwen identifies the desired action or observed problem before seeing retrieved articles. An unresolved goal produces a short clarification without retrieving or rendering procedures.",
+    "The LLM selects individual article actions or direct facts. The server quotes them exactly with their necessary conditions and permitted citations.",
+    "Clarification wording combines neutral language frames with grounded user phrases. This prevents free-form factual advice, but the questions remain constrained.",
+    "A separate model review checks applicability and progress, with one repair attempt. Guidance and clarification are exclusive reply types; a stray question cannot invalidate otherwise valid guidance.",
+    "Server-owned profiles, explicit role grants, course constraints and current indexed metadata remain authoritative. Negative and hypothetical progress reports do not establish completion."
+  ],
+  "findings": [
+    "All four vague openings in the final reviewer set produced goal questions, zero article retrieval and zero citations. The mobile reproduction also asks what the user wants to do.",
+    "Direct certificate facts, Catalog View follow-ups, account recovery after a clarified goal, Instructor permission guidance, Training Manager boundaries and the 6800-to-CYBERM0000 correction passed their cases.",
+    "Failure: switching explicitly from course help to an inactivity-disabled account misses the relevant login Help Desk source and repeats a screen/error question. Repeating the issue eventually recovers.",
+    "Failure: forgotten password during CAC association yields only a reference to recovery guidance without the recovery entry point. Later scripted inputs supply that entry point; those successful turns do not erase the failure.",
+    "Failure: a Student claiming to be a Training Manager gets no restricted instructions, but the fallback repeats an irrelevant error question after it was answered.",
+    "Partials: a certificate answer initially omits location; an eligibility answer repeats an already performed check; a request-form answer omits the explicitly requested limitation on fields and submission instructions.",
+    "A later focused-query experiment improved the CAC detour but regressed certificate, Catalog View and request-form behavior. It was rejected and the fully reviewed release restored."
+  ],
+  "verification": "280 Python and 6 JavaScript tests passed. All 34 reviewed API turns returned HTTP 200. All 34 traces were audited, containing 93 Qwen generations, with zero observed source-access inconsistencies. All 57 allowlisted runtime files match the reviewed source. The isolated demo has 19 approved articles and 24 chunks; original services remain healthy with 315 chunks. Models, source grants and resource limits were preserved. A mobile browser check found no page errors or horizontal overflow. The browser check used Chrome at a mobile viewport, not physical iPhone/Safari; both browser traces also passed source-access checks.",
+  "historical_note": "Earlier candidates and failures are retained below rather than replaced by successful retries. The final 95476e195b49ce1b review was performed before the rejected 236e4a7026f78e4d experiment; the exact verified 95476 source was restored, hashes rechecked and the public mobile case rerun. The rejected experiment completed 12 direct/progress turns and 6 vague turns before stopping; no role replay was run on it. These are development iterations, not independent samples for an accuracy percentage.",
+  "http_200_count": 34,
+  "trace_count": 34,
+  "model_generations": 93,
+  "observed_source_access_inconsistencies": 0,
+  "offline_checks": {
+    "python": 280,
+    "javascript": 6,
+    "passed": true
+  },
+  "deployment": {
+    "release_id": "95476e195b49ce1b",
+    "phase": "running",
+    "original_before": {
+      "frontend": true,
+      "backend": true,
+      "langfuse": true,
+      "original_chunk_count": 315
+    },
+    "original_after": {
+      "frontend": true,
+      "backend": true,
+      "langfuse": true,
+      "original_chunk_count": 315
+    },
+    "original_now": {
+      "frontend": true,
+      "backend": true,
+      "langfuse": true,
+      "original_chunk_count": 315
+    },
+    "release_files": 57,
+    "source_parity": true,
+    "demo_health": {
+      "ok": true,
+      "dataset_id": "mcele-curated-v1",
+      "chunk_count": 24
+    },
+    "article_count": 19,
+    "public_frontend_status": 200,
+    "public_health_verified": true
+  },
+  "cases": [
+    {
+      "case_id": "exact",
+      "transcript_filename": "exact.json",
+      "verdict": "partial",
+      "reason": "Vague opener clarifies before retrieval. Initial certificate answer omits requested location; explicit navigation follow-up quotes correct Student Dashboard/My Courses navigation without the prior unnecessary location question.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Pass: What help do you need? Zero sources and zero retrieval; no procedure or assumed course action."
+        },
+        {
+          "turn": 2,
+          "observation": "Partial: quotes exact Download Certificate definition but Where do I go? lacks Student Dashboard/My Courses navigation. No redundant course question."
+        },
+        {
+          "turn": 3,
+          "observation": "Pass: exact canonical Student Dashboard, My Courses, and Find the course steps supplied. Previous fallback and awkward appended question absent. Initial omitted navigation remains minor friction at case level."
+        }
+      ],
+      "suite": "vague"
+    },
+    {
+      "case_id": "colloquial",
+      "transcript_filename": "colloquial.json",
+      "verdict": "partial",
+      "reason": "Clarifies colloquial vague course intent, then quotes applicable own non-PME enrollment and eligibility facts. Negative report does not advance completion, but repeats already-performed Eligibility check and does not directly answer finished?",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Pass: short goal question, zero retrieval/sources; no platform/enrollment guess."
+        },
+        {
+          "turn": 2,
+          "observation": "Pass: supplied own non-PME self-paced MCeLE goal receives exact canonical catalog/View/Eligibility/Enroll Now/My Courses guidance, preserving If available condition."
+        },
+        {
+          "turn": 3,
+          "observation": "Partial: red Eligibility and absent Enroll Now receive correct eligibility restriction fact, but repeated instruction to check Eligibility is minor friction. No claim of successful enrollment; completed_quotes empty. Parent goal retains own non-PME enrollment; current goal is Does that mean it is finished?"
+        }
+      ],
+      "suite": "vague"
+    },
+    {
+      "case_id": "account",
+      "transcript_filename": "account.json",
+      "verdict": "pass",
+      "reason": "Vague account issue clarifies without retrieval; actual forgotten-password goal gets focused exact password passage; failed five-minute recovery switches to correctly conditioned missing-email guidance without claiming completion.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Pass: asks what happened, grounded in user account quote; zero retrieval/sources and no assumed login method."
+        },
+        {
+          "turn": 2,
+          "observation": "Pass: password goal with remembered username receives exact Forgot Password/Password Assistance/PIN steps, without username-recovery or CAC procedures. Some omission of final sign-in is minor and does not block current task."
+        },
+        {
+          "turn": 3,
+          "observation": "Pass: failed five-minute no-PIN report gets exact wait up to 30 minutes, spam/junk, conditional Help Desk guidance. completed_quotes empty; no completion claim, no stray progress question."
+        }
+      ],
+      "suite": "vague"
+    },
+    {
+      "case_id": "switch",
+      "transcript_filename": "switch.json",
+      "verdict": "fail",
+      "reason": "Explicit account correction still receives generic fallback and a repeated exact-message/screen question despite adequate disabled-inactivity Help Desk evidence. Repeating the same problem then yields correct guidance.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Pass: What help do you need? Zero retrieval/sources and no premature procedure."
+        },
+        {
+          "turn": 2,
+          "observation": "Fail: explicit drop-course correction with disabled because of inactivity message and reactivation goal receives I could not confirm a reliable next step from the available guidance. What exact message or screen do you see now? Retrieved 3, no sources. Canonical MCELE-LOGIN-001 disabled-account section supplies sufficient Help Desk guidance; user already supplied the exact problem."
+        },
+        {
+          "turn": 3,
+          "observation": "Correct exact Help Desk reactivation passage follows repeated explanation, with an unnecessary trailing Disabled account heading. Recovery does not erase prior answered-question-loop failure."
+        }
+      ],
+      "suite": "vague"
+    },
+    {
+      "case_id": "certificate",
+      "transcript_filename": "certificate.json",
+      "verdict": "pass",
+      "reason": "Precise fact answered from one canonical action without unnecessary interview or unrelated transcript/actions.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "HTTP 200; Download Certificate view/download/print fact only."
+        }
+      ],
+      "suite": "progress"
+    },
+    {
+      "case_id": "enrollment",
+      "transcript_filename": "enrollment.json",
+      "verdict": "pass",
+      "reason": "Applicable self non-PME enrollment guidance and focused Catalog View next step/boundary. Prior generic fallback and extra question fixed. Negative click/enrollment reports did not advance completion.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "HTTP 200; Course Catalog/Search, View, Eligibility, conditional Enroll/Re-Enroll and My Courses guidance."
+        },
+        {
+          "turn": 2,
+          "observation": "HTTP 200; found course with unclicked View yields precise View opens Course Details instruction."
+        },
+        {
+          "turn": 3,
+          "observation": "HTTP 200; Catalog View factual boundary answered with exact relevant sentence; no completed-content View conflation, no unnecessary follow-up."
+        }
+      ],
+      "suite": "progress"
+    },
+    {
+      "case_id": "cac",
+      "transcript_filename": "cac.json",
+      "verdict": "fail",
+      "reason": "First clear forgotten-password detour question receives only a generic instruction to use approved recovery guidance, with no entry point, link or recovery step despite approved coverage. Later fixed inputs supply the recovery entry point independently, so their success does not establish successful first-turn guidance.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "HTTP 200; only Use the approved MCeLE credential-recovery guidance for the forgotten username or password. No Forgot Password entry point, link, or recovery procedure; parent CAC goal null. Less actionable than prior release."
+        },
+        {
+          "turn": 2,
+          "observation": "HTTP 200; when the replay input independently supplies Forgot Password page, correct username/Continue step."
+        },
+        {
+          "turn": 3,
+          "observation": "HTTP 200; correct numeric email PIN field/Continue step."
+        },
+        {
+          "turn": 4,
+          "observation": "HTTP 200; explicit successful reset/sign-in and CAC-resume question gets correct Existing Account Start Here, credentials, Sign In and confirm association."
+        }
+      ],
+      "suite": "progress"
+    },
+    {
+      "case_id": "request",
+      "transcript_filename": "request.json",
+      "verdict": "partial",
+      "reason": "All hypothetical, failed and actual-opening submission/approval boundaries remain correct. Last turn omits the requested form-fields/submission scope answer that previous release supplied.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "HTTP 200; applicable My Courses > Launch/View > Enrollment > Overview > Request opening steps."
+        },
+        {
+          "turn": 2,
+          "observation": "HTTP 200; hypothetical Request click does not mean submitted or approved; no false completion."
+        },
+        {
+          "turn": 3,
+          "observation": "HTTP 200; failed click/no submission does not advance progress; correct boundary sentence."
+        },
+        {
+          "turn": 4,
+          "observation": "HTTP 200; actual opened form/no sending gets correct opening versus submitted/approved sentence; omits canonical Form-specific fields and submission instructions are outside this guidance despite explicit scope question."
+        }
+      ],
+      "suite": "progress"
+    },
+    {
+      "case_id": "student_role",
+      "transcript_filename": "student_role.json",
+      "verdict": "fail",
+      "reason": "Vague course opener correctly clarified with zero retrieval, and claimed Training Manager identity did not expose restricted guidance. However, the response to a clear enrollment goal asks for an unrelated exact message/screen; after the user explicitly says there is no error message, it repeats the same question. This fails the wrong-goal/repeated answered clarification criteria. No unsupported question-field instructions were rendered.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Short goal clarification 'What would you like to do?' with zero sources and retrieved_count 0; pass."
+        },
+        {
+          "turn": 2,
+          "observation": "Student role claim did not grant TM article access; sources empty. Clear recommendation/denial goal instead received generic reliable-next-step fallback and exact-message/screen question, which does not address the selected-profile restriction."
+        },
+        {
+          "turn": 3,
+          "observation": "User answered there is no error message and requested TM instructions in a question. No restricted procedures leaked, but assistant repeats exact-message/screen question verbatim; fail."
+        }
+      ],
+      "suite": "roles"
+    },
+    {
+      "case_id": "instructor_role",
+      "transcript_filename": "instructor_role.json",
+      "verdict": "pass",
+      "reason": "AO claim cannot grant access: both copying request and legitimate permission follow-up give focused approved Instructor guidance identifying AO requirement and selected Instructor limitations without exposing AO procedures.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "MOODLE-COPY-002 only; explains AO Moodle role required, Instructor lacks role, obtain permissions or contact AO user; no copy instructions."
+        },
+        {
+          "turn": 2,
+          "observation": "Direct permissions question answered from same appropriate short article without unnecessary clarification."
+        }
+      ],
+      "suite": "roles"
+    },
+    {
+      "case_id": "tm_enrollment",
+      "transcript_filename": "tm_enrollment.json",
+      "verdict": "pass",
+      "reason": "Authorized direct 5500 enrollment request receives focused initial navigation. Missing-document automatic-denial/override request is correctly bounded as unsupported; follow-up asking where to check bundled certificate receives exact applicable source guidance without repeating navigation or unsupported remedies.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "MCELE-ECDEP-001 scope plus Administration > Requests > Manage Requests filters; no unnecessary interview."
+        },
+        {
+          "turn": 2,
+          "observation": "States approved guidance does not establish answer to automatic denial/override; no invented advice or question-field remedy."
+        },
+        {
+          "turn": 3,
+          "observation": "Focused Request file list, NAVMC Form 11580 and prerequisite certification passage, including certificate may be bundled inside form."
+        }
+      ],
+      "suite": "roles"
+    },
+    {
+      "case_id": "unknown_platform",
+      "transcript_filename": "unknown_platform.json",
+      "verdict": "pass",
+      "reason": "6800 course-content platform remains unconfirmed and is clarified without guessing or retrieval. Explicit correction to CYBERM0000 with confirmed enrollment/platform receives applicable launch steps immediately.",
+      "turn_observations": [
+        {
+          "turn": 1,
+          "observation": "Asks MCeLE or Moodle and states content platform not confirmed; zero sources and retrieved_count 0."
+        },
+        {
+          "turn": 2,
+          "observation": "Accepts course correction and supplied MCeLE goal; MCELE-LAUNCH-002 launch steps use Student Dashboard > My Courses, enrolled course, conditional Launch button, confirm course opens."
+        }
+      ],
+      "suite": "roles"
+    }
+  ],
+  "rejected_experiment": {
+    "release_id": "236e4a7026f78e4d",
+    "direct_progress": {
+      "conversations": 4,
+      "turns": 12,
+      "pass": 1,
+      "fail": 3
+    },
+    "vague": {
+      "conversations": 2,
+      "turns": 6,
+      "partial": 1,
+      "fail": 1
+    },
+    "action": "Restored exact previously reviewed release; experimental source kept privately."
+  },
+  "privacy": "Raw session identifiers, trace identifiers, private network details and runtime credentials are excluded. Exact synthetic transcripts and trace records remain outside Git.",
+  "mobile_browser": {
+    "turns": 2,
+    "http_200_count": 2,
+    "trace_count": 2,
+    "model_generations": 4,
+    "observed_source_access_inconsistencies": 0,
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "opener_answer": "What are you trying to do?",
+    "opener_retrieved_count": 0,
+    "followup": "Exact Download Certificate action; MCELE-COURSES-001 only",
+    "scope": "Public demo on headless Chrome at mobile viewport; this is not a physical iPhone or Safari test."
+  }
+}

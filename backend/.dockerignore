@@ -13,3 +13,16 @@
 !demo_policy.py
 !demo_sessions.py
 !conversation.py
+!troubleshooting.py
+!access_support.py
+!account_course_support.py
+!intent_interpreter.py
+!flexible_support.py
+!dialogue_state.py
+!article_registry.py
+!article_retrieval.py
+!evidence_conditions.py
+!compact_interpretation.py
+!compact_reply.py
+
+!compact_relevance.py

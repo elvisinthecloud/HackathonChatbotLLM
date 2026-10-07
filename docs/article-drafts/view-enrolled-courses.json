@@ -1,0 +1,36 @@
+{
+  "type": "knowledge_article_draft",
+  "status": "reviewed_and_integrated_in_curated_source",
+  "title": "View Enrolled Courses",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "access_review_status": "confirmed",
+  "course_scope_description": "Own MCeLE course listings, statuses, common self-paced actions and records. No staff management of another user records or course eligibility rules.",
+  "content": "Use this guidance to find your own MCeLE courses, check their status, and understand common self-paced course actions.\n\n### Find your courses\n\n1. Select **Student Dashboard** in the left navigation menu.\n2. Select **My Courses**.\n3. Find the course. You can sort newest or oldest, or filter by course type, status, or category.\n\nCourses can show statuses such as Pending, In Progress, Completed, Incomplete, Enrolled, Disenrolled, Passed, Failed, or Equivalency.\n\n### Common course actions\n\n- **Launch:** Opens the course enrollment page, where you can access the associated self-paced course material, tests, or surveys.\n- **View:** Reviews completed-course content. Selecting View does not enroll you in the course again. If you want to take a completed course again, use the applicable re-enrollment guidance.\n- **Download Certificate:** View, download, or print a course certificate or diploma.\n- **Disenroll:** Disenroll from the course.\n- **Details:** Open the dropdown under the course title to see the description and ACE, CEU, and RRC credit amounts.\n- **Sub-Courses:** Open the dropdown under a curriculum title to see its associated sub-courses.\n\nUse the actions available for the course and its current status.\n\n### Transcripts\n\nSelect **Request Official Transcript** in the top right for a transcript going to a college or employer. Select **Print Transcript** for an unofficial transcript.\n",
+  "indexed": true,
+  "provenance": {
+    "type": "adapted",
+    "source_page_id": "403636310",
+    "source_html": "EKB/View-Enrolled-Courses_403636310.html",
+    "source_updated": "2026-07-24",
+    "user_confirmations": [
+      {
+        "date": "2026-10-02",
+        "description": "All five roles may receive this own-course guidance. Student Dashboard > My Courses is current, including for instructors and AOs. Add the distinction that View reviews completed content without enrolling again."
+      }
+    ]
+  },
+  "remaining_content_limits": [
+    "The exported action table does not supply a complete step-by-step procedure for every action.",
+    "The alternative Portal Home widget is omitted pending label confirmation.",
+    "Detailed re-enrollment guidance remains in the reviewed Finding and Registering for Courses article."
+  ],
+  "curated_source": "knowledge/curated/articles/mcele-view-courses-all.json",
+  "indexed_record_note": "The referenced curated source is indexed; this authoring draft is not separately ingested."
+}

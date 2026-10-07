@@ -15,26 +15,47 @@ SERVICES = ("demo-db", "demo-backend", "demo-frontend", "demo-tunnel")
 CONTAINERS = tuple(PROJECT + "-" + name for name in ("db", "backend", "frontend", "tunnel"))
 NETWORK = PROJECT + "-network"
 VOLUME = PROJECT + "-postgres-data"
-ALLOWLIST = (
+BASE_ALLOWLIST = (
     "compose.demo.yml", "backend/Dockerfile", "backend/.dockerignore",
     "backend/app.py", "backend/db.py", "backend/ingest.py", "backend/demo_config.py", "backend/demo_dataset.py", "backend/demo_policy.py", "backend/demo_sessions.py",
-    "backend/prompts.py", "backend/rag.py", "backend/conversation.py", "backend/requirements.txt", "backend/requirements.lock", "backend/text_utils.py",
+    "backend/prompts.py", "backend/rag.py", "backend/conversation.py", "backend/troubleshooting.py", "backend/access_support.py", "backend/account_course_support.py", "backend/intent_interpreter.py", "backend/flexible_support.py", "backend/dialogue_state.py", "backend/evidence_conditions.py", "backend/article_registry.py", "backend/article_retrieval.py", "backend/requirements.txt", "backend/requirements.lock", "backend/text_utils.py",
     "frontend/index.html", "frontend/chat-widget.css", "frontend/chat-widget.js", "frontend/nginx.conf",
-    "database/schema.sql", "knowledge/curated/articles/mcele-course-launch-sts1-student.json",
-    "knowledge/curated/articles/moodle-copy-permission-instructor.json", "knowledge/curated/articles/moodle-copy-course-ao.json",
-    "knowledge/curated/articles/moodle-copy-stuck-ao.json", "knowledge/curated/articles/mcele-ecdep-request-tm.json",
-    "knowledge/curated/articles/mcele-enrollment-report-tm.json", "knowledge/curated/articles/mcele-rrc-repeat-student.json",
-    "knowledge/curated/articles/mcele-epme-eligibility-student.json",
-    "knowledge/curated/articles/mcele-csc-access-student.json",
+    "database/schema.sql",
     "knowledge/curated/manifest.json", "knowledge/curated/taxonomy.json",
     "scripts/deploy.py", "scripts/configure_runtime.py", "scripts/rollback.py", "scripts/release_guard.py",
     "scripts/atlas_release.py", "scripts/verify_deployment.py", "scripts/verify_scenarios.py", "verification/synthetic-sts1.png",
+    "scripts/evaluate_retrieval.py", "docs/retrieval-evaluation-cases.json",
+    "backend/compact_interpretation.py", "backend/compact_reply.py", "backend/compact_relevance.py",
 )
 
 
 def reject_symlinks(path: Path) -> None:
     if any(p.is_symlink() for p in (path, *path.parents)):
         raise ValueError("Symlinks are forbidden in deployment paths")
+
+
+def release_files(local: Path) -> tuple[str, ...]:
+    """Package only named reviewed files; never crawl the knowledge directory."""
+    manifest_path = local / 'knowledge/curated/manifest.json'
+    reject_symlinks(manifest_path)
+    if manifest_path.stat().st_size > 1024 * 1024:
+        raise ValueError('Registry exceeds release size limit')
+    manifest = json.loads(manifest_path.read_text())
+    entries = manifest.get('articles')
+    if not isinstance(entries, list) or not 1 <= len(entries) <= 1000:
+        raise ValueError('Invalid release article registry')
+    files = []
+    for entry in entries:
+        rel = entry.get('file') if isinstance(entry, dict) else None
+        if not isinstance(rel, str) or not re.fullmatch(r'articles/[a-z0-9-]+\.json', rel):
+            raise ValueError('Invalid reviewed article path')
+        files.append('knowledge/curated/' + rel)
+    if len(set(files)) != len(files):
+        raise ValueError('Duplicate reviewed article path')
+    return BASE_ALLOWLIST + tuple(files)
+
+
+ALLOWLIST = release_files(Path(__file__).resolve().parents[1])
 
 
 def require_deployment_host():
@@ -51,7 +72,7 @@ def release_id(hashes: dict) -> str:
 
 def source_hashes(local: Path) -> dict:
     result = {}
-    for rel in ALLOWLIST:
+    for rel in release_files(local):
         p = local / rel
         reject_symlinks(p)
         if not p.is_file():

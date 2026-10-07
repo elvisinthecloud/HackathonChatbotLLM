@@ -1,0 +1,30 @@
+{
+  "article_id": "MCELE-COURSES-001",
+  "title": "View Enrolled Courses",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this guidance to find your own MCeLE courses, check their status, and understand common self-paced course actions. It does not cover staff management of another user's records or course eligibility rules.\n\n### Find your courses\n\n1. Select **Student Dashboard** in the left navigation menu.\n2. Select **My Courses**.\n3. Find the course. You can sort newest or oldest, or filter by course type, status, or category.\n\nCourses can show statuses such as **Pending**, **In Progress**, **Completed**, **Incomplete**, **Enrolled**, **Disenrolled**, **Passed**, **Failed**, or **Equivalency**.\n\n### Common course actions\n\n- **Launch:** Opens the course enrollment page, where you can access the associated self-paced course material, tests, or surveys.\n- **View:** Reviews completed-course content. Selecting **View** does not enroll you in the course again. If you want to take a completed course again, use the applicable re-enrollment guidance.\n- **Download Certificate:** View, download, or print a course certificate or diploma.\n- **Disenroll:** Disenroll from the course.\n- **Details:** Open the dropdown under the course title to see the description and ACE, CEU, and RRC credit amounts.\n- **Sub-Courses:** Open the dropdown under a curriculum title to see its associated sub-courses.\n\nUse the actions available for the course and its current status.\n\n### Transcripts\n\nSelect **Request Official Transcript** in the top right for a transcript going to a college or employer. Select **Print Transcript** for an unofficial transcript.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence enrolled-course article, preserving status coverage, Student Dashboard and My Courses navigation, common self-paced actions, and transcript actions; the own-course scope and View versus re-enrollment distinction reflect the reviewed user corrections.",
+    "source_page_id": "403636310",
+    "source_html": "EKB/View-Enrolled-Courses_403636310.html",
+    "source_updated": "2026-07-24",
+    "user_corrections": [
+      {
+        "date": "2026-10-02",
+        "description": "All five seeded roles may receive own-course guidance. Use Student Dashboard > My Courses in the left navigation, including for staff accessing their own learner courses. View reviews completed content without enrolling again; retaking a course follows re-enrollment guidance. Omit the Portal Home widget pending label confirmation."
+      }
+    ]
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

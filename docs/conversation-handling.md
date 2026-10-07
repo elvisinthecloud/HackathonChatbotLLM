@@ -1,5 +1,11 @@
 # Conversational turns
 
+This document records the earlier social-turn checkpoint. The current
+[guided troubleshooting implementation](guided-troubleshooting.md) supersedes its
+unsupported-prose, Content Management, and same-course topic-change limitations.
+The historical live results below do not verify the new guided implementation,
+which has been tested offline while the VM is unavailable.
+
 The deterministic recognizer in `backend/conversation.py` accepts only complete
 messages composed of reviewed greetings, thanks, acknowledgements, and generic
 capability questions. Unmatched words cause the whole original message to follow

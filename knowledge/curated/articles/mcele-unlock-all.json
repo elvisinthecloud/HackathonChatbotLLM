@@ -1,0 +1,56 @@
+{
+  "article_id": "MCELE-UNLOCK-001",
+  "title": "Unlock Your Account",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this guidance when your MCeLE account is temporarily locked after multiple failed login attempts. Users cannot manually unlock their own accounts.\n\n### After three failed login attempts\n\n1. Stop trying to sign in after the third failed attempt.\n2. Wait 60 minutes for the account to unlock automatically.\n3. After the wait, sign in again with the correct username and password.\n\n### Need access before the wait ends\n\n1. Contact the Help Desk or an Administrator for assistance with a manual unlock.\n2. After the account is unlocked, sign in with the correct username and password.\n\n### Account still appears locked after waiting\n\n1. Restart the browser.\n2. Try signing in again.\n3. If the lockout message persists, clear the browser cache and retry.\n\n### Unsure of your credentials\n\n1. Do not keep guessing the username or password.\n2. Use the approved MCeLE credential-recovery guidance for **Forgot Username?** or **Forgot Password?**.\n3. Return to MCeLE sign-in after recovering the credential.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence account-unlock article, preserving the temporary lockout rule, automatic wait, Help Desk or Administrator escalation, browser restart, cache guidance, and credential-recovery distinction.",
+    "source_page_id": "403636427",
+    "source_html": "EKB/Unlock-Your-Account_403636427.html",
+    "source_updated": "2026-07-14",
+    "user_corrections": [
+      {
+        "date": "2026-09-30",
+        "description": "All five seeded roles may receive temporary MCeLE account-lockout guidance; this does not grant users manual-unlock permission. Accounts lock after 3 failed attempts and automatically unlock after 60 minutes."
+      }
+    ]
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review",
+  "section_conditions": [
+    {
+      "section": "After three failed login attempts",
+      "condition_quote": "After three failed login attempts",
+      "kind": "semantic"
+    },
+    {
+      "section": "Need access before the wait ends",
+      "condition_quote": "Need access before the wait ends",
+      "kind": "elapsed_wait",
+      "minimum_minutes": 60,
+      "relation": "before"
+    },
+    {
+      "section": "Account still appears locked after waiting",
+      "condition_quote": "Account still appears locked after waiting",
+      "kind": "elapsed_wait",
+      "minimum_minutes": 60,
+      "relation": "after"
+    },
+    {
+      "section": "Unsure of your credentials",
+      "condition_quote": "Unsure of your credentials",
+      "kind": "semantic"
+    }
+  ]
+}

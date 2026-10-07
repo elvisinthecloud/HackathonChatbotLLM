@@ -1,0 +1,184 @@
+{
+  "type": "offline_validation",
+  "date": "2026-09-30",
+  "article_count": 15,
+  "verification": "Actual backend routing/rendering with local curated sources and mocked retrieval, model and tracing boundaries. All example inputs are synthetic.",
+  "live_model_verified": false,
+  "database_indexed": false,
+  "deployment_verified": false,
+  "tests": {
+    "python": 115,
+    "frontend": 6
+  },
+  "source_validation": true,
+  "release_allowlist_verified": true,
+  "example_conversations": [
+    {
+      "scenario": "browser_to_app",
+      "profile_id": "ao",
+      "course_id": null,
+      "turns": [
+        {
+          "user": "How do I log into Moodle?",
+          "answer": "1. Sign in to MCeLE. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-ACCESS-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "browser",
+          "active_article": "MOODLE-ACCESS-001",
+          "step_index": 0
+        },
+        {
+          "user": "Done",
+          "answer": "2. In the left navigation menu, select **Instructor-Led Courses** to open Moodle. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-ACCESS-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "browser",
+          "active_article": "MOODLE-ACCESS-001",
+          "step_index": 1
+        },
+        {
+          "user": "I mean the app.",
+          "answer": "1. Log in to MCeLE with your username and password. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-APP-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "app",
+          "active_article": "MOODLE-APP-001",
+          "step_index": 0
+        },
+        {
+          "user": "What is the site URL?",
+          "answer": "5. In the app, enter the exact, case-sensitive site URL `elearning.mcele.usmc.mil/moodle`. [1]\n\nWould you like to return to the current step?",
+          "sources": [
+            "MOODLE-APP-001"
+          ],
+          "suggested_replies": [
+            "Yes",
+            "No"
+          ],
+          "moodle_access_method": "app",
+          "active_article": "MOODLE-APP-001",
+          "step_index": 0
+        },
+        {
+          "user": "Yes",
+          "answer": "1. Log in to MCeLE with your username and password. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-APP-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "app",
+          "active_article": "MOODLE-APP-001",
+          "step_index": 0
+        }
+      ]
+    },
+    {
+      "scenario": "failed_moodle_handoff",
+      "profile_id": "student",
+      "course_id": "5500",
+      "turns": [
+        {
+          "user": "I clicked Launch in MCeLE My Courses, but it did not open my 5500 course.",
+          "answer": "1. If the MCeLE handoff does not redirect successfully, return to MCeLE and select **Instructor-Led Courses** in the left navigation. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-ACCESS-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "browser",
+          "active_article": "MOODLE-ACCESS-001",
+          "step_index": 0
+        },
+        {
+          "user": "Done",
+          "answer": "2. In Moodle, open **Dashboard** or **My Courses** and select the course tile. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MOODLE-ACCESS-001"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": "browser",
+          "active_article": "MOODLE-ACCESS-001",
+          "step_index": 1
+        }
+      ]
+    },
+    {
+      "scenario": "ao_as_learner",
+      "profile_id": "ao",
+      "course_id": "CYBERM0000",
+      "turns": [
+        {
+          "user": "I am an AO taking my enrolled CYBERM0000 course, but it shows an active session.",
+          "answer": "1. Clear the browser cache. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MCELE-LAUNCH-002"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": null,
+          "active_article": "MCELE-LAUNCH-002",
+          "step_index": 0
+        },
+        {
+          "user": "I already cleared the cache, but have not restarted.",
+          "answer": "2. Restart the browser. [1]\n\nTell me when you've completed this step, or what is stopping you.",
+          "sources": [
+            "MCELE-LAUNCH-002"
+          ],
+          "suggested_replies": [
+            "Done",
+            "I'm stuck"
+          ],
+          "moodle_access_method": null,
+          "active_article": "MCELE-LAUNCH-002",
+          "step_index": 1
+        }
+      ]
+    },
+    {
+      "scenario": "created_activity_support",
+      "profile_id": "ao",
+      "course_id": null,
+      "turns": [
+        {
+          "user": "An activity in the Moodle course I created is not working.",
+          "answer": "For a Moodle course or material/activity problem, including a missing course tile, contact the **Student Support Help Desk** and use **option 3 for Moodle support**. [1]",
+          "sources": [
+            "MOODLE-ACCESS-001"
+          ],
+          "suggested_replies": [],
+          "moodle_access_method": "browser",
+          "active_article": "MOODLE-ACCESS-001",
+          "step_index": 0
+        }
+      ]
+    }
+  ],
+  "release_file_count": 48,
+  "local_release_id": "d51aa735d098040c"
+}

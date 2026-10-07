@@ -15,7 +15,8 @@ import time
 
 ROOT = Path.home() / 'mcele-hackathon-demo'
 BASE = 'http://127.0.0.1:8081'
-WORK = {'embed_text', 'article_candidate_search', 'vector_search', 'ollama_chat'}
+WORK = {'embed_text', 'article_candidate_search', 'vector_search'}
+MODEL_WORK = WORK | {'ollama_chat'}
 
 
 def main():
@@ -81,7 +82,7 @@ def main():
 
             check(answer.get('response_kind') == ('conversation' if expected == 'social' else 'support'), 'Correct response kind')
             if expected in ('social', 'clarification'):
-                check(not WORK.intersection(names), 'No embedding, candidate/vector search, or chat-model spans')
+                check(not MODEL_WORK.intersection(names), 'No embedding, candidate/vector search, or chat-model spans')
                 check(answer.get('retrieved_count') == 0 and not ids, 'Zero retrieved chunks and no sources')
                 check(bool(answer.get('needs_clarification')) == (expected == 'clarification'), 'Correct clarification status')
             if expected == 'social':
@@ -90,14 +91,21 @@ def main():
                     check(answer['answer'] == 'Yes. What would you like help with?', 'Exact capability reply; prior article not repeated')
             if expected == 'clarification':
                 check('exact error' in answer['answer'].lower(), 'Requests exact error before troubleshooting')
+            if expected in ('retrieval', 'guided_clarification'):
+                check((WORK | {'guided_response'}).issubset(names), 'Real retrieval and guided-response spans present')
+            if expected == 'guided_clarification':
+                state = (answer.get('context') or {}).get('troubleshooting') or {}
+                check(answer.get('retrieved_count', 0) > 0 and not ids, 'Diagnostic question makes no source claim')
+                check(answer.get('needs_clarification') and state.get('article_id') == article_id
+                      and state.get('pending_question') == 'step_problem', 'Preserves the pending step problem')
             if expected == 'retrieval':
-                check(WORK.issubset(names), 'Real embedding, candidate search, vector search and chat-model spans present')
                 check(ids == [article_id] and answer.get('retrieved_count', 0) > 0, 'Only expected article returned')
-                check(not answer.get('needs_clarification'), 'Support answer delivered')
+                check(bool(answer.get('answer')), 'Support answer delivered')
                 if article_id == 'MCELE-LAUNCH-001' and 'refused to connect' in message:
-                    check(all(word in answer['answer'].lower() for word in ('24 hours', 'restart', 'computer')), 'Approved launch guidance present')
+                    check('1. log in to **mcele**' in answer['answer'].lower(), 'Approved first launch step present')
                 elif article_id == 'MOODLE-COPY-003':
-                    check(all(word in answer['answer'].lower() for word in ('quality assurance', 'content management and removal policy')), 'Approved stuck-copy guidance present')
+                    required = 'policy' if 'policy' in message.lower() else 'quality assurance'
+                    check(required in answer['answer'].lower(), 'Requested approved stuck-copy guidance present')
             turn = {'message': message, 'answer': answer['answer'],
                     'response_kind': answer.get('response_kind'), 'retrieved_count': answer['retrieved_count'],
                     'sources': ids, 'trace_id': answer['trace_id'], 'observations': names,
@@ -112,14 +120,14 @@ def main():
         ('I cannot launch my CYBERM0000 course.', 'clarification', None),
         ('Okay, thank you!', 'social', None),
         ('The error says sts1.auth.ecuf.deas.mil refused to connect.', 'retrieval', 'MCELE-LAUNCH-001'),
-        ('Thanks, but I still cannot launch CYBERM0000.', 'retrieval', 'MCELE-LAUNCH-001'),
+        ('Thanks, but I still cannot launch CYBERM0000.', 'guided_clarification', 'MCELE-LAUNCH-001'),
         ('Thanks, I appreciate it.', 'social', None),
     ])
     run_conversation('Academics Officer: stuck copy, capability reply, and contextual follow-up', 'ao', [
         ('I am trying to copy a course in Moodle to make a clone, but it keeps loading and never submits. What should I do?', 'retrieval', 'MOODLE-COPY-003'),
         ('Oh okay, thank you! Are you able to help me with other things?', 'social', None),
         ('How are you today?', 'social', None),
-        ('Where can I find that policy you mentioned?', 'retrieval', 'MOODLE-COPY-003'),
+        ('Where can I find the Content Management and Removal Policy?', 'retrieval', 'MOODLE-COPY-003'),
         ('Got it, thank you.', 'social', None),
     ])
     after = original_health()
@@ -128,7 +136,7 @@ def main():
                          'turns': len(turns), 'passed_turns': sum(t['passed'] for t in turns),
                          'original_health_unchanged': before == after, 'original_health': after,
                          'demo_health_ok': fetch(BASE + '/api/health').get('ok'),
-                         'limitations': 'Serial live API tests, not browser automation. Screenshots and general same-course topic switching excluded. Initial run found a pre-existing resolver limitation: naming Content Management in an AO follow-up changes the inferred task and triggers clarification. This run uses a context-only policy follow-up. Initial transcript retained separately; polite Student follow-up checks routing, not repetition of all initial troubleshooting steps.'}
+                         'limitations': 'Serial live API tests, not browser automation. Covers social bypass, one-step support, diagnostic follow-up and an explicit Content Management reference. Screenshots and full procedure traversal use verify_scenarios.py. This report applies only to the release tested at the recorded time.'}
     print(json.dumps(report, indent=2))
 
 

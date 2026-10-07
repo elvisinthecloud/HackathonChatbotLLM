@@ -481,8 +481,9 @@ h1 {
 }
 
 .chat-bubble h3 {
-  margin: 0.15rem 0 0.35rem;
-  font-size: 0.88rem;
+  margin: 0.85rem 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   line-height: 1.35;
   letter-spacing: 0;
 }
@@ -490,12 +491,20 @@ h1 {
 .chat-bubble ol,
 .chat-bubble ul {
   margin: 0 0 0.5rem;
-  padding-left: 1.15rem;
+  padding-left: 1.6rem;
 }
 
 .chat-bubble li {
-  margin: 0 0 0.3rem;
-  padding-left: 0.1rem;
+  margin: 0 0 0.55rem;
+  padding-left: 0.2rem;
+}
+
+.chat-bubble h3:first-child {
+  margin-top: 0;
+}
+
+.chat-bubble li::marker {
+  font-weight: 600;
 }
 
 .chat-bubble li:last-child {
@@ -542,6 +551,7 @@ h1 {
 
 .inline-citation {
   display: inline-block;
+  white-space: nowrap;
   margin-left: 0.12rem;
   color: #1d4ed8;
   font-size: 0.75em;
@@ -737,3 +747,9 @@ h1 {
 .clarify-panel button { display: flex; align-items: center; gap: 8px; max-width: 100%; padding: 11px 14px; border: 1px solid #b9cde0; border-radius: 16px 16px 16px 4px; background: #edf4fc; color: #123647; font: inherit; text-align: left; cursor: pointer; }
 .clarify-panel button:hover { background: #dcecf5; border-color: #3976b8; }
 .clarify-panel button:focus-visible { outline: 2px solid #1467ce; outline-offset: 2px; }
+.suggested-replies { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; padding: 0 0 0 8px; }
+.suggested-replies-label { flex-basis: 100%; color: #5c6678; font-size: 0.72rem; }
+.suggested-reply { max-width: 100%; padding: 8px 12px; border: 1px solid #b9cde0; border-radius: 999px; background: #fff; color: #123647; font: inherit; font-size: 0.8rem; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.suggested-reply:hover:not(:disabled) { background: #edf4fc; border-color: #3976b8; }
+.suggested-reply:focus-visible { outline: 2px solid #1467ce; outline-offset: 2px; }
+.suggested-reply:disabled { opacity: 0.55; cursor: not-allowed; }

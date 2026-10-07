@@ -20,12 +20,17 @@ SCHEMA = (
         image_text text NOT NULL DEFAULT '', had_image boolean NOT NULL DEFAULT false,
         trace_id text, context jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now())""",
     'CREATE INDEX IF NOT EXISTS demo_turns_session_idx ON demo_turns(session_id, id)',
+    'ALTER TABLE demo_sessions ADD COLUMN IF NOT EXISTS revision bigint NOT NULL DEFAULT 0',
 )
 
 class SessionMissing(ValueError):
     pass
 
 class SessionCapacity(ValueError):
+    pass
+
+class SessionConflict(ValueError):
+    """A reply was computed against a transcript that has since changed."""
     pass
 
 
@@ -55,7 +60,7 @@ def create_session(profile_id, course_id):
 
 def load_session(token):
     with get_connection() as conn:
-        row=conn.execute('SELECT id,profile_id,selected_course_id,context,context_version FROM demo_sessions WHERE token_hash=%s AND expires_at>now()',
+        row=conn.execute('SELECT id,profile_id,selected_course_id,context,context_version,revision FROM demo_sessions WHERE token_hash=%s AND expires_at>now()',
                          (token_hash(token),)).fetchone()
         if row is None or row[1] not in PROFILES:
             raise SessionMissing('Demo session expired or missing')
@@ -63,7 +68,7 @@ def load_session(token):
     if len(turns)>=100:
         raise SessionCapacity('This conversation has reached 100 turns. Start a new conversation.')
     return {'id':str(row[0]),'profile':PROFILES[row[1]],'selected_course_id':row[2],
-            'context':row[3], 'version':row[4], 'turns':turns}
+            'context':row[3], 'version':row[4], 'revision':row[5], 'turns':turns}
 
 
 def context_memory(session, changed):
@@ -72,7 +77,7 @@ def context_memory(session, changed):
     # Filter before bounding history so social turns cannot evict support answers.
     # Unmarked historical turns retain their existing behavior.
     current=[t for t in session['turns'] if t[3]==session['version']
-             and t[4].get('_response_kind') != 'conversation']
+             and (t[4] if isinstance(t[4],dict) else {}).get('_response_kind') != 'conversation']
     history=[]
     for question,answer,_,_,_ in current[-6:]:
         history.extend([{'role':'user','content':question[:4000]}, {'role':'assistant','content':answer[:6000]}])
@@ -95,10 +100,17 @@ def save_turn(session, selected_course_id, context, changed, question, image_tex
     version=session['version']+int(changed)
     turn_context={**context, '_response_kind':result.get('response_kind','support')}
     with get_connection() as conn:
+        # Revision is distinct from the course/history context version. Every
+        # accepted reply advances it, even when the conversation stays on topic.
+        updated = conn.execute(
+            'UPDATE demo_sessions SET selected_course_id=%s,context=%s,context_version=%s,revision=revision+1 '
+            'WHERE id=%s AND revision=%s AND expires_at>now() RETURNING revision',
+            (selected_course_id,Jsonb(context),version,session['id'],session['revision']),
+        ).fetchone()
+        if updated is None:
+            raise SessionConflict('Conversation changed while generating the reply')
         conn.execute('INSERT INTO demo_turns(session_id,context_version,question,answer,image_text,had_image,trace_id,context) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)',
                      (session['id'],version,question,result['answer'],image_text[:8000],had_image,result.get('trace_id'),Jsonb(turn_context)))
-        conn.execute('UPDATE demo_sessions SET selected_course_id=%s,context=%s,context_version=%s WHERE id=%s',
-                     (selected_course_id,Jsonb(context),version,session['id']))
 
 
 def owns_trace(token, trace_id):

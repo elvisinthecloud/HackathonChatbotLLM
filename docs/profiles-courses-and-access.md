@@ -15,7 +15,9 @@ The demo keeps vector RAG with explicit server-side permissions. It does not use
 | Student | Student | MCELE-RRC-001 | Reserve Retirement Credit guidance in MCeLE |
 | Student | Student | MCELE-EPME-001 | EPME eligibility and enrollment in MCeLE for the six approved course families |
 | Student | Student | MCELE-CSC-001 | CSC access and missing-course troubleshooting across MCeLE and Moodle |
-| Regional Director | Regional Director | None | Presentation placeholder |
+| All five seeded roles | Explicit grant to each server role | MCELE-LOGIN-001, MCELE-CAC-001, MCELE-RECOVERY-001 | MCeLE account access; reviewed method/symptom branches |
+| All five seeded roles | Explicit grant to each server role | MCELE-LAUNCH-002 | Accessing an enrolled MCeLE course; not enrollment or management |
+| All five seeded roles | Explicit grant to each server role | MOODLE-ACCESS-001, MOODLE-APP-001 | Moodle navigation, app setup, and reviewed option 3 escalation |
 
 There is no inheritance. A profile's course/system associations are context hints, not additional access grants. Course scope is relevance metadata, separate from role access. General MCeLE launch guidance can apply to CYBERM0000 or CDETBAIC01 when the exact error is evidenced. Training Manager guidance is not extended to CSC/EWS enrollment merely because enrollment is also on MCeLE.
 
@@ -40,11 +42,11 @@ User correction accepted on 2026-09-14: course alone does not identify which sys
 
 The registry uses only user-supplied mappings. EWS is displayed by code rather than inventing a corrected full title. The course field accepts a known code, name, alias, or unrecognized text. Recognized mentions in messages/screenshots also provide context. Unknown course text does not create a new registry record or establish a platform. The user may clarify a missing system for that conversation.
 
-Task categories are enrollment, course content, course management, and course credit. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model. For an AO course-management question, the normal-copy and stuck-copy articles both pass deterministic access control. Each has a retrieval-only summary that is embedded but never exposed as answer context. Embedding similarity chooses the single closest article before its approved content reaches the answer generator, so paraphrases such as “taking forever” do not require a growing keyword list. Within enrollment, report or status-verification language selects the Enrollment Report article instead of the ECDEP Recommend/Deny workflow. Student EPME questions use the approved course policy and can be scoped to one named EPME course or answered with the complete six-course policy. CSC access and missing-course questions map to the combined article through MCeLE enrollment context while preserving Moodle as the course-content destination.
+Task categories are account access, enrollment, course content, course management, and course credit. A course-only question asks what the user wants to do. Mapping and task determine the current system; seeing a Moodle course in the MCeLE catalog does not make its content MCeLE-delivered. Explicit course selection takes precedence over inferred previous context; contradictory selected/mentioned courses or system evidence require clarification. Task recognition is a small deterministic set of phrases tailored to the reviewed scenarios; it is not a general intent-classification model. For an AO course-management question, the normal-copy and stuck-copy articles both pass deterministic access control. Each has a retrieval-only summary that is embedded but never exposed as answer context. Embedding similarity chooses a single article from the permitted family before its approved content reaches the source renderer. Guided follow-ups retain that article until a recognized topic or issue change; reviewed failure phrases can switch normal copying to troubleshooting. Within enrollment, report or status-verification language selects the Enrollment Report article instead of the ECDEP Recommend/Deny workflow. Student EPME questions first ask for a course when it is missing; an explicit comparison or overview request returns the approved six-course policy. Named-course questions select the relevant requirement or enrollment-assistance passage. CSC access and missing-course questions map to the combined article through MCeLE enrollment context while preserving Moodle as the course-content destination.
 
 ## Screenshot behavior
 
-The existing qwen2.5vl:7b model transcribes screenshot text. The existing chat model answers using only the subsequently permission-filtered excerpts. The Student article requires the exact hostname `sts1.auth.ecuf.deas.mil` and `refused to connect`, plus MCeLE course-content context. A vague launch failure, unreadable screenshot, generic refused-to-connect error, enrollment task, or Moodle course content does not unlock the article.
+The existing qwen2.5vl:7b model transcribes screenshot text. The existing chat model can select a passage ID from the subsequently permission-filtered source; the server renders source text and owns step progression. The Student article requires the exact hostname `sts1.auth.ecuf.deas.mil` and `refused to connect`, plus MCeLE course-content context. A vague launch failure, unreadable screenshot, generic refused-to-connect error, enrollment task, or Moodle course content does not unlock the article.
 
 The selected course identifies context; it does not establish the error. Screenshot text and user text are evidence, not instructions granting access. The clearly labelled fixture in `verification/synthetic-sts1.png` is generated with Pillow by `verification/make_screenshot_fixture.py`; it is not a real MCeLE screenshot. Real screenshot verification remains subject to the user supplying their intended screenshot.
 
@@ -52,7 +54,7 @@ The selected course identifies context; it does not establish the error. Screens
 
 Each explicit profile selection creates a fresh server session. Its random token is returned only to the browser; Postgres stores a SHA-256 token hash and an independent internal conversation UUID. Role identity is fixed by the server profile record for that session. Langfuse uses the internal UUID rather than the bearer token. Reloading the page requires selecting a profile again. No browser localStorage/sessionStorage contains transcripts or tokens.
 
-Profile changes clear visible messages, course text, draft input, image attachment, and resolved context. In-flight controls are disabled; asynchronous image reads are discarded if the profile/session changed. Clear creates another fresh session. A course or task change stays in the same transcript but increments the context version, so prior system assumptions, model history, and error evidence do not carry into the new context.
+Profile changes clear visible messages, course text, draft input, image attachment, quick replies, and resolved context. In-flight controls are disabled; asynchronous image reads are discarded if the profile/session changed. Clear creates another fresh session. A course, task, topic, or reported-error change stays in the same transcript but increments the context version, so prior system assumptions, model history, and error evidence do not carry into the new context. Guided progress and pending questions are stored in the existing session context JSON, with no schema migration.
 
 Postgres retains up to 100 completed turns per session, including question, answer, context, trace ID, and extracted screenshot text. Raw screenshots are not stored in the database. Model history is separately bounded to six recent turns/12 messages and 12,000 characters from the current context version. User/vision error evidence can survive beyond that short model window within the same context. Full earlier turns remain available for the future ticket handoff, which has not been implemented.
 
@@ -64,4 +66,28 @@ The dedicated deployment host database, volume, network, ports, resource limits,
 
 Run local tests with the documented Python environment, then use `scripts/deploy.py --apply` under the existing approval. The deployment verifies an Instructor conversation and its trace before declaring success. `scripts/verify_scenarios.py --run --synthetic-screenshot <release>/verification/synthetic-sts1.png` runs bounded sequential role/course/vision checks on the deployment host. It prints only verification summaries and trace IDs, never keys or session tokens.
 
-Isolated release `34e27280c7bae06d` contains seven curated article bodies. The EPME and CSC articles are local and pending deployment. Retrieval-only AO summaries are embedded for semantic selection but are excluded from answer excerpts and model context. Metadata and editorial notes are not embedded. Redistribution status remains pending for public submission packaging. Ticket destination/fields and final walkthrough remain deferred.
+The historical isolated release `34e27280c7bae06d` contained seven curated article bodies. The local branch now has fifteen, including EPME, CSC, and six shared login/course-access articles, with guided support changes tested offline. The VM is unavailable; current deployment parity is unverified. Retrieval-only AO summaries are embedded for semantic selection but are excluded from answer excerpts and model context. Metadata and editorial notes are not embedded. Redistribution status remains pending for public submission packaging. Ticket destination/fields and final walkthrough remain deferred.
+
+## Login and Moodle access decisions — 2026-09-30
+
+All six new articles have independent explicit grants to Student, Adjunct Faculty,
+Academics Officer, Training Manager and Regional Director. A role label in the
+message does not alter the server identity or imply a course-management task.
+An AO or instructor taking an enrolled course receives the applicable learner
+access guidance. A user reporting a course they created is classified by that task
+and its confirmed platform. Missing Moodle course tiles and broken materials or
+activities escalate to Student Support Help Desk, option 3 for Moodle support.
+
+Moodle is part of the MCeLE ecosystem. Browser access goes through Instructor-Led
+Courses in the left navigation, then Dashboard or My Courses and a course tile.
+The app is a separate procedure using MCeLE username/password and the exact source
+site address. `moodle_access_method` persists in server context outside the recent
+message window; changing methods clears the previous procedure. Phone wording alone
+requires clarification. Entry point and content platform are distinct: an MCeLE
+Launch click can hand off to Moodle, and a failed handoff uses Instructor-Led Courses.
+The older CSC-specific escalation remains independently scoped to its prior decision.
+
+CYBERM0000 is labelled biennial in the existing registry. A selective export audit
+found generic annual references but no inspected article explicitly describing
+CYBERM0000 as annual. Those references were recorded for contextual review rather
+than changed as a blanket policy update. No policy effective date was supplied.

@@ -1,0 +1,23 @@
+{
+  "article_id": "MOODLE-ACCESS-001",
+  "title": "Access Moodle courses through MCeLE",
+  "service_area": "Moodle",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Moodle is part of the MCeLE ecosystem and is where Instructor-Led Courses are accessed. This guidance covers browser access to an enrolled course.\n\n### Browser access\n\n1. Sign in to MCeLE.\n2. In the left navigation menu, select **Instructor-Led Courses** to open Moodle.\n3. In Moodle, open **Dashboard** or **My Courses**.\n4. In **My Courses**, set the drop-down to **All** to display all your courses.\n5. Select the tile for the enrolled course.\n\n### MCeLE-to-Moodle handoff\n\nIf the course appears in MCeLE **My Courses**, selecting **Launch** may redirect you to Moodle.\n\n1. If the MCeLE handoff does not redirect successfully, return to MCeLE and select **Instructor-Led Courses** in the left navigation.\n2. In Moodle, open **Dashboard** or **My Courses** and select the course tile.\n\n### Moodle support\n\nFor a Moodle course or material/activity problem, including a missing course tile, contact the **Student Support Help Desk** and use **option 3 for Moodle support**.\n\n- A Moodle course tile is missing.\n- A course material or activity will not open.\n- An Instructor or Adjunct Faculty member has a problem with a Moodle course in which they are a participant.\n- An Academics Officer has a problem with a Moodle course or activity they created.\n\nA user's role alone does not establish course management. Someone accessing an enrolled course receives the applicable learner access guidance regardless of whether they are an Adjunct Faculty member or Academics Officer.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence Moodle-access article. User-confirmed corrections establish Moodle as part of the MCeLE ecosystem, use Instructor-Led Courses in the left navigation followed by Dashboard or My Courses course tiles, and add the Student Support Help Desk option 3 escalation for missing tiles and broken materials or activities, including participant, Instructor/Adjunct Faculty, and Academics Officer cases.",
+    "source_page_id": "403636332",
+    "source_html": "EKB/Accessing-Moodle_403636332.html"
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

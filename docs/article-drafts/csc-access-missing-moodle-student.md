@@ -19,7 +19,7 @@ CSC course content is delivered in Moodle. Course discovery and enrollment are h
 ### Access your CSC course
 
 1. Sign in to MCeLE and check whether CSC appears under **My Courses**.
-2. If CSC is listed, open Moodle by selecting the **Instructor-Led Courses (Moodle)** circle on the Portal page, or select **My Learning** and then **Instructor-Led Courses**.
+2. If CSC is listed, open Moodle by selecting **Instructor-Led Courses** in the left navigation menu in MCeLE.
 3. In Moodle, open **My Courses** and set the drop-down to **All** to display all your Moodle courses.
 4. Open CSC when it appears.
 

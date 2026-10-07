@@ -31,6 +31,8 @@
     document.body.dataset.supportApiUrl ||
     "/api/support";
   const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+  const MAX_SUGGESTED_REPLIES = 3;
+  const MAX_SUGGESTED_REPLY_LENGTH = 160;
 
   let hasGreeted = false;
   let isSending = false;
@@ -43,6 +45,7 @@
   let selectedIssueCategory = null;
   let sessionId = null;
   let sessionGeneration = 0;
+  let suggestedRepliesPanel = null;
 
   function scrollToBottom() {
     chatBody.scrollTop = chatBody.scrollHeight;
@@ -139,13 +142,16 @@
     container.appendChild(quote);
   }
 
-  function appendList(container, lines, ordered, start = 1) {
+  function appendList(container, lines, ordered, start = 1, values = []) {
     const list = document.createElement(ordered ? "ol" : "ul");
     if (ordered && Number.isFinite(start) && start > 1) {
       list.start = start;
     }
     lines.forEach((line) => {
       const item = document.createElement("li");
+      if (ordered && Number.isSafeInteger(values[list.children.length])) {
+        item.value = values[list.children.length];
+      }
       appendInlineText(item, line);
       list.appendChild(item);
     });
@@ -178,13 +184,19 @@
       if (orderedMatch) {
         const items = [];
         const start = Number(orderedMatch[1]);
+        const values = [];
         while (index < lines.length) {
           const itemMatch = lines[index].trim().match(/^(\d+)[.)]\s+(.+)$/);
           if (!itemMatch) break;
+          values.push(Number(itemMatch[1]));
           items.push(itemMatch[2].trim());
           index += 1;
+          // Blank lines between steps do not create separate lists.
+          let next = index;
+          while (next < lines.length && !lines[next].trim()) next += 1;
+          if (next < lines.length && /^\d+[.)]\s+/.test(lines[next].trim())) index = next;
         }
-        appendList(container, items, true, start);
+        appendList(container, items, true, start, values);
         continue;
       }
 
@@ -260,12 +272,76 @@
     return bubble;
   }
 
-  function appendBot(text, sources) {
+  function normalizeSuggestedReplies(rawReplies) {
+    if (!Array.isArray(rawReplies)) return [];
+    const seen = new Set();
+    const replies = [];
+    rawReplies.forEach((reply) => {
+      if (typeof reply !== "string") return;
+      const text = reply.trim();
+      if (!text || text.length > MAX_SUGGESTED_REPLY_LENGTH || seen.has(text)) return;
+      seen.add(text);
+      replies.push(text);
+    });
+    return replies.slice(0, MAX_SUGGESTED_REPLIES);
+  }
+
+  function setSuggestedRepliesDisabled(disabled) {
+    if (!suggestedRepliesPanel) return;
+    suggestedRepliesPanel.querySelectorAll("button").forEach((button) => {
+      button.disabled = disabled;
+    });
+  }
+
+  function clearSuggestedReplies() {
+    if (!suggestedRepliesPanel) return;
+    if (suggestedRepliesPanel.parentNode) {
+      suggestedRepliesPanel.parentNode.removeChild(suggestedRepliesPanel);
+    }
+    suggestedRepliesPanel = null;
+  }
+
+  function renderSuggestedReplies(rawReplies) {
+    clearSuggestedReplies();
+    const replies = normalizeSuggestedReplies(rawReplies);
+    if (!replies.length) return;
+
+    const panel = document.createElement("section");
+    panel.className = "suggested-replies";
+    panel.setAttribute("aria-label", "Suggested replies");
+    panel.setAttribute("role", "group");
+
+    const label = document.createElement("span");
+    label.className = "suggested-replies-label";
+    label.textContent = "Suggested replies";
+    panel.appendChild(label);
+
+    replies.forEach((reply) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "suggested-reply";
+      button.textContent = reply;
+      button.disabled = isSending || !sessionId;
+      button.addEventListener("click", () => {
+        if (button.disabled || isSending || !sessionId) return;
+        sendMessage(reply);
+      });
+      panel.appendChild(button);
+    });
+
+    suggestedRepliesPanel = panel;
+    chatBody.appendChild(panel);
+    scrollToBottom();
+  }
+
+  function appendBot(text, sources, suggestedReplies) {
+    clearSuggestedReplies();
     const bubble = appendMessage("bot", text);
     if (bubble && Array.isArray(sources) && sources.length) {
       bubble.appendChild(renderSources(sources));
       scrollToBottom();
     }
+    renderSuggestedReplies(suggestedReplies);
   }
 
   function appendUser(text) {
@@ -371,6 +447,7 @@
     profileSelect.disabled = nextValue || !selectedProfile;
     courseSelect.disabled = nextValue || !selectedProfile;
     btnClear.disabled = nextValue || !selectedProfile;
+    setSuggestedRepliesDisabled(nextValue);
   }
 
   function toDataUrl(file) {
@@ -523,6 +600,7 @@
 
   function resetTranscript() {
     selectedIssueCategory = null;
+    clearSuggestedReplies();
     chatBody.replaceChildren();
     hasGreeted = false;
     clearResolvedContext();
@@ -579,6 +657,7 @@
   async function createSession() {
     const generation = ++sessionGeneration;
     if (!selectedProfile) return;
+    clearSuggestedReplies();
     sessionId = null;
     showSessionError("");
     chatInput.disabled = true;
@@ -646,6 +725,7 @@
     if (!text || isSending || !sessionId) return;
 
     clarifyPanel.hidden = true;
+    clearSuggestedReplies();
 
     if (pendingImagePreviewSrc) {
       appendUserWithImage(text, pendingImagePreviewSrc);
@@ -669,7 +749,7 @@
 
       typing.remove();
       if (data.response_kind !== "conversation") selectedIssueCategory = null;
-      appendBot(data.answer, data.sources);
+      appendBot(data.answer, data.sources, data.suggested_replies);
       updateResolvedContext(data.context);
     } catch (error) {
       typing.remove();
@@ -692,6 +772,7 @@
   btnClear.addEventListener("click", clearChat);
   profileSelect.addEventListener("change", () => {
     if (isSending) return;
+    clearSuggestedReplies();
     selectedProfile = profiles.find((profile) => profile.id === profileSelect.value) || null;
     selectedCourseId = null;
     courseSelect.value = "";
@@ -702,6 +783,7 @@
   });
   function updateSelectedCourse() {
     if (isSending) return;
+    clearSuggestedReplies();
     selectedCourseId = courseSelect.value.trim().slice(0, 160) || null;
     clearResolvedContext();
   }

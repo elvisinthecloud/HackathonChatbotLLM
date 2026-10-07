@@ -2,6 +2,7 @@
 from contextvars import ContextVar
 from dataclasses import dataclass
 import re
+from access_support import ALL_ROLES, NEW_ARTICLES, resolve_support_context
 
 COURSES = {
     'CYBERM0000': {'id':'CYBERM0000','title':'CYBERM0000 biennial training','aliases':['CYBERM0000'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':None},
@@ -24,17 +25,7 @@ PROFILES = {
     'regional-director': {'id':'regional-director','name':'Col Rebecca Mitchell','username':'rebecca.mitchell','rank':'Col','rank_name':'Colonel','pay_grade':'O-6','greeting_name':'Col Mitchell','role':'Regional Director','display_role':'Regional Director','course_ids':[],'delivery_areas':[]},
 }
 # These are independent grants. Profile course associations are context hints only.
-ARTICLE_POLICY = {
-    'MCELE-LAUNCH-001': ('Student','MCeLE','general',()),
-    'MOODLE-COPY-002': ('Adjunct Faculty','Moodle','general',()),
-    'MOODLE-COPY-001': ('Academics Officer','Moodle','general',()),
-    'MOODLE-COPY-003': ('Academics Officer','Moodle','general',()),
-    'MCELE-ECDEP-001': ('Training Manager','MCeLE','courses',('5500','6800')),
-    'MCELE-ENROLLMENT-REPORT-001': ('Training Manager','MCeLE','general',()),
-    'MCELE-RRC-001': ('Student','MCeLE','general',()),
-    'MCELE-EPME-001': ('Student','MCeLE','courses',('EPME3000','EPME4000','EPME5000','EPME6000','5500','6800')),
-    'MCELE-CSC-001': ('Student','MCeLE','courses',('CSC',)),
-}
+from article_registry import ARTICLE_POLICY
 ERROR_HOST = 'sts1.auth.ecuf.deas.mil'
 
 @dataclass(frozen=True)
@@ -86,7 +77,7 @@ def course_mentions(text: str) -> list[str]:
 
 
 def task_activity(text: str) -> str | None:
-    management=bool(re.search(r'\b(?:copy|copying|create|creating|AO|academics officer|permissions?|MClearn)\b',text,re.I))
+    management=bool(re.search(r'\b(?:copy|copying|clone|cloning|create|creating|created|authored|permissions?|MClearn|Content Management|Quality Assurance)\b',text,re.I))
     enrollment=bool(re.search(r'\b(?:enroll\w*|eligib\w*|prerequisit\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|EPME\w*|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*|requirements?|qualif\w*|take|start)\b',text,re.I))
     content=bool(re.search(r'\b(?:launch\w*|content|lesson|refused to connect|screenshot|error)\b',text,re.I))
     credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year|calendar year|fiscal year)\b',text,re.I))
@@ -99,6 +90,26 @@ def task_activity(text: str) -> str | None:
     return None
 
 
+def support_topic(text: str) -> str | None:
+    """Separate tasks sharing one activity so prior evidence cannot choose a new article."""
+    if re.search(r'\b(?:copy|copying|clone|cloning)\b', text, re.I) and re.search(
+            r'\b(?:stuck|slow|loading|fails?|timeout|never submits|not working|didn.t work|did not work)\b', text, re.I):
+        return 'copy-troubleshooting'
+    if re.search(r'\b(?:created|authored)\b', text, re.I) and re.search(r'\b(?:not working|won.t|broken|problem|issue|fail\w*)\b', text, re.I):
+        return 'course-problem'
+    patterns = (
+        ('enrollment-report', r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b'),
+        ('ecdep', r'\b(?:ECDEP|recommend|deny|enrollment request|seminar request)\b'),
+        ('epme', r'\b(?:eligib\w*|prerequisit\w*|EPME\w*)\b'),
+        ('rrc', r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|anniversary year|calendar year|fiscal year)\b'),
+        ('csc', r'\bCSC\b'),
+        ('copy-troubleshooting', r'\b(?:copy|copying|clone)\b.{0,100}\b(?:stuck|slow|loading|fails?|timeout|never submits)\b'),
+        ('copy', r'\b(?:copy|copying|clone|cloning)\b'),
+        ('launch', r'\b(?:launch\w*|refused to connect)\b'),
+    )
+    return next((topic for topic, pattern in patterns if re.search(pattern, text, re.I)), None)
+
+
 def resolve_context(selected: str | None, previous: dict, previous_selected: str | None,
                     question: str, image_text: str = '') -> tuple[dict, str | None, bool]:
     selected=(selected or '').strip() or None
@@ -108,9 +119,21 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
     unknown=bool(selected and not chosen)
     changed_selection=selected != previous_selected
     mentions=course_mentions(question+'\n'+image_text)
+    support = resolve_support_context(selected, previous, previous_selected, question, image_text, COURSES, chosen, mentions)
+    if support is not None:
+        context, prompt, changed = support
+        if context.get('support_article_id') == 'MCELE-LAUNCH-002' and exact_error(question+'\n'+image_text) and context.get('system_area') == 'MCeLE':
+            context.pop('unresolved', None)
+            prompt = None
+        return context, prompt, changed
     question_moodle=bool(re.search(r'\bmoodle\b',question,re.I))
     screenshot_moodle=bool(re.search(r'\bmoodle\b',image_text,re.I))
     activity=task_activity(question)
+    # Interface labels asked about during a procedure belong to that procedure;
+    # the generic word "content" must not turn management into course content.
+    if previous.get('activity') == 'course-management' and re.search(
+            r'\b(?:where|what|how)\b.{0,35}\b(?:Content Management|Quality Assurance|Manage courses|short name)\b', question, re.I):
+        activity='course-management'
     csc_context=chosen=='CSC' or mentions==['CSC']
     if csc_context and re.search(r"\b(?:access|get to|missing|not (?:appear|show)|doesn't (?:appear|show)|can't find|cannot find|where is|My Courses|Moodle)\b",question,re.I):
         # CSC discovery/enrollment begins in MCeLE even though its content opens in Moodle.
@@ -156,6 +179,8 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
              'course_known':bool(course), 'activity':activity if activity!='ambiguous' else None,
              'system_area':system,'delivery_area':course.get('content_area'),
              'enrollment_area':course.get('enrollment_area'),'discovery_portal':course.get('discovery_portal')}
+    topic = support_topic(question)
+    context['topic'] = topic or (previous.get('topic') if not course_changed and activity == previous.get('activity') else None)
     conflict=len(mentions)>1 or bool(chosen and mentions and mentions!=[chosen])
     # For known courses, task mapping wins over a casual mention of the other portal.
     # Explicit contradictory task location or screenshot evidence must be clarified.
@@ -167,6 +192,7 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
         context['unresolved']=True
         return context,'The course, task, and system details conflict. Are you working on enrollment in MCeLE or course content/management in Moodle? Please confirm the task and change or clear the course field if needed.',True
     changed=course_changed or bool(previous.get('unresolved')) or any(context.get(k)!=previous.get(k) for k in ('activity','system_area'))
+    changed = changed or bool(topic and previous.get('topic') and topic != previous['topic'])
     if not activity:
         return context,'What are you trying to do with this course: enroll or manage an enrollment request, launch/access course content, or copy/manage the course?',changed
     if not system:
@@ -178,7 +204,16 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
 def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAccess:
     role=profile['role']
     area,course=context.get('system_area'),context.get('course_id')
-    enrollment_report=bool(re.search(r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b',evidence,re.I))
+    if context.get('support_flow'):
+        aid = context.get('support_article_id')
+        if aid == 'MCELE-LAUNCH-002' and role == 'Student' and exact_error(evidence) and area == 'MCeLE':
+            aid = 'MCELE-LAUNCH-001'
+        policy = ARTICLE_POLICY.get(aid)
+        roles = policy[0] if policy and isinstance(policy[0], tuple) else ((policy[0],) if policy else ())
+        permitted = bool(policy and role in roles and area == policy[1] and not context.get('unresolved')
+                         and (policy[2] != 'courses' or course in policy[3]))
+        return RetrievalAccess(role, area, course, (aid,) if permitted else ())
+    enrollment_report=context.get('topic') == 'enrollment-report' or (not context.get('topic') and bool(re.search(r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b',evidence,re.I)))
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
                 'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
                 'MCELE-ECDEP-001':'enrollment','MCELE-ENROLLMENT-REPORT-001':'enrollment',
@@ -196,8 +231,10 @@ def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAcce
 
 
 def clarification(profile: dict, context: dict, evidence: str) -> str | None:
+    if context.get('support_flow'):
+        return None
     if profile['role']=='Regional Director':
         return 'Regional Director is a presentation placeholder. No knowledge articles are assigned to this demo role yet.'
     if profile['role']=='Student' and context.get('system_area')=='MCeLE' and context.get('activity')=='course-content' and not exact_error(evidence):
-        return 'Please attach a screenshot or type the exact error shown when the course fails to launch. A launch failure alone is not enough to choose the right troubleshooting steps.'
+        return 'What exact error appears when you try to launch the course? You can type it or attach a screenshot.'
     return None

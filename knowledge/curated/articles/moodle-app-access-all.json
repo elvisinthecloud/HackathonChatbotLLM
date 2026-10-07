@@ -1,0 +1,23 @@
+{
+  "article_id": "MOODLE-APP-001",
+  "title": "Access Moodle with the mobile app",
+  "service_area": "Moodle",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this procedure for the Moodle mobile app. It is separate from browser access through MCeLE.\n\n### App access\n\n1. Log in to MCeLE with your username and password.\n2. Use your MCeLE username, not your email; it is normally `firstname.middleinitial.lastname`, such as `john.a.doe`. The username is not case sensitive.\n3. In MCeLE, select **Instructor-Led Courses** in the left navigation menu to activate your Moodle account.\n4. Download the Moodle app from the Apple App Store or Google Play Store.\n5. In the app, enter the exact, case-sensitive site URL `elearning.mcele.usmc.mil/moodle`.\n6. Select **Log in**.\n7. Log in with your MCeLE username and password.\n8. When prompted to **Open this page in Moodle**, select **Open**.\n9. Confirm that you return to the Dashboard in the Moodle app.\n\n### QR code enrollment\n\n1. In the Moodle app, select the three dots in the bottom-right navigation bar.\n2. Select **Scan QR Code**.\n3. Scan the QR code provided for the course.\nIf there is a problem, contact the Student Support Help Desk and use **option 3 for Moodle support**.\n\n### Locked out\n\n1. Close every open window and tab.\n2. Open a new session and retry.\n3. If the same error remains, contact the Help Desk at **1-888-435-8762** and use **option 3 for Moodle support**.\n\n### Moodle support\n\nFor persistent app access or login problems, contact the **Student Support Help Desk** and use **option 3 for Moodle support**.\n\nUse the same option 3 escalation if a Moodle course tile is missing, a course material or activity will not open, an Instructor or Adjunct Faculty member has a problem with a Moodle course in which they are a participant, or an Academics Officer has a problem with a Moodle course or activity they created.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence Moodle-app article, preserving its MCeLE activation, app setup, exact case-sensitive site URL, return-to-app, QR-code, and source Help Desk instructions. User-confirmed Moodle support escalation was added for persistent app access and uncovered course or activity problems.",
+    "source_page_id": "403636342",
+    "source_html": "EKB/Accessing-the-Moodle-app_403636342.html"
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

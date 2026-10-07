@@ -1,0 +1,29 @@
+{
+  "article_id": "MCELE-LAUNCH-002",
+  "title": "Launch an enrolled course",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this guidance to open course content for a course in which you are enrolled.\n\n### Before you begin\n\nConfirm that you are enrolled in the course. Allow pop-ups or add an exception for the MCeLE website because course content opens in a new browser window. The **Launch** button opens standard training; **Launch Menu** opens non-standard or more complex training.\n\n### Standard course launch\n\n1. In the left navigation menu, select **Student Dashboard**, then **My Courses**.\n2. Find the enrolled course you want to open.\n3. If the course has a **Launch** button, select **Launch Course**.\n4. Confirm that the course opens and its associated content becomes available.\n\n### Launch menu course\n\n1. In the left navigation menu, select **Student Dashboard**, then **My Courses**.\n2. Find the enrolled course and select **Launch Menu**.\n3. In the top panel of the Course Menu, select **Launch**.\n4. Complete the first menu item.\n5. Select **Launch** on the next menu item when it appears.\n6. Repeat until the course is complete.\n\n### Moodle handoff\n\nMCeLE **My Courses** may list a course whose content is in Moodle, and selecting **Launch** may redirect to Moodle. If that handoff fails, open **Instructor-Led Courses** from the left navigation in MCeLE, then use Moodle **Dashboard** or **My Courses** to open the course tile.\n\n### Pop-up blocked\n\n1. Disable the browser pop-up blocker or add an exception for the MCeLE website.\n2. Return to the course listing and select **Launch Course** or **Launch** again.\n\n### Active session\n\n1. Clear the browser cache.\n2. Restart the browser.\n3. Return to the course listing and try launching again.\n\n### Blank page\n\n1. Clear the browser cache and cookies.\n2. Restart the browser, or try a different browser.\n3. Return to the course listing and try launching again.\n\n### Skillsoft connection\n\n1. Try launching the Skillsoft course again later.\n2. If the connection problem continues, contact the Help Desk.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence course-launch article, preserving enrollment prerequisites, standard and menu launch procedures, four source symptom branches, and Help Desk escalation; the user-confirmed Moodle handoff boundary was added.",
+    "source_page_id": "403636316",
+    "source_html": "EKB/Launch-Course_403636316.html",
+    "user_corrections": [
+      {
+        "date": "2026-10-02",
+        "description": "Use the user-confirmed Student Dashboard > My Courses navigation for the enrolled-course listing, including staff accessing their own courses."
+      }
+    ]
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

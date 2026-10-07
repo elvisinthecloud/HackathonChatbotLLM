@@ -50,6 +50,7 @@ function harness(initialCategory, outcomes) {
     setSending(value) { context.isSending = value; },
     appendTyping() { return { remove() {} }; },
     clearImage() {},
+    clearSuggestedReplies() {},
     async requestChat(_text, _image, category) {
       sentCategories.push(category);
       const outcome = outcomes[pendingOutcome++];

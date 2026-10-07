@@ -1,0 +1,23 @@
+{
+  "article_id": "MCELE-CAC-001",
+  "title": "CAC login troubleshooting",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use these branches when CAC login to MCeLE fails. Close all browser windows before retrying, reinsert the CAC, and select the correct certificate.\n\n### Login loop\n\n1. Close all browser windows and tabs.\n2. Reinsert the CAC and start a new browser session.\n3. When prompted, select the **Identification** certificate.\n4. Retry CAC login.\n\n### Access denied\n\n1. Close the browser session and retry with the CAC inserted.\n2. Select the correct certificate.\n3. Verify the account's DEERS eligibility.\n4. If access remains denied, contact the Help Desk for account assistance.\n\n### No CAC prompt\n\n1. Close all browser windows and tabs.\n2. Reinsert the CAC.\n3. Restart the browser.\n4. Retry CAC login.\n\n### CAC login fails on a personal device\n\n1. Confirm that the required DoD root certificates are installed.\n2. If they are missing, install them from [Cyber.mil PKI/PKE end-user guidance](https://www.cyber.mil/pki-pke/end-users/getting-started/).\n3. Restart the browser and retry CAC login.\n\n### CAC login fails after receiving a new CAC\n\n1. Clear the current certificate from the browser.\n2. Restart the browser.\n3. Reinsert the new CAC and retry CAC login.\n\n### Account is deactivated or disabled\n\n1. Close the current browser session.\n2. Contact the Help Desk and request account reactivation.\n3. Retry CAC login after the account is reactivated.\n\n### Best practice\n\n1. Close **all** browser windows before retrying.\n2. Reinsert the CAC.\n3. Select the correct certificate.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence CAC troubleshooting article, retaining its symptom headings, fixes, personal-device link, and Help Desk escalation.",
+    "source_page_id": "403636525",
+    "source_html": "EKB/CAC-Login-Troubleshooting_403636525.html"
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

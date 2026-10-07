@@ -1,0 +1,131 @@
+{
+  "evaluated_at_utc": "2026-10-07T02:48:54.026410+00:00",
+  "release": "bce8bc9b726cbc84",
+  "status": "behavior_acceptance_failed",
+  "model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+  "corpus": {
+    "approved_articles": 19,
+    "active_chunks": 22,
+    "physical_rows_including_retired": 24,
+    "future_target_articles": "200\u2013300; not evaluated"
+  },
+  "execution": "Serialized synthetic conversations through the deployed application and existing VM model; independent Sol GPT-6.1 Medium transcript review.",
+  "campaign": {
+    "live_application_turns": 160,
+    "original_exploratory_turns": 47,
+    "intermediate_candidate_turns": 67,
+    "final_turns": 46,
+    "final_conversations": 6,
+    "conversation_lengths_final": [
+      8,
+      6,
+      7,
+      9,
+      8,
+      8
+    ]
+  },
+  "final_turn_grades": {
+    "pass": 15,
+    "partial": 22,
+    "fail": 9
+  },
+  "final_conversation_grades": {
+    "pass": 0,
+    "partial": 4,
+    "fail": 2
+  },
+  "cases": [
+    {
+      "name": "Training Manager: seminar request, interruption, follow-up",
+      "grade": "Partial",
+      "reason": "Better task relevance and continuity; the final Recommend/Deny action was left out of offered evidence."
+    },
+    {
+      "name": "Student: launch error and unsuccessful recovery",
+      "grade": "Partial",
+      "reason": "Complete STS1 procedure worked once; later answers skipped required recovery steps."
+    },
+    {
+      "name": "Student: role boundary, then own certificate",
+      "grade": "Fail",
+      "reason": "Role restrictions held, but the earlier task persisted and the absent certificate button was repeatedly recommended."
+    },
+    {
+      "name": "Account/CAC: username recovery, delayed email, password detour",
+      "grade": "Partial",
+      "reason": "Recovery instructions and both password validation failures improved; password reset remains incomplete and CAC resumption was not established."
+    },
+    {
+      "name": "Mobile: Safari, missing course tile, switch to Moodle app",
+      "grade": "Fail",
+      "reason": "Repeated unavailable/completed controls, redundant setup questions, then a context-limit error on turn eight."
+    },
+    {
+      "name": "Academics Officer: course copy, stalled copy, partial progress",
+      "grade": "Partial",
+      "reason": "Full copy walkthrough and media instructions improved; a QA-button question received the wrong procedure and later advice repeated a completed check."
+    }
+  ],
+  "comparison_design": "Final reviewer grades: 15 useful/pass replies, 22 partial replies and 9 failed replies. Across whole conversations: 0 pass, 4 partial and 2 fail. Tester A replayed the same 21 inputs as the original baseline; Tester B replayed the same 25 inputs as candidate 01902. These are different comparison baselines, and single replays do not establish a statistical improvement rate.",
+  "final_response_failures": {
+    "generic_validation": 0,
+    "context_limit": 1
+  },
+  "safety_observations": "No forbidden role-source exposure or invented rendered support facts observed in the recorded bounded cases. This is not comprehensive access/security validation.",
+  "maintained_offline_guards": {
+    "passed": 118,
+    "failed": 0,
+    "kind": "Supplementary contracts, not live conversation acceptance"
+  },
+  "deployment_verification": {
+    "active_release_matches": true,
+    "application_ready": true,
+    "index_current": true,
+    "matching_application_files": 49,
+    "owner_managed_extra_file": "backend/Dockerfile"
+  },
+  "changes": [
+    "Normalized search wording from the interpretation model is used only for retrieval ranking; exact user reports and selected-profile authority remain separate.",
+    "A bounded model check selects directly relevant articles from already authorized retrieved candidates before selecting exact factual passages. Retrieval rank is preserved rather than favoring unrelated articles just because their prerequisites are known.",
+    "Duplicate context proposals are validated independently. A uniquely supported value survives; conflicting valid values are rejected. Multisentence quotes preserve affirmative method/platform facts and scoped negation.",
+    "Question/source pairs are constrained to the actual missing field. An ambiguous course name can receive a course-ID question. A short interruption can receive a neutral pause acknowledgement.",
+    "The bounded repair attempt now reserves enough room for the detailed correction prompt. No model setting, role grant, or article wording was changed.",
+    "Each selected factual passage is now paired directly with its supporting user report in the model response format. This removes a bookkeeping failure without relaxing authority, provenance or source-condition checks. Both previously failing password-recovery turns now return instructions.",
+    "Pause acknowledgement requires an interruption in the current user message; an earlier pause cannot justify ignoring a new question."
+  ],
+  "findings": [
+    "Longer conversations exposed wrong-source detours that short happy-path tests missed. Role permission alone did not establish task relevance.",
+    "A valid current course report could be discarded when the model emitted duplicate claims. Whole two-sentence browser/platform reports were also rejected by overly narrow provenance matching.",
+    "The bot sometimes treats suggested steps as completed steps, repeats absent controls, and retains an older task through a genuine task switch. These remain behavioral checks, not automatically solved by transport fixes.",
+    "Some questions ask for information the current articles do not contain, including where a particular quality-assurance button is located or why a certificate button is absent. Those need honest coverage gaps rather than adjacent instructions.",
+    "Incomplete procedures have two causes: the seminar procedure\u2019s final Recommend/Deny action was excluded from the offered evidence by the prompt budget; some launch-recovery steps were offered but the model did not select them. These need separate fixes."
+  ],
+  "next_priorities": [
+    {
+      "title": "Preserve essential evidence within the context budget",
+      "detail": "Deduplicate repeated memory and evidence metadata in model inputs while retaining full server-side provenance. Admit complete procedural units, including their final action. Verify the failed mobile eighth turn and the missing seminar Recommend/Deny step against the live model."
+    },
+    {
+      "title": "Respect what the user has already done or cannot see",
+      "detail": "Distinguish completed actions, unavailable controls and unresolved outcomes. Repeating Download Certificate or selecting a missing tile cannot count as progress. If approved guidance does not cover the obstacle, say so and use its supported escalation path."
+    },
+    {
+      "title": "Make task and access-method changes reliable",
+      "detail": "The model must retire the earlier staff request when the user asks about their own certificate, and treat the installed app/site-address question as an app setup task. The approved app URL exists; more articles would not fix that selection failure."
+    },
+    {
+      "title": "Evaluate complete next actions, then expand article coverage",
+      "detail": "A valid exact quote can still omit a required step or answer an adjacent question. Add reviewed content for genuine gaps such as locating the Quality Assurance report, then evaluate retrieval competition before scaling to 200\u2013300 articles."
+    }
+  ],
+  "limitations": [
+    "Real-model synthetic text testing, serialized; not a real-user study, concurrent-load benchmark, image-understanding evaluation, or production-readiness claim.",
+    "Same Qwen model and 19 approved articles. The future 200\u2013300-article corpus has not been ingested or tested.",
+    "Relevance and task choices remain model judgments; exact quotation prevents invented wording but does not guarantee useful or correctly applied guidance.",
+    "Maximum-length messages can still exceed the bounded context; this pass covers longer conversations with ordinary short messages.",
+    "Exact-input replays preserve messages chosen for earlier replies, so they are reported separately from fresh adaptive follow-ups.",
+    "One of the final 46 ordinary short-message turns failed the context guard at the interpretation stage. Longer conversational memory still needs a tighter bounded projection; this is not only an unusually long-message limitation."
+  ],
+  "private_artifacts": "output/long-dialogue-pass/report.html and exact conversation/reviewer JSON records; excluded from repository publication."
+}
