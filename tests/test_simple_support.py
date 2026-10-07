@@ -48,6 +48,15 @@ class GateTests(unittest.TestCase):
         self.assertEqual(text, 'A [1]. B [2]. C [1]. D.')
         self.assertEqual([s['source_path'] for s in sources], ['MCELE-LAUNCH-001', 'MCELE-LOGIN-001'])
 
+    def test_model_written_numeric_citations_are_removed(self):
+        text, sources = ss.number_citations('Wait 30 minutes [1]. Then sign in [MCELE-LOGIN-001].', 'Student')
+        self.assertEqual(text, 'Wait 30 minutes. Then sign in [1].')
+        self.assertEqual(len(sources), 1)
+
+    def test_history_hides_numeric_citations(self):
+        session = {'version': 0, 'turns': [('q', 'Restart your computer [1].', '', 0, {})]}
+        self.assertEqual(ss.history(session, False)[1]['content'], 'Restart your computer.')
+
     def test_history_respects_version_and_reset(self):
         session = {'version': 1, 'turns': [('old q', 'old a', '', 0, {}), ('q1', 'a1', 'screen text', 1, {})]}
         h = ss.history(session, False)

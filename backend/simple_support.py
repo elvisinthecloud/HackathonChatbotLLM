@@ -101,6 +101,7 @@ def squash(s):
 
 
 CITE = re.compile(r'\[([A-Z]+(?:-[A-Z0-9]+)+)\]')
+NUMERIC_CITE = re.compile(r' ?\[\d+(?:[,\s-]+\d+)*\]')
 
 
 def items(reply):
@@ -137,6 +138,7 @@ def drop_unsupported(reply, bad):
 def number_citations(reply, role):
     """Replace article-ID citations with [n] and build the source list."""
     by_id = {a['id']: a for a in permitted(role)}
+    reply = NUMERIC_CITE.sub('', reply)  # only server-numbered citations link to sources
     order = []
     def sub(m):
         aid = m.group(1)
@@ -160,7 +162,8 @@ def history(session, changed):
     msgs = []
     for question, answer, image_text, _, _ in turns:
         user = question[:4000] + (f'\n[Screenshot description: {image_text[:2000]}]' if image_text else '')
-        msgs += [{'role': 'user', 'content': user}, {'role': 'assistant', 'content': answer[:6000]}]
+        # Stored replies carry [n] markers; hide them so the model keeps citing article IDs.
+        msgs += [{'role': 'user', 'content': user}, {'role': 'assistant', 'content': NUMERIC_CITE.sub('', answer)[:6000]}]
     total, kept = 0, []
     for m in reversed(msgs):
         if total + len(m['content']) > HISTORY_CHARS:
