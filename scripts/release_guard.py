@@ -25,7 +25,7 @@ BASE_ALLOWLIST = (
     "scripts/deploy.py", "scripts/configure_runtime.py", "scripts/rollback.py", "scripts/release_guard.py",
     "scripts/atlas_release.py", "scripts/verify_deployment.py", "scripts/verify_scenarios.py", "verification/synthetic-sts1.png",
     "scripts/evaluate_retrieval.py", "docs/retrieval-evaluation-cases.json",
-    "backend/compact_interpretation.py", "backend/compact_reply.py", "backend/compact_relevance.py",
+    "backend/compact_interpretation.py", "backend/compact_reply.py", "backend/compact_relevance.py", "backend/simple_support.py",
 )
 
 

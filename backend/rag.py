@@ -1276,8 +1276,13 @@ async def legacy_answer_question(question: str, session: dict, selected_course_i
 
 async def answer_question(question, session, selected_course_id, image=None, issue_category=None):
     """Production entry: permission-first retrieval and model-composed conversation."""
+    import os
     import sys
-    from flexible_support import answer
+    # CHAT_ENGINE=flexible restores the previous verbatim-passage planner.
+    if os.environ.get('CHAT_ENGINE', 'simple') == 'flexible':
+        from flexible_support import answer
+    else:
+        from simple_support import answer
     try:
         return await answer(sys.modules[__name__], question, session, selected_course_id, image, issue_category)
     finally:

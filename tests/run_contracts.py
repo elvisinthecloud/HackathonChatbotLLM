@@ -23,6 +23,7 @@ MAINTAINED_MODULES=(
     'test_release_packaging',
     'test_interpretation_context_contract',
     'test_context_gap_fixes',
+    'test_simple_support',
 )
 
 
