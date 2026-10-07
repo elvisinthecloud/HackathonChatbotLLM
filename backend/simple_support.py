@@ -122,16 +122,23 @@ def violations(reply, role):
         if kind == 'phone':
             ok = re.sub(r'\D', '', val)[-10:] in digits
         else:
-            ok = squash(norm(val).strip(' .:')) in flat
+            ok = squash(norm(val).strip(' .:,;!?"\'“”‘’()')) in flat
         if not ok:
             v.append((kind, val))
     return v
 
 
 def drop_unsupported(reply, bad):
-    keep = [s for s in re.split(r'(?<=[.!?])\s+|\n', reply)
-            if not any(val in s for _, val in bad)]
-    out = '\n'.join(keep).strip()
+    lines = []
+    for line in reply.split('\n'):
+        marker = re.match(r'\s*(?:\d+\.|[-*])\s+', line)
+        head, body = (marker.group(0), line[marker.end():]) if marker else ('', line)
+        kept = [s for s in re.split(r'(?<=[.!?])\s+', body) if not any(val in s for _, val in bad)]
+        if ' '.join(kept).strip():
+            lines.append(head + ' '.join(kept))
+        elif not marker and not body.strip():
+            lines.append('')
+    out = re.sub(r'\n{3,}', '\n\n', '\n'.join(lines)).strip()
     return out if re.search(r'[A-Za-z]{3,}', out) and CITE.search(out) else FALLBACK
 
 

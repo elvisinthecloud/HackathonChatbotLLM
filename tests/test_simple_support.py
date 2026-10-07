@@ -43,6 +43,14 @@ class GateTests(unittest.TestCase):
         self.assertIn('Restart', kept)
         self.assertEqual(ss.drop_unsupported('Open **Privacy and security**.', bad), ss.FALLBACK)
 
+    def test_quoted_labels_match_article_text(self):
+        self.assertEqual(ss.violations('Use the **"Item Has"** filter for **RRC** [MCELE-RRC-001].', 'Student'), [])
+
+    def test_strip_keeps_list_structure(self):
+        reply = '1. Go to the **Course Catalog**.\n2. Open **Secret Menu** now.\n3. Use the **Item Has** filter [MCELE-RRC-001].'
+        out = ss.drop_unsupported(reply, [('label', 'Secret Menu')])
+        self.assertEqual(out, '1. Go to the **Course Catalog**.\n3. Use the **Item Has** filter [MCELE-RRC-001].')
+
     def test_citations_become_numbers_with_sources(self):
         text, sources = ss.number_citations('A [MCELE-LAUNCH-001]. B [MCELE-LOGIN-001]. C [MCELE-LAUNCH-001]. D [MCELE-ECDEP-001].', 'Student')
         self.assertEqual(text, 'A [1]. B [2]. C [1]. D.')
