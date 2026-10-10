@@ -73,6 +73,17 @@ class GateTests(unittest.TestCase):
         self.assertEqual(ss.history(session, True), [])
 
 
+class MethodNoteTests(unittest.TestCase):
+    def test_phone_without_method_adds_note(self):
+        arts = ss.permitted('Student')
+        self.assertEqual(ss.method_note('im on my iphone and cant open my class', arts), ss.PHONE_NOTE)
+        self.assertEqual(ss.method_note('im on my iphone using safari', arts), '')
+        self.assertEqual(ss.method_note('cant open my class', arts), '')
+        self.assertEqual(ss.method_note('on my phone', [a for a in arts if a['id'] == 'MCELE-LOGIN-001']), '')
+        self.assertIn('Note for this turn: ' + ss.PHONE_NOTE, ss.system_prompt({'name': 'x', 'role': 'Student'}, note=ss.PHONE_NOTE))
+        self.assertNotIn('Note for this turn', ss.system_prompt({'name': 'x', 'role': 'Student'}))
+
+
 class CourseScopeTests(unittest.TestCase):
     def ids(self, text, role='Student'):
         return {a['id'] for a in ss.in_scope(role, text)}

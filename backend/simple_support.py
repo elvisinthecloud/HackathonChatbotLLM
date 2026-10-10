@@ -77,7 +77,7 @@ Rules:
 - Don't tell the user something isn't available to them, or that they lack access, unless an article says so.
 - When the user reports a button or option isn't there and the article doesn't cover that, say the articles don't cover it and point to the Help Desk route the relevant article gives.
 - If the user is on a phone or tablet and hasn't said whether they use the Moodle app or a browser (Safari, Chrome), ask which one before giving any Moodle steps.
-- When an article says something may or sometimes happens (for example, a document may be inside another file), tell the user to check for it. Never recommend a decision such as Deny or Recommend; the user decides.
+- When an article says something may or sometimes happens (for example, a document may be inside another file), tell the user to check for it. Never say which decision to make (such as Recommend, Deny, approve or reject) or what would justify one; the user decides.
 - If an article is for one specific error message, use its steps only after the user reports that error. If they describe a problem without the error text, ask what the screen shows.
 - Cite the articles you used at the end of a sentence like [MCELE-LOGIN-001].
 - Keep replies short and easy to read on a phone.
@@ -86,12 +86,26 @@ Articles this user may see:
 {articles}"""
 
 
-def system_prompt(profile, course_id=None, articles=None):
+PHONE = re.compile(r'\b(iphone|ipad|android|phone|mobile|tablet|cell)\b', re.I)
+METHOD = re.compile(r'\b(app|safari|chrome|edge|firefox|browser)\b', re.I)
+PHONE_NOTE = ('The user is on a phone or tablet and has not said whether they use the Moodle app or a browser. '
+              'Ask which one before giving any Moodle steps.')
+
+
+def method_note(user_text, articles):
+    """Server-side nudge: phone mentioned, no access method named, and Moodle articles in scope."""
+    if PHONE.search(user_text) and not METHOD.search(user_text) and any(a['id'].startswith('MOODLE-') for a in articles):
+        return PHONE_NOTE
+    return ''
+
+
+def system_prompt(profile, course_id=None, articles=None, note=''):
     arts = '\n\n'.join(
         f"=== {a['id']}: {a['title']}" + (f" (applies to courses: {', '.join(a['courses'])})" if a['courses'] else '')
         + '\n' + a['content'] for a in (permitted(profile['role']) if articles is None else articles))
     course_line = f'The user selected course: {course_id}.\n' if course_id else ''
-    return SYSTEM.format(name=profile['name'], role=profile['role'], course_line=course_line, articles=arts)
+    prompt = SYSTEM.format(name=profile['name'], role=profile['role'], course_line=course_line, articles=arts)
+    return prompt + ('\n\nNote for this turn: ' + note if note else '')
 
 
 # ---- fact gate ----
@@ -245,7 +259,7 @@ async def answer(rag, question, session, selection, image=None, issue_category=N
         past = history(session, changed)
         said = ' '.join([m['content'] for m in past if m['role'] == 'user'] + [user])
         scoped = in_scope(role, said, course_id)
-        messages = [{'role': 'system', 'content': system_prompt(profile, course_id, scoped)},
+        messages = [{'role': 'system', 'content': system_prompt(profile, course_id, scoped, method_note(said, scoped))},
                     *past, {'role': 'user', 'content': user}]
         draft = await chat(rag, 'simple_reply', messages)
         first = violations(draft, role)
