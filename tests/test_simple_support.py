@@ -82,7 +82,7 @@ class HelpDeskAndRepeatTests(unittest.TestCase):
     def test_helpdesk_needs_routing_article_or_admission(self):
         self.assertEqual([k for k, _ in ss.violations('Contact the Help Desk [MCELE-RRC-001].', 'Student')], ['helpdesk'])
         self.assertEqual(ss.violations('Contact the Help Desk [MCELE-LAUNCH-001].', 'Student'), [])
-        self.assertEqual(ss.violations("The articles don't cover that. Contact the Help Desk.", 'Student'), [])
+        self.assertEqual([k for k, _ in ss.violations("The articles don't cover that. Contact the Help Desk.", 'Student')], ['helpdesk'])
         self.assertEqual(ss.violations(ss.FALLBACK, 'Student'), [])
         self.assertIn('helpdesk', ss.repair_message([('helpdesk', 'Help Desk')]))
 

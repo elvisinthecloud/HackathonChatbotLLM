@@ -70,10 +70,10 @@ Rules:
 - If the user changes topic, follow the new topic.
 - If the user asks for something their role isn't covered for here, say you can't help with that for their role.
 - Use **bold** ONLY for exact on-screen labels, menu items, buttons, links and phone numbers copied character-for-character from an article. Never bold anything else.
-- Mention the Help Desk only when the article you are using says to, or when the user is stuck and no article covers their situation. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
-- If the articles don't answer the question, say the articles don't cover it. Don't guess reasons, causes, who else could help, what a report or page contains, or how a code or field is formatted.
-- Before saying the articles don't cover something, check every step of the article you are using. If it has steps the user hasn't tried yet, give the next one instead.
-- A Help Desk route belongs to the article it appears in. Never send an MCeLE course or account problem to the Moodle "option 3" route; that route is only for Moodle course, tile, material or app problems.
+- Mention the Help Desk only when the article you are giving steps from says to, and cite that article. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
+- If the articles don't answer the question, say so in one short sentence. Don't guess reasons, causes, who else could help, what a report or page contains, or how a code or field is formatted.
+- If the article you are using still has steps the user hasn't tried, give the next one before saying anything is uncovered.
+- Never send an MCeLE course or account problem to the Moodle "option 3" route; that route is only for Moodle course, tile, material or app problems.
 - If the user is only pausing ("hang on"), chatting or thanking you, reply in one friendly sentence with no steps, no citation and no Help Desk.
 - Never describe what other roles can or cannot do, and never explain how another role does their task.
 - Don't add tips, causes or troubleshooting ideas (browser settings, incognito, retry later, etc.) unless an article states them.
@@ -135,12 +135,11 @@ def items(reply):
 
 
 HELPDESK = re.compile(r'help ?desk', re.I)
-UNCOVERED = re.compile(r"(don'?t|do not|does not|doesn'?t) (cover|have approved guidance|include)|not covered|no approved guidance", re.I)
 
 
 def helpdesk_violation(reply, allowed):
-    """A Help Desk mention needs a cited article that routes there, or an admission that the articles don't cover it."""
-    if not HELPDESK.search(reply) or UNCOVERED.search(reply):
+    """A Help Desk mention needs a cited article that routes there."""
+    if not HELPDESK.search(reply) or reply.strip() == FALLBACK:
         return []
     if any(HELPDESK.search(allowed.get(c, '')) for c in set(CITE.findall(reply))):
         return []
@@ -277,9 +276,9 @@ async def chat(rag, name, messages):
     import httpx
     s = rag.settings
     payload = {'model': s.chat_model, 'messages': messages, 'stream': False,
-               'options': {'temperature': s.temperature, 'num_ctx': s.num_ctx, 'num_predict': 700}}
+               'options': {'temperature': 0, 'num_ctx': s.num_ctx, 'num_predict': 700}}
     with rag.langfuse.start_as_current_generation(name=name, model=s.chat_model, input=messages,
-                                                  model_parameters={'temperature': s.temperature, 'num_ctx': s.num_ctx}):
+                                                  model_parameters={'temperature': 0, 'num_ctx': s.num_ctx}):
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(f"{s.ollama_base_url.rstrip('/')}/api/chat", json=payload)
         if response.status_code >= 400:
