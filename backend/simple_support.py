@@ -64,13 +64,14 @@ Help them finish what they are trying to do, like a friendly, competent help des
 Rules:
 - Use only the articles below for facts: steps, button names, links, phone numbers, emails, course rules. Never invent a fact, link, button or contact.
 - You may write in your own words, but keep links, button names and numbers exactly as written in the article.
-- Give only the next steps that fit where the user is now. Don't repeat steps they say they already did, and don't re-send a whole procedure when they ask about one step.
+- Give only the next steps that fit where the user is now. Before writing, reread the earlier turns: never re-send a step you already gave or one the user says they did, unless they ask you to repeat it. Don't re-send a whole procedure when they ask about one step.
 - Ask a question only when you truly cannot help without the answer, and ask at most one.
 - If the user says a button or option isn't there, or the articles don't cover their situation, say so plainly and point them to the Help Desk route given in the articles. Don't loop back to the same steps.
 - If the user changes topic, follow the new topic.
 - If the user asks for something their role isn't covered for here, say you can't help with that for their role.
 - Use **bold** ONLY for exact on-screen labels, menu items, buttons, links and phone numbers copied character-for-character from an article. Never bold anything else.
-- If the articles don't say where to go or who to contact, say "contact the Help Desk" and nothing more. Never name any other office, unit, command, region, administrator or website.
+- Mention the Help Desk only when the article you are using says to, or when the user is stuck and no article covers their situation. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
+- If the articles don't answer the question, say the articles don't cover it. Don't guess reasons, causes, who else could help, what a report or page contains, or how a code or field is formatted.
 - Never describe what other roles can or cannot do, and never explain how another role does their task.
 - Don't add tips, causes or troubleshooting ideas (browser settings, incognito, retry later, etc.) unless an article states them.
 - Don't say what a button or page does, what an error means, or what will happen next (e.g. "the request moves on", "View shows the certificate") unless an article says exactly that.
@@ -89,7 +90,7 @@ Articles this user may see:
 PHONE = re.compile(r'\b(iphone|ipad|android|phone|mobile|tablet|cell)\b', re.I)
 METHOD = re.compile(r'\b(app|safari|chrome|edge|firefox|browser)\b', re.I)
 PHONE_NOTE = ('The user is on a phone or tablet and has not said whether they use the Moodle app or a browser. '
-              'Ask which one before giving any Moodle steps.')
+              'Ask which one before giving any Moodle steps. This reply must contain only that question, no steps.')
 
 
 def method_note(user_text, articles):
@@ -130,9 +131,23 @@ def items(reply):
     return out
 
 
+HELPDESK = re.compile(r'help ?desk', re.I)
+UNCOVERED = re.compile(r"(don'?t|do not|does not|doesn'?t) (cover|have approved guidance|include)|not covered|no approved guidance", re.I)
+
+
+def helpdesk_violation(reply, allowed):
+    """A Help Desk mention needs a cited article that routes there, or an admission that the articles don't cover it."""
+    if not HELPDESK.search(reply) or UNCOVERED.search(reply):
+        return []
+    if any(HELPDESK.search(allowed.get(c, '')) for c in set(CITE.findall(reply))):
+        return []
+    return [('helpdesk', HELPDESK.search(reply).group(0))]
+
+
 def violations(reply, role):
     allowed = {a['id']: a['content'] for a in permitted(role)}
     v = [('citation', c) for c in sorted(set(CITE.findall(reply))) if c not in allowed]
+    v += helpdesk_violation(reply, allowed)
     text = norm(' '.join(allowed.values()))
     flat, digits = squash(text), re.sub(r'\D', '', text)
     for kind, val in items(reply):
@@ -178,9 +193,16 @@ def number_citations(reply, role):
     return text, sources
 
 
+def describe(kind, val):
+    if kind == 'helpdesk':
+        return ('helpdesk: you mention the Help Desk, but no article you cited routes this situation there. '
+                'Either cite the article that does, or drop the Help Desk line, or say plainly that the articles do not cover it')
+    return f'{kind}: {val}'
+
+
 def repair_message(bad, labels=None):
     msg = ('Your reply was not sent. These items are not supported by the articles or are not available to this user: '
-           + '; '.join(f'{k}: {v}' for k, v in bad)
+           + '; '.join(describe(k, v) for k, v in bad)
            + '. Rewrite the reply without them. Copy labels, links and numbers exactly from an article and cite it, '
              "or say the articles don't cover it and to contact the Help Desk. Reply with only the rewritten message.")
     if labels:
@@ -198,6 +220,27 @@ def allowed_labels(text, articles):
             if label not in seen:
                 seen.append(label)
     return seen[:60]
+
+
+# ---- repeat check ----
+ASK_AGAIN = re.compile(r"\b(again|repeat|resend|re-send|one more time|what were|remind me|say that)\b", re.I)
+
+
+def line_key(line):
+    line = re.sub(r'^\s*(?:\d+\.|[-*])\s+', '', line)
+    line = re.sub(r'\*\*|\s?\[[A-Z0-9-]+\]|\s?\[\d+\]', '', line)
+    return re.sub(r'[^a-z0-9]+', ' ', line.lower()).strip()
+
+
+def repeated_lines(reply, past_replies):
+    """Lines (>= 30 chars) already sent in an earlier reply of this conversation."""
+    seen = {line_key(l) for r in past_replies for l in r.split('\n')}
+    out = []
+    for line in reply.split('\n'):
+        k = line_key(line)
+        if len(k) >= 30 and k in seen and line.strip() not in out:
+            out.append(line.strip())
+    return out
 
 
 # ---- conversation ----
@@ -275,13 +318,21 @@ async def answer(rag, question, session, selection, image=None, issue_category=N
                                                                           {'role': 'user', 'content': hint}])
                 second = violations(repaired, role)
             final, gate = (repaired, 'repaired') if not second else (drop_unsupported(repaired, second), 'stripped')
+        repeats = [] if ASK_AGAIN.search(question) else repeated_lines(final, [m['content'] for m in past if m['role'] == 'assistant'])
+        if len(repeats) >= 2 and gate != 'stripped':
+            ask = ('Your reply was not sent. These lines were already sent earlier in this conversation: '
+                   + ' | '.join(repeats) + '. Remove them and keep only what is new for the user now. '
+                     'Keep labels, links and citations exactly as before. Reply with only the rewritten message.')
+            deduped = await chat(rag, 'simple_dedupe', messages + [{'role': 'assistant', 'content': final}, {'role': 'user', 'content': ask}])
+            if not violations(deduped, role):
+                final, gate = deduped, gate + '+deduped'
         text, sources = number_citations(final, role)
         context = {'selected_course_id': course_id, 'engine': 'simple-gated'}
         metadata = {'architecture': 'simple-gated-rag', 'role': role, 'course_id': course_id,
                     'allowed_article_ids': [a['id'] for a in scoped],
                     'cited_source_ids': [s['source_path'] for s in sources], 'gate': gate,
                     'first_violations': [f'{k}: {v}' for k, v in first][:20],
-                    'repair_violations': [f'{k}: {v}' for k, v in second][:20]}
+                    'repair_violations': [f'{k}: {v}' for k, v in second][:20], 'repeated_lines': repeats[:10]}
         rag.langfuse.update_current_trace(metadata=metadata)
         trace.update(metadata=metadata, output={'answer': text})
         return {'answer': text, 'response_kind': 'support', 'suggested_replies': [], 'sources': sources,

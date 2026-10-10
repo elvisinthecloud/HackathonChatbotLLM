@@ -73,6 +73,21 @@ class GateTests(unittest.TestCase):
         self.assertEqual(ss.history(session, True), [])
 
 
+class HelpDeskAndRepeatTests(unittest.TestCase):
+    def test_helpdesk_needs_routing_article_or_admission(self):
+        self.assertEqual([k for k, _ in ss.violations('Contact the Help Desk [MCELE-RRC-001].', 'Student')], ['helpdesk'])
+        self.assertEqual(ss.violations('Contact the Help Desk [MCELE-LAUNCH-001].', 'Student'), [])
+        self.assertEqual(ss.violations("The articles don't cover that. Contact the Help Desk.", 'Student'), [])
+        self.assertEqual(ss.violations(ss.FALLBACK, 'Student'), [])
+        self.assertIn('helpdesk', ss.repair_message([('helpdesk', 'Help Desk')]))
+
+    def test_repeated_lines_ignore_markers_bold_and_citations(self):
+        past = ['1. Set **TYPE: Course Enrollment** and **REGION: All** [MCELE-ECDEP-001].\n2. Find the student.']
+        reply = '- Set TYPE: Course Enrollment and REGION: All [1].\nShort.\n3. Expand **Request file list** now please.'
+        self.assertEqual(ss.repeated_lines(reply, past), ['- Set TYPE: Course Enrollment and REGION: All [1].'])
+        self.assertTrue(ss.ASK_AGAIN.search('can you say that again'))
+
+
 class MethodNoteTests(unittest.TestCase):
     def test_phone_without_method_adds_note(self):
         arts = ss.permitted('Student')
@@ -129,6 +144,25 @@ class AnswerFlowTests(unittest.TestCase):
             return asyncio.run(ss.answer(rag, 'help', session, None)), calls
         finally:
             ss.chat = original
+
+    def test_repeated_reply_gets_one_dedupe_call(self):
+        calls = []
+        async def fake_chat(rag, name, messages):
+            calls.append(name)
+            return {'simple_reply': 'Select **Delete browsing data** from the menu now [MCELE-LAUNCH-001].\nThen restart your computer please [MCELE-LAUNCH-001].',
+                    'simple_dedupe': 'Then restart your computer please [MCELE-LAUNCH-001].'}[name]
+        original = ss.chat
+        ss.chat = fake_chat
+        try:
+            rag = type('Rag', (), {'langfuse': FakeLangfuse()})()
+            old = 'Select **Delete browsing data** from the menu now [1].\nThen restart your computer please [1].'
+            session = {'id': 's', 'profile': {'id': 'student', 'name': 'Sgt T', 'role': 'Student'},
+                       'selected_course_id': None, 'version': 0, 'turns': [('q', old, '', 0, {})]}
+            result = asyncio.run(ss.answer(rag, 'ok what next', session, None))
+        finally:
+            ss.chat = original
+        self.assertEqual(calls, ['simple_reply', 'simple_dedupe'])
+        self.assertEqual(result['answer'], 'Then restart your computer please [1].')
 
     def test_clean_reply_needs_one_call(self):
         result, calls = self.run_answer(['Restart your computer [MCELE-LAUNCH-001].'])
