@@ -70,7 +70,7 @@ Rules:
 - If the user changes topic, follow the new topic.
 - If the user asks for something their role isn't covered for here, say you can't help with that for their role.
 - Use **bold** ONLY for exact on-screen labels, menu items, buttons, links and phone numbers copied character-for-character from an article. Never bold anything else.
-- Mention the Help Desk only when the article you are giving steps from says to, and cite that article. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
+- Mention the Help Desk only when the article you are giving steps from says to, or when the user is stuck and no article covers their situation. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
 - If the articles don't answer the question, say so in one short sentence. Don't guess reasons, causes, who else could help, what a report or page contains, or how a code or field is formatted.
 - If the article you are using still has steps the user hasn't tried, give the next one before saying anything is uncovered.
 - Never send an MCeLE course or account problem to the Moodle "option 3" route; that route is only for Moodle course, tile, material or app problems.
@@ -137,21 +137,12 @@ def items(reply):
 HELPDESK = re.compile(r'help ?desk', re.I)
 
 
-def helpdesk_violation(reply, allowed):
-    """A Help Desk mention needs a cited article that routes there."""
-    if not HELPDESK.search(reply) or reply.strip() == FALLBACK:
-        return []
-    if any(HELPDESK.search(allowed.get(c, '')) for c in set(CITE.findall(reply))):
-        return []
-    return [('helpdesk', HELPDESK.search(reply).group(0))]
-
-
 def violations(reply, role, user_text=''):
     """Unsupported items in a reply. Things the user typed themselves (their course name, 'help desk') are allowed."""
     allowed = {a['id']: a['content'] for a in permitted(role)}
     v = [('citation', c) for c in sorted(set(CITE.findall(reply))) if c not in allowed]
-    if not HELPDESK.search(user_text):
-        v += helpdesk_violation(reply, allowed)
+    # Help Desk referrals are deliberately not gated: stripping them produced refusals, which hurt more than a
+    # stray referral. The prompt still tells the model to use only the route the article gives.
     text = norm(' '.join(allowed.values()))
     flat, digits = squash(text), re.sub(r'\D', '', text)
     said = squash(norm(user_text))
@@ -211,16 +202,9 @@ def number_citations(reply, role):
     return text, sources
 
 
-def describe(kind, val):
-    if kind == 'helpdesk':
-        return ('helpdesk: you mention the Help Desk, but the article you are giving steps from does not route this situation there. '
-                'Drop the Help Desk line. Do not borrow a Help Desk route or phone option from a different article')
-    return f'{kind}: {val}'
-
-
 def repair_message(bad, labels=None):
     msg = ('Your reply was not sent. These items are not supported by the articles or are not available to this user: '
-           + '; '.join(describe(k, v) for k, v in bad)
+           + '; '.join(f'{k}: {v}' for k, v in bad)
            + '. Rewrite the reply without them. Copy labels, links and numbers exactly from an article and cite it, '
              "or say the articles don't cover it and to contact the Help Desk. Reply with only the rewritten message.")
     if labels:
