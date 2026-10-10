@@ -146,20 +146,31 @@ def helpdesk_violation(reply, allowed):
     return [('helpdesk', HELPDESK.search(reply).group(0))]
 
 
-def violations(reply, role):
+def violations(reply, role, user_text=''):
+    """Unsupported items in a reply. Things the user typed themselves (their course name, 'help desk') are allowed."""
     allowed = {a['id']: a['content'] for a in permitted(role)}
     v = [('citation', c) for c in sorted(set(CITE.findall(reply))) if c not in allowed]
-    v += helpdesk_violation(reply, allowed)
+    if not HELPDESK.search(user_text):
+        v += helpdesk_violation(reply, allowed)
     text = norm(' '.join(allowed.values()))
     flat, digits = squash(text), re.sub(r'\D', '', text)
+    said = squash(norm(user_text))
     for kind, val in items(reply):
+        if kind == 'label' and CITE.fullmatch('[' + val + ']'):
+            continue  # a bolded article id is a citation, not a screen label
         if kind == 'phone':
             ok = re.sub(r'\D', '', val)[-10:] in digits
         else:
-            ok = squash(norm(val).strip(' .:,;!?"\'“”‘’()')) in flat
+            key = squash(norm(val).strip(' .:,;!?"\'“”‘’()'))
+            ok = key in flat or (len(key) >= 3 and key in said)
         if not ok:
             v.append((kind, val))
     return v
+
+
+def hard(bad):
+    """Violations worth stripping a reply over. A stray Help Desk line is repaired, never stripped."""
+    return [b for b in bad if b[0] != 'helpdesk']
 
 
 def drop_unsupported(reply, bad):
@@ -312,26 +323,29 @@ async def answer(rag, question, session, selection, image=None, issue_category=N
         messages = [{'role': 'system', 'content': system_prompt(profile, course_id, scoped, method_note(said, scoped))},
                     *past, {'role': 'user', 'content': user}]
         draft = await chat(rag, 'simple_reply', messages)
-        first = violations(draft, role)
+        first = violations(draft, role, said)
         final, second, gate = draft, [], 'first'
         if first:
             repaired = await chat(rag, 'simple_repair', messages + [{'role': 'assistant', 'content': draft},
                                                                     {'role': 'user', 'content': repair_message(first)}])
-            second = violations(repaired, role)
+            second = violations(repaired, role, said)
             if second:
                 # Last try before stripping: show the exact labels the articles it cited allow.
                 hint = repair_message(second, allowed_labels(draft + repaired, scoped))
                 repaired = await chat(rag, 'simple_repair_2', messages + [{'role': 'assistant', 'content': repaired},
                                                                           {'role': 'user', 'content': hint}])
-                second = violations(repaired, role)
-            final, gate = (repaired, 'repaired') if not second else (drop_unsupported(repaired, second), 'stripped')
+                second = violations(repaired, role, said)
+            if not hard(second):
+                final, gate = repaired, 'repaired' if not second else 'repaired-soft'
+            else:
+                final, gate = drop_unsupported(repaired, hard(second)), 'stripped'
         repeats = [] if ASK_AGAIN.search(question) else repeated_lines(final, [m['content'] for m in past if m['role'] == 'assistant'])
         if len(repeats) >= 2 and gate != 'stripped':
             ask = ('Your reply was not sent. These lines were already sent earlier in this conversation: '
                    + ' | '.join(repeats) + '. Remove them and keep only what is new for the user now. '
                      'Keep labels, links and citations exactly as before. Reply with only the rewritten message.')
             deduped = await chat(rag, 'simple_dedupe', messages + [{'role': 'assistant', 'content': final}, {'role': 'user', 'content': ask}])
-            if not violations(deduped, role):
+            if not hard(violations(deduped, role, said)):
                 final, gate = deduped, gate + '+deduped'
         text, sources = number_citations(final, role)
         context = {'selected_course_id': course_id, 'engine': 'simple-gated'}

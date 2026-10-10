@@ -86,6 +86,14 @@ class HelpDeskAndRepeatTests(unittest.TestCase):
         self.assertEqual(ss.violations(ss.FALLBACK, 'Student'), [])
         self.assertIn('helpdesk', ss.repair_message([('helpdesk', 'Help Desk')]))
 
+    def test_user_typed_terms_and_bold_article_ids_are_allowed(self):
+        self.assertEqual(ss.violations('Enter **CYBERM0000** in **Course Code** [MCELE-ENROLLMENT-REPORT-001].', 'Training Manager',
+                                       user_text='my course is CYBERM0000'), [])
+        self.assertTrue(ss.violations('Enter **CYBERM0000** in **Course Code** [MCELE-ENROLLMENT-REPORT-001].', 'Training Manager'))
+        self.assertEqual(ss.violations('See **MCELE-LAUNCH-001**: select **Delete browsing data** [MCELE-LAUNCH-001].', 'Student'), [])
+        self.assertEqual(ss.violations('Yes, the Help Desk is the next step [MCELE-RRC-001].', 'Student', user_text='is the help desk my only option'), [])
+        self.assertEqual(ss.hard([('helpdesk', 'Help Desk'), ('label', 'X')]), [('label', 'X')])
+
     def test_repeated_lines_ignore_markers_bold_and_citations(self):
         past = ['1. Set **TYPE: Course Enrollment** and **REGION: All** [MCELE-ECDEP-001].\n2. Find the student.']
         reply = '- Set TYPE: Course Enrollment and REGION: All [1].\nShort.\n3. Expand **Request file list** now please.'
@@ -181,6 +189,13 @@ class AnswerFlowTests(unittest.TestCase):
                                          'Open **Incognito**. Restart your computer [MCELE-LAUNCH-001].'])
         self.assertEqual(calls, ['simple_reply', 'simple_repair', 'simple_repair_2'])
         self.assertNotIn('Incognito', result['answer'])
+        self.assertIn('Restart', result['answer'])
+
+    def test_lone_helpdesk_violation_is_kept_not_stripped(self):
+        reply = 'Restart your computer. If that fails, contact the Help Desk [MCELE-RRC-001].'
+        result, calls = self.run_answer([reply, reply, reply])
+        self.assertEqual(len(calls), 3)
+        self.assertIn('Help Desk', result['answer'])
         self.assertIn('Restart', result['answer'])
 
     def test_second_repair_can_rescue_the_reply(self):
