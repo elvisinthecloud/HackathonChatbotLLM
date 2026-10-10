@@ -125,12 +125,26 @@ class AnswerFlowTests(unittest.TestCase):
         self.assertEqual(result['answer'], 'Restart your computer [1].')
         self.assertEqual(result['sources'][0]['source_path'], 'MCELE-LAUNCH-001')
 
-    def test_bad_reply_is_repaired_then_stripped(self):
+    def test_bad_reply_gets_two_repairs_then_is_stripped(self):
         result, calls = self.run_answer(['Open **Incognito** [MCELE-LAUNCH-001].',
+                                         'Open **Incognito** [MCELE-LAUNCH-001].',
                                          'Open **Incognito**. Restart your computer [MCELE-LAUNCH-001].'])
-        self.assertEqual(calls, ['simple_reply', 'simple_repair'])
+        self.assertEqual(calls, ['simple_reply', 'simple_repair', 'simple_repair_2'])
         self.assertNotIn('Incognito', result['answer'])
         self.assertIn('Restart', result['answer'])
+
+    def test_second_repair_can_rescue_the_reply(self):
+        result, calls = self.run_answer(['Open **Privacy and security** [MCELE-LAUNCH-001].',
+                                         'Open **Clear browsing data** [MCELE-LAUNCH-001].',
+                                         'Select **Delete browsing data** [MCELE-LAUNCH-001].'])
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(result['answer'], 'Select **Delete browsing data** [1].')
+
+    def test_allowed_labels_come_from_cited_articles(self):
+        labels = ss.allowed_labels('x [MCELE-LAUNCH-001]', ss.permitted('Student'))
+        self.assertIn('Delete browsing data', labels)
+        self.assertNotIn('Item Has', labels)
+        self.assertIn('Item Has', ss.allowed_labels('no citation', ss.permitted('Student')))
 
 
 if __name__ == '__main__':

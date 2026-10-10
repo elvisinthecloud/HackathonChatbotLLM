@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "dataset_id": "mcele-curated-v1",
-  "release_id": "curated-20261005.1",
+  "release_id": "curated-20261010.1",
   "buckets": {
     "mcele-launch": "MCeLE course launch error",
     "moodle-copy": "Moodle course copying",
@@ -103,7 +103,7 @@
     {
       "article_id": "MCELE-ECDEP-001",
       "file": "articles/mcele-ecdep-request-tm.json",
-      "file_sha256": "88bddbf20a93b9a3202c553754c81d210b9066d78b21216fbdc816858e5e6a76",
+      "file_sha256": "2de27f5d2a10556fe252207d685b591509948e9628c8cd88037a473ec70b645a",
       "allowed_roles": [
         "Training Manager"
       ],
@@ -337,7 +337,7 @@
     {
       "article_id": "MOODLE-APP-001",
       "file": "articles/moodle-app-access-all.json",
-      "file_sha256": "09c00f5de576fa8c410e3b5304b68abffb990f0437196c6661d70b281478f586",
+      "file_sha256": "86ee00eabee6d5c72d6f0b31a99f87afca9de367480a7e3388d35d24151b7136",
       "allowed_roles": [
         "Student",
         "Adjunct Faculty",

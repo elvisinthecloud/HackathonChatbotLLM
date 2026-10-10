@@ -76,6 +76,9 @@ Rules:
 - Don't say what a button or page does, what an error means, or what will happen next (e.g. "the request moves on", "View shows the certificate") unless an article says exactly that.
 - Don't tell the user something isn't available to them, or that they lack access, unless an article says so.
 - When the user reports a button or option isn't there and the article doesn't cover that, say the articles don't cover it and point to the Help Desk route the relevant article gives.
+- If the user is on a phone or tablet and hasn't said whether they use the Moodle app or a browser (Safari, Chrome), ask which one before giving any Moodle steps.
+- When an article says something may or sometimes happens (for example, a document may be inside another file), tell the user to check for it. Never recommend a decision such as Deny or Recommend; the user decides.
+- If an article is for one specific error message, use its steps only after the user reports that error. If they describe a problem without the error text, ask what the screen shows.
 - Cite the articles you used at the end of a sentence like [MCELE-LOGIN-001].
 - Keep replies short and easy to read on a phone.
 
@@ -161,6 +164,28 @@ def number_citations(reply, role):
     return text, sources
 
 
+def repair_message(bad, labels=None):
+    msg = ('Your reply was not sent. These items are not supported by the articles or are not available to this user: '
+           + '; '.join(f'{k}: {v}' for k, v in bad)
+           + '. Rewrite the reply without them. Copy labels, links and numbers exactly from an article and cite it, '
+             "or say the articles don't cover it and to contact the Help Desk. Reply with only the rewritten message.")
+    if labels:
+        msg += ' The only labels you may bold are these, copied exactly: ' + '; '.join(labels) + '.'
+    return msg
+
+
+def allowed_labels(text, articles):
+    """Bold labels from the articles the model cited (or all in scope if it cited none)."""
+    cited = set(CITE.findall(text))
+    pool = [a for a in articles if a['id'] in cited] or articles
+    seen = []
+    for a in pool:
+        for label in re.findall(r'\*\*([^*\n]{1,80})\*\*', a['content']):
+            if label not in seen:
+                seen.append(label)
+    return seen[:60]
+
+
 # ---- conversation ----
 def history(session, changed):
     if changed:
@@ -226,13 +251,15 @@ async def answer(rag, question, session, selection, image=None, issue_category=N
         first = violations(draft, role)
         final, second, gate = draft, [], 'first'
         if first:
-            fix = ('Your reply was not sent. These items are not supported by the articles or are not available to this user: '
-                   + '; '.join(f'{k}: {v}' for k, v in first)
-                   + '. Rewrite the reply without them. Copy labels, links and numbers exactly from an article and cite it, '
-                     "or say the articles don't cover it and to contact the Help Desk. Reply with only the rewritten message.")
             repaired = await chat(rag, 'simple_repair', messages + [{'role': 'assistant', 'content': draft},
-                                                                    {'role': 'user', 'content': fix}])
+                                                                    {'role': 'user', 'content': repair_message(first)}])
             second = violations(repaired, role)
+            if second:
+                # Last try before stripping: show the exact labels the articles it cited allow.
+                hint = repair_message(second, allowed_labels(draft + repaired, scoped))
+                repaired = await chat(rag, 'simple_repair_2', messages + [{'role': 'assistant', 'content': repaired},
+                                                                          {'role': 'user', 'content': hint}])
+                second = violations(repaired, role)
             final, gate = (repaired, 'repaired') if not second else (drop_unsupported(repaired, second), 'stripped')
         text, sources = number_citations(final, role)
         context = {'selected_course_id': course_id, 'engine': 'simple-gated'}
