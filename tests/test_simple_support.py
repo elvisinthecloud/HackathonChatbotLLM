@@ -43,6 +43,11 @@ class GateTests(unittest.TestCase):
         self.assertIn('Restart', kept)
         self.assertEqual(ss.drop_unsupported('Open **Privacy and security**.', bad), ss.FALLBACK)
 
+    def test_strip_keeps_factless_goodbye_without_citation(self):
+        reply = "Glad it worked! If anything else comes up, contact the Help Desk."
+        self.assertEqual(ss.drop_unsupported(reply, [('helpdesk', 'Help Desk')]), 'Glad it worked!')
+        self.assertEqual(ss.drop_unsupported('Open **Secret Menu**. Then select **Other Thing**.', [('label', 'Secret Menu')]), ss.FALLBACK)
+
     def test_quoted_labels_match_article_text(self):
         self.assertEqual(ss.violations('Use the **"Item Has"** filter for **RRC** [MCELE-RRC-001].', 'Student'), [])
 

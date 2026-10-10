@@ -72,6 +72,9 @@ Rules:
 - Use **bold** ONLY for exact on-screen labels, menu items, buttons, links and phone numbers copied character-for-character from an article. Never bold anything else.
 - Mention the Help Desk only when the article you are using says to, or when the user is stuck and no article covers their situation. Never add a closing "if you still have trouble, contact the Help Desk" line. Never name any other office, unit, command, region, administrator or website.
 - If the articles don't answer the question, say the articles don't cover it. Don't guess reasons, causes, who else could help, what a report or page contains, or how a code or field is formatted.
+- Before saying the articles don't cover something, check every step of the article you are using. If it has steps the user hasn't tried yet, give the next one instead.
+- A Help Desk route belongs to the article it appears in. Never send an MCeLE course or account problem to the Moodle "option 3" route; that route is only for Moodle course, tile, material or app problems.
+- If the user is only pausing ("hang on"), chatting or thanking you, reply in one friendly sentence with no steps, no citation and no Help Desk.
 - Never describe what other roles can or cannot do, and never explain how another role does their task.
 - Don't add tips, causes or troubleshooting ideas (browser settings, incognito, retry later, etc.) unless an article states them.
 - Don't say what a button or page does, what an error means, or what will happen next (e.g. "the request moves on", "View shows the certificate") unless an article says exactly that.
@@ -171,7 +174,12 @@ def drop_unsupported(reply, bad):
         elif not marker and not body.strip():
             lines.append('')
     out = re.sub(r'\n{3,}', '\n\n', '\n'.join(lines)).strip()
-    return out if re.search(r'[A-Za-z]{3,}', out) and CITE.search(out) else FALLBACK
+    if not re.search(r'[A-Za-z]{3,}', out):
+        return FALLBACK
+    # Plain prose with no labels, links, numbers or Help Desk routing (e.g. a goodbye) needs no citation.
+    if CITE.search(out) or (not items(out) and not HELPDESK.search(out)):
+        return out
+    return FALLBACK
 
 
 def number_citations(reply, role):
@@ -195,8 +203,8 @@ def number_citations(reply, role):
 
 def describe(kind, val):
     if kind == 'helpdesk':
-        return ('helpdesk: you mention the Help Desk, but no article you cited routes this situation there. '
-                'Either cite the article that does, or drop the Help Desk line, or say plainly that the articles do not cover it')
+        return ('helpdesk: you mention the Help Desk, but the article you are giving steps from does not route this situation there. '
+                'Drop the Help Desk line. Do not borrow a Help Desk route or phone option from a different article')
     return f'{kind}: {val}'
 
 
