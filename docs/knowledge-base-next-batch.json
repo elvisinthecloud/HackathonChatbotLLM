@@ -1,0 +1,313 @@
+{
+  "status": "curated_integrated_and_indexed",
+  "indexed": true,
+  "source_archive": "Confluence-space-export-111758-2.html.zip",
+  "selection_date": "2026-09-29",
+  "selection_theme": "Cannot sign in or access course content",
+  "selection_reason": "Distinguish account login, CAC authentication, credential recovery, course launch, and Moodle navigation before choosing a troubleshooting path.",
+  "attachments_reviewed": false,
+  "access_mapping": "All six selected source articles are confirmed for everyone within their reviewed scopes, with independent explicit grants to all five seeded roles. Source audience tags were reviewed rather than used as automatic grants.",
+  "moodle_routing_plan": {
+    "status": "implemented_with_bounded_offline_and_live_checks",
+    "user_confirmed_default": "Interpret an unspecified request to log into Moodle as access through the MCeLE ecosystem.",
+    "user_confirmed_navigation": "Instructor-Led Courses in the left navigation menu.",
+    "user_confirmed_exception": "Moodle app login uses a different procedure and must use its own article.",
+    "source": "User clarification on 2026-09-29.",
+    "implemented_ambiguity_question": "Are you using the Moodle app or MCeLE in a web browser?",
+    "implemented_context_behavior": "Remember the clarified access method for follow-ups; switch source guidance when the user changes methods."
+  },
+  "articles": [
+    {
+      "title": "Logging In to MCeLE",
+      "source_page_id": "403636493",
+      "source_html": "EKB/Logging-In-to-MCeLE_403636493.html",
+      "source_kba_id": "KBA-MCeLE-JR-LOGIN-001",
+      "source_audience": "ALL USERS",
+      "source_updated": "2026-07-14",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "decision_source": "User confirmed everyone should receive this guidance on 2026-09-29."
+      },
+      "purpose": "Separate CAC login from username/password login and identify the relevant account-access problem.",
+      "test_reports": [
+        "I cannot sign in to MCeLE.",
+        "Login succeeds, but some content still requires CAC access."
+      ],
+      "routing_detail": "Which login method is being used?",
+      "related_selected_articles": [
+        "403636525",
+        "403636424"
+      ],
+      "curated_article_id": "MCELE-LOGIN-001",
+      "curated_path": "knowledge/curated/articles/mcele-login-all.json"
+    },
+    {
+      "title": "CAC Login Troubleshooting",
+      "source_page_id": "403636525",
+      "source_html": "EKB/CAC-Login-Troubleshooting_403636525.html",
+      "source_kba_id": "KBA-MCeLE-GS-CAC-002",
+      "source_audience": "ALL USERS",
+      "source_updated": "2026-07-10",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "decision_source": "User confirmed everyone can receive this guidance on 2026-09-29."
+      },
+      "purpose": "Distinguish a login loop, access denial, absent CAC prompt, personal-device failure, new CAC, and disabled account.",
+      "test_reports": [
+        "CAC login keeps looping.",
+        "My new CAC does not work.",
+        "I do not get a CAC prompt."
+      ],
+      "routing_detail": "What happens when CAC login is attempted?",
+      "source_escalation": "Help Desk for account reactivation.",
+      "curated_article_id": "MCELE-CAC-001",
+      "curated_path": "knowledge/curated/articles/mcele-cac-login-all.json"
+    },
+    {
+      "title": "Forgot Your Username or Password",
+      "source_page_id": "403636424",
+      "source_html": "EKB/Forgot-Your-Username-or-Password_403636424.html",
+      "source_kba_id": null,
+      "source_audience": "ALL USERS",
+      "source_updated": "2026-07-14",
+      "purpose": "Guide credential recovery and distinguish a forgotten username from a password reset or missing recovery email.",
+      "test_reports": [
+        "I forgot my username.",
+        "I requested a password reset, but no email arrived."
+      ],
+      "routing_detail": "Which credential or recovery step is missing?",
+      "source_escalation": "Check spam/junk and contact the Help Desk if recovery email does not arrive.",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "decision_source": "User confirmed everyone can receive this guidance on 2026-09-29."
+      },
+      "curated_article_id": "MCELE-RECOVERY-001",
+      "curated_path": "knowledge/curated/articles/mcele-credential-recovery-all.json"
+    },
+    {
+      "title": "Launch Course",
+      "source_page_id": "403636316",
+      "source_html": "EKB/Launch-Course_403636316.html",
+      "source_kba_id": null,
+      "source_audience": "STUDENTS",
+      "source_updated": "2026-07-14",
+      "purpose": "Separate a blocked course window, active-session message, blank page, and Skillsoft connection failure after login.",
+      "test_reports": [
+        "Nothing opens when I launch the course.",
+        "The course says there is an active session.",
+        "The course opens a blank page.",
+        "I cannot launch my 5500 course from MCeLE My Courses.",
+        "I clicked Launch in MCeLE, but it did not open my Moodle course.",
+        "I am already in Moodle, but the course activity will not open.",
+        "I am an Academics Officer taking CYBERM0000, and my enrolled course will not launch.",
+        "I am an Adjunct Faculty member trying to open a course I am enrolled in.",
+        "I am an Academics Officer, and an activity in the Moodle course I created is not working."
+      ],
+      "routing_detail": "Resolve the course content platform and distinguish self-paced launch from an MCeLE-to-Moodle handoff or a problem inside Moodle. Launch wording alone does not identify MCeLE content.",
+      "source_escalation": "Help Desk for unresolved Skillsoft connectivity.",
+      "source_limit": "Contains screenshot placeholders. Do not replace the existing exact-error launch article with this broader guidance.",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "scope": "Guidance for accessing the user's own enrolled course, including users whose role is Adjunct Faculty or Academics Officer. Role alone does not make an enrolled-course issue a course-management issue.",
+        "decision_source": "User confirmed everyone accessing an enrolled course can receive this guidance on 2026-09-29."
+      },
+      "curated_article_id": "MCELE-LAUNCH-002",
+      "curated_path": "knowledge/curated/articles/mcele-course-launch-all.json"
+    },
+    {
+      "title": "Accessing Moodle",
+      "source_page_id": "403636332",
+      "source_html": "EKB/Accessing-Moodle_403636332.html",
+      "source_kba_id": null,
+      "source_audience": "STUDENTS",
+      "source_updated": "2026-07-14",
+      "purpose": "Distinguish getting to Instructor-Led Courses from finding a course in Moodle My Courses.",
+      "test_reports": [
+        "Where do I open Moodle?",
+        "I reached Moodle, but I cannot see my course.",
+        "How do I log into Moodle?",
+        "MCeLE lists my Moodle course, but Launch does not redirect me.",
+        "I can see the course tile in Moodle, but an activity does not open."
+      ],
+      "routing_detail": "Is Moodle inaccessible, or is the course missing after Moodle opens?",
+      "source_escalation": null,
+      "source_limit": "The reviewed navigation can address access or a failed MCeLE-to-Moodle handoff. It does not establish why enrollment is missing or supply fixes for a specific material/activity failure.",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "scope": "Basic navigation through Instructor-Led Courses and Moodle Dashboard/My Courses, including new or unfamiliar Adjunct Faculty and Academics Officers. Guidance does not grant course enrollment or management permissions.",
+        "decision_source": "User confirmed all roles can receive this guidance on 2026-09-30."
+      },
+      "user_confirmed_navigation": "Instructor-Led Courses in the left navigation menu; Moodle course tiles on Dashboard or My Courses.",
+      "user_confirmed_escalation": "Student Support Help Desk, option 3 for Moodle support, for a missing course tile or material/activity that will not open.",
+      "curated_article_id": "MOODLE-ACCESS-001",
+      "curated_path": "knowledge/curated/articles/moodle-access-all.json"
+    }
+  ],
+  "additional_candidates": [
+    {
+      "title": "Accessing the Moodle app",
+      "source_page_id": "403636342",
+      "source_html": "EKB/Accessing-the-Moodle-app_403636342.html",
+      "source_kba_id": null,
+      "source_audience": "STUDENTS",
+      "source_updated": "2026-07-22",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "role_exclusions": [],
+        "scope": "Moodle app setup and login guidance for all roles.",
+        "decision_source": "User confirmed everyone can receive app setup and login guidance on 2026-09-30."
+      },
+      "purpose": "Distinguish app setup/login from accessing Instructor-Led Courses through MCeLE.",
+      "source_process": "Sign into MCeLE with username/password and access Instructor-Led Courses to activate Moodle access, then follow the app site setup, login and return-to-app instructions.",
+      "test_reports": [
+        "How do I log into Moodle?",
+        "I mean the Moodle app.",
+        "Moodle does not work on my phone."
+      ],
+      "source_escalation": "Help Desk for persistent login or app-access issues.",
+      "source_limit": "Source audience and app/browser navigation differences still require review; attachments have not been reviewed.",
+      "curated_article_id": "MOODLE-APP-001",
+      "curated_path": "knowledge/curated/articles/moodle-app-access-all.json"
+    }
+  ],
+  "course_access_routing_plan": {
+    "status": "implemented_with_bounded_offline_and_live_checks",
+    "source": "User clarification on 2026-09-29.",
+    "user_confirmed_terminology": "Users may say launch when they mean opening Moodle course material or activities. The word launch alone does not establish the content platform.",
+    "user_confirmed_moodle_navigation": "Moodle course tiles can be opened from Dashboard or My Courses under Instructor-Led Courses. There is no classic course-start Launch button within Moodle.",
+    "user_confirmed_mcele_entry": "Moodle courses may also be listed in MCeLE My Courses. Launch can redirect to Moodle, but this handoff sometimes fails.",
+    "user_confirmed_handoff_alternative": "For a confirmed Moodle course whose MCeLE handoff fails, access Instructor-Led Courses from the left navigation menu.",
+    "user_estimated_symptom_distribution": {
+      "mcele_self_paced": 0.7,
+      "moodle": 0.3
+    },
+    "estimate_use": "Approximate user estimate for test coverage; never use it to determine a particular user's platform or permissions.",
+    "unsupported_detail_behavior": "For a missing Moodle course tile or a material/activity that will not open, use the user-approved Student Support Help Desk escalation, option 3 for Moodle support. Keep MCeLE self-paced launch troubleshooting scoped to the appropriate content platform and enrolled-course task.",
+    "role_task_rule": "Identify the current task. An Instructor or AO accessing an enrolled course receives the same applicable learner guidance as everyone else; course creation or management does not follow from the role alone.",
+    "implemented_context": [
+      "system_area",
+      "delivery_area",
+      "entry_point",
+      "failure_stage",
+      "moodle_access_method",
+      "support_branch"
+    ],
+    "implemented_resolution": "Use a confirmed course/task mapping when available. Otherwise clarify the course or destination one useful question at a time. Keep the MCeLE entry point separate from the Moodle content destination.",
+    "implemented_paths": [
+      "MCeLE self-paced course launch failure: reviewed Launch Course guidance when access and symptom match.",
+      "MCeLE-to-Moodle handoff failure: reviewed Accessing Moodle guidance with Instructor-Led Courses left-navigation wording.",
+      "Already inside Moodle: distinguish a missing course tile from a material/activity that will not open, then use the approved Student Support Help Desk escalation, option 3 for Moodle support, when there is no matching supported procedure.",
+      "Moodle app issue: keep the app-specific guidance and method for follow-ups."
+    ]
+  },
+  "moodle_support_escalation": {
+    "status": "implemented_with_bounded_offline_and_live_checks",
+    "decision_source": "User clarification on 2026-09-29.",
+    "contact": "Student Support Help Desk",
+    "option": 3,
+    "option_purpose": "Moodle support",
+    "cases": [
+      {
+        "situation": "A Moodle course tile is missing or a course material/activity will not open.",
+        "guidance": "Contact the Student Support Help Desk and use option 3 for Moodle support."
+      },
+      {
+        "situation": "An Instructor/Adjunct Faculty member has a problem with a Moodle course they are part of.",
+        "guidance": "Contact Student Support for Moodle assistance."
+      },
+      {
+        "situation": "An Academics Officer has a problem with a Moodle course or activity they created.",
+        "guidance": "Contact Moodle support through the Student Support Help Desk, option 3."
+      }
+    ],
+    "role_task_rule": "Identify the current task. An Instructor or AO accessing an enrolled course receives the same applicable learner guidance as everyone else; course creation or management does not follow from the role alone.",
+    "unsupported_procedure_behavior": "Use this approved escalation for uncovered Moodle course/material/activity problems rather than inventing troubleshooting steps."
+  },
+  "cyber_training_editorial_review": {
+    "status": "bounded_read_only_audit_complete",
+    "user_confirmed_course": "CYBERM0000",
+    "user_confirmed_current_cadence": "biennial",
+    "user_reported_previous_cadence": "annual",
+    "decision_source": "User clarification on 2026-09-29; effective policy date was not provided.",
+    "current_repo_registry": "The CYBERM0000 display title already says biennial training.",
+    "scope_rule": "Review cadence statements specifically about CYBERM0000; do not change unrelated annual policies or infer dates, population-specific exceptions, or other course requirements.",
+    "audit_date": "2026-09-30",
+    "definite_outdated_cyber_articles_found": [],
+    "conclusion": "No explicit statement that CYBERM0000 itself is annual was found in the index or six selectively inspected candidate bodies. Four generic annual-language articles are contextual review candidates, not confirmed outdated CYBERM0000 articles.",
+    "source_candidates": [
+      {
+        "title": "Who Can Use MCeLE and What Training Is Available?",
+        "source_page_id": "403636505",
+        "source_html": "EKB/403636505.html",
+        "source_kba_id": "KBA-MCeLE-GS-EL-002",
+        "evidence": "Annual Training \u2014 Yearly training requirements.",
+        "cyberm0000_mentioned": false,
+        "assessment": "Generic annual-training category; retain unless it incorrectly groups CYBERM0000 as annual."
+      },
+      {
+        "title": "MCeLE Ecosystem Components Overview",
+        "source_page_id": "413925489",
+        "source_html": "EKB/MCeLE-Ecosystem-Components-Overview_413925489.html",
+        "source_kba_id": "KBA-MCeLE-GS-ECO-001",
+        "evidence": "Common topics: Annual training, language and culture, and pre-deployment preparation.",
+        "cyberm0000_mentioned": false,
+        "assessment": "Generic self-paced-course topic examples; does not establish cyber-training cadence."
+      },
+      {
+        "title": "Re-Enrollment",
+        "source_page_id": "403636309",
+        "source_html": "EKB/Re-Enrollment_403636309.html",
+        "evidence": "Re-Enrollment is a time saver for users who must retake a course or enroll in annual training they took previously.",
+        "cyberm0000_mentioned": false,
+        "assessment": "A general recurring-training explanation. Consider course-neutral wording if adapting it to cover CYBERM0000, while preserving any valid annual requirements for other courses."
+      },
+      {
+        "title": "View Course Catalog Description",
+        "source_page_id": "403636405",
+        "source_html": "EKB/View-Course-Catalog-Description_403636405.html",
+        "evidence": "Annual Certification indicates whether the course completes an annual certification requirement.",
+        "cyberm0000_mentioned": false,
+        "assessment": "Defines a catalog field; do not rename the field or infer CYBERM0000 cadence from it."
+      }
+    ],
+    "other_inspected_candidates": [
+      {
+        "title": "Account Security",
+        "source_page_id": "413925939",
+        "assessment": "No cadence wording."
+      },
+      {
+        "title": "Finding and Registering for Courses",
+        "source_page_id": "403636307",
+        "source_html": "EKB/Finding-and-Registering-for-Courses_403636307.html",
+        "assessment": "Mentions Re-Enroll Now after prior completion without establishing cadence."
+      }
+    ],
+    "coverage": "Read EKB/index.html and six selected candidate HTML bodies in place. Attachments and all other article bodies were not reviewed. No full-archive extraction or exhaustive body scan.",
+    "current_article_result": "The curated CYBERM0000 launch article contains no cadence statement. No inspected active source requires an annual-to-biennial edit.",
+    "source_articles_modified": false,
+    "audit_method": "User-requested read-only Luna subagent audit; the root agent independently verified the four generic annual-language source excerpts."
+  },
+  "access_review_status": "all_six_confirmed",
+  "implementation": {
+    "date": "2026-10-02",
+    "local_manifest_articles": 19,
+    "database_indexed": true,
+    "live_verified": true,
+    "sources_read": "Six explicitly selected HTML articles read in place; attachments unreviewed.",
+    "upload_snapshot": "Earlier nine-article upload snapshot unchanged.",
+    "live_verification_scope": "Selected synthetic API conversations and inspected traces; no full-corpus or general-user accuracy claim.",
+    "live_testing_summary": "docs/synthetic-testing-summary.json"
+  }
+}

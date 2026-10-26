@@ -1,0 +1,67 @@
+{
+  "type": "planner_redesign_current_model_review",
+  "release_id": "724fd72f045deb9f",
+  "model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+  "planner_version": 2,
+  "articles": 19,
+  "chunks": 24,
+  "runtime_files": 57,
+  "runtime_source_parity": true,
+  "original_health_unchanged": true,
+  "python_tests": 306,
+  "javascript_tests": 9,
+  "synthetic_conversations": 13,
+  "chat_turns": 34,
+  "http_200": 34,
+  "trace_count": 34,
+  "chat_generations": 40,
+  "source_access_inconsistencies": 0,
+  "case_verdicts": {
+    "obstacles/exact": "pass",
+    "obstacles/heldout": "partial",
+    "obstacles/recovery": "fail",
+    "obstacles/correction": "fail",
+    "progress/certificate": "fail",
+    "progress/enrollment": "fail",
+    "progress/cac": "fail",
+    "progress/request": "fail",
+    "roles/student_tm_claim": "fail",
+    "roles/instructor_ao_claim": "fail",
+    "roles/tm_ecdep_auto": "partial",
+    "roles/pin_correction": "partial",
+    "roles/content_6800": "fail"
+  },
+  "verdict_counts": {
+    "pass": 1,
+    "partial": 3,
+    "fail": 9
+  },
+  "median_seconds": 2.43,
+  "max_seconds": 6.9,
+  "test_method": "Three independent Sol 6.1 medium suites established 34 recorded inputs. Parent replayed those exact inputs against the final release in fresh sessions; a Sol reviewer and parent reviewed final responses. Serial shared lock, no silent retries. Earlier adaptive cases are fixed comparative replays in the final run.",
+  "mobile_browser": {
+    "turns": 5,
+    "http_200": 5,
+    "ordered_lists": 1,
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "viewport": "390x844"
+  },
+  "findings": [
+    "The exact screenshot sequence keeps the unexplained error after \u201cLaunch it\u201d and asks for the error message.",
+    "The known STS1 error now receives all eight canonical steps, including restart and relaunch, plus escalation.",
+    "Vague questions can still prompt an assumed error; disabled-account corrections miss available Help Desk guidance.",
+    "Certificate, Catalog View, request-form boundaries and CAC recovery/resumption still receive unnecessary questions or generic failures.",
+    "Role claims did not expose restricted sources. Access success does not compensate for unhelpful role-permission replies.",
+    "Replies varied across recorded evaluations, including with restored prompt wording. These runs do not isolate model capability from the planner/prompt interaction."
+  ],
+  "limitations": "This is a development baseline, not a successful overall behavior acceptance. Final cases replay the same recorded inputs in fresh sessions; some later inputs therefore supply progress despite a poor earlier reply. Synthetic reports are not real actions. No real-user, image-understanding, concurrent-load or unseen-corpus validation is claimed.",
+  "model_comparison": "Deferred until user reviews current-model results and chooses comparison setup. No model changes.",
+  "historical_releases": [
+    "fbd10f82c20f91b0",
+    "781a222b45841ef1",
+    "e33564f1d55c0d68",
+    "c37a338760a9ae39",
+    "234e97371c1aa850"
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "type": "reviewed_knowledge_batch",
+  "date": "2026-09-30",
+  "status": "integrated_and_indexed",
+  "indexed": true,
+  "curated": true,
+  "access_approved": true,
+  "source_archive": "Confluence-space-export-111758-2.html.zip",
+  "selection_method": "Index plus six selective HTML bodies read in place; no full extraction or attachments.",
+  "purpose": "Add similar symptoms with different causes and actions to stress-test retrieval competition.",
+  "evaluation_sequence": "Fixed six-source access baseline and all nineteen selected sources ranked serially with the approved embedding model; actual conversations evaluated separately.",
+  "articles": [
+    {
+      "title": "Unlock Your Account",
+      "source_page_id": "403636427",
+      "source_html": "EKB/Unlock-Your-Account_403636427.html",
+      "source_audience": "ALL USERS",
+      "competes_with": [
+        "MCELE-LOGIN-001",
+        "MCELE-CAC-001",
+        "MCELE-RECOVERY-001"
+      ],
+      "distinction": "Distinguish a temporarily locked account after failed attempts from disabled/inactive accounts, forgotten credentials and CAC certificate failures.",
+      "human_review_needed": [],
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "allowed_roles": [
+          "Student",
+          "Adjunct Faculty",
+          "Academics Officer",
+          "Training Manager",
+          "Regional Director"
+        ],
+        "role_exclusions": [],
+        "scope": "Receive MCeLE temporary account-lockout guidance; this does not grant manual-unlock permissions.",
+        "decision_source": "User confirmed everyone for now on 2026-09-30."
+      },
+      "reviewed_guidance": {
+        "status": "confirmed_current",
+        "failed_attempt_limit": 3,
+        "automatic_unlock_wait_minutes": 60,
+        "manual_unlock_permission": "Administrators only; users contact Help Desk or an Administrator for assistance.",
+        "persistent_lockout_guidance": "Restart the browser after waiting; clear the browser cache if the issue persists.",
+        "credential_guidance": "Use correct credentials after unlock; recover forgotten credentials rather than guessing.",
+        "decision_source": "User confirmed the stated rules and troubleshooting steps remain correct on 2026-09-30."
+      },
+      "article_id": "MCELE-UNLOCK-001",
+      "indexed": true
+    },
+    {
+      "title": "Associate CAC to Account",
+      "source_page_id": "403636428",
+      "source_html": "EKB/Associate-CAC-to-Account_403636428.html",
+      "source_audience": "ALL USERS",
+      "competes_with": [
+        "MCELE-LOGIN-001",
+        "MCELE-CAC-001"
+      ],
+      "distinction": "Distinguish the explicit association/unlinked-CAC prompt from a certificate prompt, login loop or access-denied message.",
+      "human_review_needed": [],
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "allowed_roles": [
+          "Student",
+          "Adjunct Faculty",
+          "Academics Officer",
+          "Training Manager",
+          "Regional Director"
+        ],
+        "role_exclusions": [],
+        "scope": "Receive MCeLE CAC-association guidance; account creation remains a separate process.",
+        "decision_source": "User answered yes to everyone receiving this guidance on 2026-09-30."
+      },
+      "recommended_scope": {
+        "status": "confirmed",
+        "existing_account": "Guide the approved CAC-association procedure one step at a time.",
+        "new_account": "Explain the New Account Start Here entry point; detailed account creation requires its separate source.",
+        "decision_source": "User approved the demonstrated existing-account and new-account paths on 2026-09-30."
+      },
+      "reviewed_guidance": {
+        "status": "confirmed_scope",
+        "account_existence_question": "Do you already have an MCeLE account?",
+        "existing_account": "Guide Existing Account Start Here and signing in with existing MCeLE credentials; skip prerequisites the user has already completed.",
+        "new_account": "Guide New Account Start Here; detailed creation instructions require separate source review.",
+        "recovery_subgoal": "Preserve the CAC-association goal while handling forgotten credentials, then return to association.",
+        "implementation_status": "implemented_with_server_context_resume; bounded live synthetic recovery/resume replay passed",
+        "decision_source": "User approved the example flow on 2026-09-30."
+      },
+      "source_dependencies": [
+        {
+          "title": "Create or Request an MCeLE Account",
+          "status": "pending_separate_source_and_access_review",
+          "purpose": "Provide source-backed detailed account-creation instructions beyond New Account Start Here."
+        }
+      ],
+      "article_id": "MCELE-CAC-ASSOC-001",
+      "indexed": true
+    },
+    {
+      "title": "Finding and Registering for Courses",
+      "source_page_id": "403636307",
+      "source_html": "EKB/Finding-and-Registering-for-Courses_403636307.html",
+      "source_audience": "STUDENTS",
+      "competes_with": [
+        "MCELE-EPME-001",
+        "MCELE-ECDEP-001",
+        "MCELE-CSC-001",
+        "MCELE-LAUNCH-002"
+      ],
+      "distinction": "Find and enroll oneself in non-PME self-paced MCeLE courses; distinguish this from PME eligibility/seminar enrollment, staff request review, and an already-enrolled course launch failure.",
+      "human_review_needed": [],
+      "source_review": {
+        "date": "2026-09-30",
+        "source_updated": "2026-07-14",
+        "scope": "Finding and enrolling oneself in non-PME self-paced MCeLE courses and curricula.",
+        "navigation": "Course Catalog or Catalog Search, then View and Course Details.",
+        "eligibility": "Use the green/red Eligibility text and displayed Enroll Now or Re-Enroll Now availability; do not infer that every role can enroll in every course.",
+        "enrollment_result": "After enrollment, the course appears in My Courses (user correction on 2026-10-02).",
+        "source_gap": "The source mentions Submit Course Request(s) and points to step 4, but step 4 describes launching already-enrolled courseware; it does not provide the request-submission procedure.",
+        "excluded_workflows": [
+          "PME-specific eligibility or seminar enrollment requirements",
+          "Training Manager review of another user enrollment request",
+          "Troubleshooting launch of an already-enrolled course"
+        ],
+        "source_gap_status": "Request-form opening steps supplied by the user and included in the local draft. Form-specific completion/submission instructions remain outside the supplied guidance."
+      },
+      "draft_path": "docs/article-drafts/finding-and-registering-for-courses.json",
+      "reviewed_guidance": {
+        "status": "confirmed_with_user_corrections",
+        "date": "2026-10-02",
+        "scope": "Own enrollment in non-PME self-paced MCeLE courses; PME enrollment follows separate rules.",
+        "enrolled_course_location": "My Courses",
+        "course_request_steps": [
+          "Go to My Courses and find the course.",
+          "Select Launch or View.",
+          "Open the Enrollment tab.",
+          "Look in Overview for any available request forms.",
+          "Select Request to open the form."
+        ],
+        "decision_source": "User corrected the course location, agreed with the non-PME distinction and supplied the request-form path on 2026-10-02."
+      },
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "allowed_roles": [
+          "Student",
+          "Adjunct Faculty",
+          "Academics Officer",
+          "Training Manager",
+          "Regional Director"
+        ],
+        "role_exclusions": [],
+        "scope": "Own enrollment in non-PME self-paced MCeLE courses and curricula. Course eligibility still determines actual enrollment. PME enrollment and staff review of other users requests remain separate.",
+        "decision_source": "User answered YES on 2026-10-02 to the pending all-five-role audience question while VM reconnection proceeded in parallel."
+      },
+      "article_id": "MCELE-FIND-001",
+      "indexed": true
+    },
+    {
+      "title": "View Enrolled Courses",
+      "source_page_id": "403636310",
+      "source_html": "EKB/View-Enrolled-Courses_403636310.html",
+      "source_audience": "STUDENTS",
+      "competes_with": [
+        "MCELE-LAUNCH-002",
+        "MOODLE-ACCESS-001"
+      ],
+      "distinction": "Distinguish locating a course and checking its status from a failed Launch action or navigating within Moodle.",
+      "human_review_needed": [],
+      "source_review": {
+        "date": "2026-10-02",
+        "source_updated": "2026-07-24",
+        "scope": "Locate the user own MCeLE courses across enrollment statuses and explain common self-paced course actions. This does not supply enrollment eligibility or staff management procedures.",
+        "primary_navigation": "Select Student Dashboard in the left navigation, then My Courses.",
+        "alternate_source_entry": "MCeLE Portal Home > My In-Progress Courses; current widget label and intended status coverage remain to be confirmed.",
+        "listing_tools": [
+          "Sort newest or oldest",
+          "Filter by course type, status, or category"
+        ],
+        "status_examples": [
+          "Pending",
+          "In Progress",
+          "Completed",
+          "Incomplete",
+          "Enrolled",
+          "Disenrolled",
+          "Passed",
+          "Failed",
+          "Equivalency"
+        ],
+        "source_actions": {
+          "Launch": "Open the course enrollment page, where associated course material, tests or surveys can be launched.",
+          "View": "Review completed-course content without enrolling again.",
+          "Download Certificate": "View, download or print a course certificate or diploma.",
+          "Disenroll": "Disenroll from the course; the source does not give a detailed procedure.",
+          "Details": "Open the Details dropdown under the title for the description and ACE, CEU and RRC credit amounts.",
+          "Sub-Courses": "Open the Sub-Courses dropdown under a curriculum title.",
+          "Transcript": "Request Official Transcript for colleges or employers, or Print Transcript for an unofficial transcript."
+        },
+        "routing_distinctions": [
+          "Locating a course or checking status versus enrollment or re-enrollment",
+          "Available Launch action versus troubleshooting a failed launch",
+          "MCeLE listing versus navigation and course materials inside Moodle"
+        ],
+        "source_limits": [
+          "Several action-table How to Access cells contain no step-by-step procedure; do not invent missing actions or guarantee every button appears for every course/status."
+        ],
+        "label_consistency_note": "The existing curated Launch Course article still quotes My Active Courses. Resolve that label separately from the Portal Home widgets; do not assume all locations have the same label.",
+        "alternate_entry_status": "Omitted from the reviewed draft; future optional entry needs separate label confirmation."
+      },
+      "draft_path": "docs/article-drafts/view-enrolled-courses.json",
+      "reviewed_access": {
+        "status": "confirmed",
+        "audience": "everyone",
+        "allowed_roles": [
+          "Student",
+          "Adjunct Faculty",
+          "Academics Officer",
+          "Training Manager",
+          "Regional Director"
+        ],
+        "role_exclusions": [],
+        "scope": "Own MCeLE course listings, statuses, common self-paced actions and records. No staff management of another user records or course eligibility rules.",
+        "decision_source": "User explicitly confirmed all five roles on 2026-10-02."
+      },
+      "reviewed_guidance": {
+        "status": "confirmed_with_user_corrections",
+        "date": "2026-10-02",
+        "primary_navigation": "Student Dashboard in the left navigation > My Courses, including staff accessing their own courses.",
+        "completed_course_distinction": "View reviews completed-course content without enrolling again; retaking the course follows re-enrollment guidance.",
+        "decision_source": "User confirmed navigation and approved adding the View/re-enrollment distinction on 2026-10-02."
+      },
+      "article_id": "MCELE-COURSES-001",
+      "indexed": true
+    }
+  ],
+  "excluded_candidate": {
+    "title": "Moodle Troubleshooting",
+    "source_page_id": "413925971",
+    "source_html": "EKB/Moodle-Troubleshooting_413925971.html",
+    "reason": "Exported body contains only a title; no usable procedure or audience. Do not index title-only placeholders as answer sources."
+  },
+  "review_progress": {
+    "confirmed_article_count": 4,
+    "total_article_count": 4,
+    "access_confirmed_article_count": 4,
+    "guidance_confirmed_article_count": 4,
+    "next_article": null
+  },
+  "excluded_articles": [
+    {
+      "title": "Reactivating a Disabled Account",
+      "source_page_id": "403636429",
+      "source_html": "EKB/Reactivating-a-Disabled-Account_403636429.html",
+      "status": "excluded_by_user",
+      "decision_date": "2026-10-02",
+      "decision_source": "User declined including this article in the batch.",
+      "routing_decision": "Preserve existing Help Desk guidance for disabled/deactivated accounts; do not add the proposed self-service reactivation flow."
+    }
+  ],
+  "review_completion_date": "2026-10-02",
+  "curated_article_count": 19,
+  "integration_date": "2026-10-02",
+  "live_validation_date": "2026-10-02",
+  "live_testing_summary": "docs/synthetic-testing-summary.json"
+}

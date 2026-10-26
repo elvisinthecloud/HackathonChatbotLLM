@@ -3,6 +3,7 @@
 import argparse
 import base64
 import json
+import re
 import socket
 import time
 import urllib.request
@@ -24,15 +25,39 @@ def trace_headers():
     return {'Authorization':'Basic '+auth}
 
 
-def verify_trace(trace_id, role, article_id):
-    expected={'rag_answer','access_filter','embed_text','article_candidate_search','vector_search','retrieval_route','ollama_chat'}
+def verify_trace(trace_id, role, article_id, source_only=True, allowed_article_ids=None,
+                 require_allowed_set=False):
+    expected={'rag_answer','access_filter','embed_text','article_candidate_search','vector_search','retrieval_route'}
+    if source_only:
+        expected.add('guided_response')
+    else:
+        expected.add('ollama_chat')
     headers=trace_headers()
     for _ in range(12):
         try:
             trace=fetch('http://127.0.0.1:3000/api/public/traces/'+trace_id,headers=headers)
             observed={o.get('name') for o in trace.get('observations',[])}
             metadata=trace.get('metadata') or {}
-            if expected.issubset(observed) and 'curated-demo' in trace.get('tags',[]) and metadata.get('role')==role and metadata.get('allowed_article_ids')==[article_id]:
+            allowed=metadata.get('allowed_article_ids')
+            flexible = metadata.get('architecture') == 'flexible-grounded-rag'
+            interpreted = metadata.get('architecture') == 'interpreted-evidence-dialogue'
+            compact = metadata.get('architecture') == 'compact-evidence-dialogue'
+            flexible = flexible or interpreted or compact
+            if flexible:
+                expected={'rag_answer','embed_text','article_candidate_search','support_draft','support_grounding_review'}
+                if metadata.get('planner_version') == 2:
+                    expected={'rag_answer','embed_text','article_candidate_search','support_planner'}
+                if interpreted:
+                    expected={'rag_answer','embed_text','article_candidate_search','support_interpretation','support_decision'}
+                if compact:
+                    expected={'rag_answer','embed_text','article_candidate_search','compact_interpretation','compact_reply'}
+            access_ok = ((article_id in (allowed or []) if flexible else allowed == [article_id]) if allowed_article_ids is None else
+                         (set(allowed or []) == set(allowed_article_ids) if require_allowed_set else
+                          article_id in (allowed or []) and set(allowed or []).issubset(set(allowed_article_ids))))
+            if (expected.issubset(observed) and 'curated-demo' in trace.get('tags',[]) and
+                    metadata.get('role')==role and access_ok and
+                    (not flexible or metadata.get('decision') in ('accepted','passages') and
+                     article_id in metadata.get('cited_source_ids',[]))):
                 return sorted(observed)
         except Exception:
             pass
@@ -60,7 +85,7 @@ def main():
     if not answer.get('sources') or any(s.get('source_path')!='MOODLE-COPY-002' for s in answer['sources']) or not answer.get('trace_id'):
         raise RuntimeError('Instructor permission/citation check failed')
     text=answer.get('answer','').lower()
-    if 'academics officer' not in text or 'manage courses' in text or 'copy and view' in text:
+    if not ('academics officer' in text or re.search(r'\bao\b',text)) or 'manage courses' in text or 'copy and view' in text:
         raise RuntimeError('Instructor answer must contain permission guidance without AO procedure')
     observed=verify_trace(answer['trace_id'],'Adjunct Faculty','MOODLE-COPY-002')
     report={'conversation':'passed','profile':'Instructor','citations':['MOODLE-COPY-002'],

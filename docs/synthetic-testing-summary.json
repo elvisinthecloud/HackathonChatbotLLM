@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-02",
+  "synthetic_inputs": true,
+  "type": "live_synthetic_testing_summary",
+  "release_id": "655d8389af771862",
+  "article_count": 19,
+  "tester_agents": 3,
+  "baseline_sessions": 13,
+  "baseline_chat_turns": 47,
+  "targeted_replay_sessions": 8,
+  "targeted_replay_chat_turns": 49,
+  "final_check_sessions": 2,
+  "final_check_chat_turns": 6,
+  "supplemental_sessions": 5,
+  "supplemental_chat_attempts": 21,
+  "recorded_http_429": 13,
+  "baseline_traces_inspected": 47,
+  "baseline_turns_with_chat_model_span": 2,
+  "offline_python_tests": 150,
+  "offline_javascript_tests": 6,
+  "raw_embedding_source_turns": 48,
+  "raw_embedding_top1_correct": 38,
+  "raw_embedding_top3_contains_target": 48,
+  "limitations": "Manual review of bounded synthetic API conversations, not general user accuracy, browser automation, or a load test.",
+  "remaining_issues": [
+    "Natural completion reports can repeat catalog guidance, including compound Done replies.",
+    "Retaking a completed course can return course-list navigation instead of clarifying course type and selecting the relevant enrollment guidance.",
+    "Negated CAC/PIN guesses can require extra clarification despite an explicit account-lockout correction."
+  ],
+  "deployment": {
+    "selected_article_count": 19,
+    "indexed_chunks": 24,
+    "original_health_unchanged": true,
+    "original_chunks_unchanged": 315,
+    "release_files_verified": 55,
+    "public_frontend_health_verified": true
+  },
+  "findings_that_held": [
+    "Moodle course mapping, app/browser clarification and method switching.",
+    "Instructor versus AO copying grants; shared learner guidance for staff roles."
+  ],
+  "deployed_corrections": [
+    "Persistent account-lockout context and automatic versus manual unlock wording.",
+    "CAC association goal retention and recovery completion/resume.",
+    "Own non-PME enrollment corrections, request-form progress and opening/submission boundary.",
+    "Typed PME codes exclude general non-PME enrollment guidance."
+  ],
+  "protocol_notes": [
+    "Initial unpaced attempts recorded 13 HTTP 429 replies; only the synthetic client gained pacing.",
+    "A lockout replay exceeded its eight-turn cap after a duplicate call; the nine-turn transcript and an auxiliary capped run are retained."
+  ],
+  "transcripts_location": "Private generated HTML report and synthetic transcripts outside the repository; session credentials excluded from the report."
+}

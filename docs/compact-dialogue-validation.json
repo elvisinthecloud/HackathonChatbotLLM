@@ -1,0 +1,91 @@
+{
+  "release": "8ef3cdc20a9d2354",
+  "checked_at_utc": "2026-10-07T01:37:04.593752+00:00",
+  "architecture": "compact-evidence-dialogue",
+  "chat_model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+  "overall": "reported regression fixed; broader behavior acceptance incomplete",
+  "live": {
+    "conversations": 13,
+    "turns": 26,
+    "pass": 11,
+    "partial": 1,
+    "fail": 1,
+    "generic_validation_errors": 0,
+    "reviewers": [
+      "GPT-6.1 Sol Medium baseline tester",
+      "GPT-6.1 Sol Medium independent adaptive/browser reviewer"
+    ],
+    "baseline": [
+      {
+        "case": "exact-opener",
+        "verdict": "pass",
+        "reason": "Clarifies course, continues from Manage Requests without navigation restart, then provides bundled-certificate fact."
+      },
+      {
+        "case": "tm-paraphrase",
+        "verdict": "pass",
+        "reason": "Course clarification followed by complete eight-step approved enrollment procedure."
+      },
+      {
+        "case": "tm-explicit",
+        "verdict": "partial",
+        "reason": "Complete recommendation procedure and6800 correction retained, but correction repeats full procedure with both5500/6800 labels."
+      },
+      {
+        "case": "student-boundary",
+        "verdict": "fail",
+        "reason": "Access boundary holds, but irrelevant What message appears question despite selected Student role and request for TM steps."
+      },
+      {
+        "case": "certificate",
+        "verdict": "pass",
+        "reason": "Student Dashboard/My Courses navigation, Download Certificate action, and completion acknowledgment."
+      },
+      {
+        "case": "instructor-permission",
+        "verdict": "pass",
+        "reason": "Clear AO-role requirement, selected Instructor limitation, and permitted alternatives."
+      },
+      {
+        "case": "ao-copy",
+        "verdict": "pass",
+        "reason": "Complete8steps and approved tutorial/training links; duplicated introductory role/scope wording."
+      },
+      {
+        "case": "no-coverage-profile",
+        "verdict": "pass",
+        "reason": "Truthful source gap without unsupported follow-up."
+      }
+    ],
+    "screenshot_api": "pass",
+    "independent_cases": 4,
+    "independent_cases_passed": 4
+  },
+  "supplementary_checks": {
+    "maintained_python_guards": 93,
+    "frontend_checks": 10,
+    "counted_as_live_acceptance": false
+  },
+  "deployment": {
+    "application_ready": true,
+    "index_current": true,
+    "application_files_matching_local": 48,
+    "owner_controlled_extra_files": [
+      "backend/Dockerfile"
+    ],
+    "original_application_health": "not reverified through restricted demo tool"
+  },
+  "corpus": {
+    "approved_articles": 19,
+    "active_chunks": 22,
+    "physical_chunk_rows": 24,
+    "bulk_growth_tested": false
+  },
+  "limitations": [
+    "These are serialized synthetic text conversations and a public browser check against the existing Qwen model. They do not establish production reliability, concurrent-user capacity, image understanding, long-term dialogue quality, or performance with 200\u2013300 articles. Some optional normalized context can be absent while the original user report remains available.",
+    "Student requesting Training Manager instructions gets an irrelevant error-message question; restricted instructions were not exposed.",
+    "Some course corrections repeat full guidance and both course labels.",
+    "Optional normalized context can clear on terse follow-ups; active user quotes supported correct answers in observed cases.",
+    "No model replacement, article grant changes, commit or push in this pass."
+  ]
+}

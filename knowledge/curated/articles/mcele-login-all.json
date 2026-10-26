@@ -1,0 +1,23 @@
+{
+  "article_id": "MCELE-LOGIN-001",
+  "title": "Log in to MCeLE with CAC or username and password",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "MCeLE supports CAC login and username/password login. Some MCeLE content and features require CAC access because of distribution and security settings.\n\n### Before you begin\n\nHave your CAC and PIN ready for CAC login, or have your MCeLE username and password ready for username/password login. Limit failed attempts to avoid a mandatory lockout period.\n\n### CAC login\n\n1. Close all open browser sessions.\n2. Open a new browser.\n3. Insert your CAC into the card reader.\n4. Navigate to the MCeLE URL.\n5. When the Warning Statement appears, select **Agree**.\n6. Choose your DoD ID Certificate and select **OK**.\n7. Enter your PIN, then select **OK**.\n8. Confirm that the MCeLE Portal Student Landing Page displays.\n\nYour CAC must be associated with your MCeLE account before it can be used to log in.\n\n### Username/password login\n\n1. Close all open browser sessions.\n2. Open a new browser.\n3. Navigate to the MCeLE URL.\n4. When the Warning Statement appears, select **Agree**.\n5. If prompted to select a CAC or certificate, select **Cancel**.\n6. On the MCeLE Login page, enter your username and password, then select **Login**.\n7. Confirm that the MCeLE Portal Landing Page displays.\n\nIf you do not remember your credentials, use the approved credential-recovery guidance for **Forgot Username?** or **Forgot Password?**.\n\n### Common account notes\n\nIf your account is locked, use the account-unlock process. If your account is disabled because of inactivity, contact the Help Desk for account reactivation. Your profile must be verified every six months; after login, the Profile page opens automatically for review and updates. If your password has expired, use the password-change process.\n\n### CAC login problem\n\nIf CAC login fails, remove the CAC, close every tab and browser, reinsert the CAC, and try again. On a personal device, install the required DoD root certificates from [Cyber.mil PKI/PKE end-user guidance](https://www.cyber.mil/pki-pke/end-users/getting-started/). A new CAC may require clearing the browser's current certificate and restarting the browser. Contact the Help Desk if the account is deactivated or disabled.\n\n### Username/password login problem\n\nFor an **invalid credentials** message, use **Forgot Password?**, restart the browser, and try again. If repeated attempts locked the account, wait or contact the Help Desk for a manual unlock. Check the username format, typically `firstname.middleinitial.lastname`, or use **Forgot Username?**. When recovering a username, try both your personal and work email if needed.\n\n### Disabled account\n\nIf your account is disabled because of inactivity, contact the Help Desk for account reactivation.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence article, preserving the CAC and username/password procedures, common account notes, and source troubleshooting link.",
+    "source_page_id": "403636493",
+    "source_html": "EKB/Logging-In-to-MCeLE_403636493.html"
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

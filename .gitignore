@@ -22,6 +22,11 @@ verification.json
 docs/article-discovery.md
 recovery/partial-documents/initial-inspection-and-article-discovery.partial.md
 
+# Local live-test transcripts, generated reports, and overnight execution state.
+output/
+tmp/
+docs/live-conversation-*.json
+docs/overnight-validation-checkpoint.md
 # Private deployment details and newly generated operational records.
 deployment.local.*
 *.local.env

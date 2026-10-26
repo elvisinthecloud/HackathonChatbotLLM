@@ -1,0 +1,30 @@
+{
+  "article_id": "MCELE-CAC-ASSOC-001",
+  "title": "Associate CAC to Account",
+  "service_area": "MCeLE",
+  "allowed_roles": [
+    "Student",
+    "Adjunct Faculty",
+    "Academics Officer",
+    "Training Manager",
+    "Regional Director"
+  ],
+  "course_scope": "general",
+  "course_ids": [],
+  "content": "Use this guidance when MCeLE prompts you to associate an unlinked CAC with an account. This article covers an existing-account association and the entry point for a new account; detailed account-creation instructions require separate approved guidance.\n\n### Before you begin\n\n1. Insert your CAC into the reader.\n2. Navigate to MCeLE.\n3. Accept the warning banner.\n4. Select the **DoD ID** certificate.\n5. Enter your CAC PIN.\n\n### Associate the CAC with an existing account\n\n1. Select **Existing Account Start Here**.\n2. Enter your existing MCeLE username and password.\n3. Select **Sign In**.\n4. Confirm that the CAC is associated with the existing account.\n\nSkip any prerequisite steps you have already completed.\n\n### Associate the CAC when you do not already have an account\n\n1. Complete the CAC sign-in steps above.\n2. Select **New Account Start Here**.\n3. Follow the account-creation instructions shown there.\n\nThis article does not provide detailed new-account creation steps.\n\n### Forgot your MCeLE credentials during association\n\n1. Pause the CAC-association flow.\n2. Use the approved MCeLE credential-recovery guidance for the forgotten username or password.\n3. Return to **Existing Account Start Here** and continue the CAC-association steps after recovering access.\n\n### CAC is not recognized\n\n1. Try another supported browser.\n2. Try a different CAC reader.\n3. Retry the association steps.",
+  "provenance": {
+    "type": "adapted",
+    "description": "Adapted from the approved Confluence CAC-association article, preserving the existing-account procedure, the New Account Start Here entry point, credential-recovery return path, and browser or reader troubleshooting without adding unreviewed account-creation details.",
+    "source_page_id": "403636428",
+    "source_html": "EKB/Associate-CAC-to-Account_403636428.html",
+    "source_updated": "2026-07-14",
+    "user_corrections": [
+      {
+        "date": "2026-09-30",
+        "description": "All five seeded roles may receive CAC-association guidance. Existing-account and new-account entry paths are approved; detailed new-account creation remains a separate source-review dependency."
+      }
+    ]
+  },
+  "synthetic": false,
+  "redistribution": "pending-submission-review"
+}

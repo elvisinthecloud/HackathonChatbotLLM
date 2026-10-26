@@ -7,6 +7,7 @@
   ],
   "course_scope": "general",
   "course_ids": [],
+  "retrieval_text": "Normal Moodle course copy procedure when an Academics Officer asks how to copy or clone a course and no failure, delay, loading, timeout, or submission problem is reported.",
   "content": "You need the **Academics Officer (AO) Moodle role** to copy or create courses. To copy an existing course:\n\n1. From the Moodle dashboard, select the **Home** tab.\n2. Navigate to the category containing the course you want to copy.\n3. Select **More** in the upper-right corner, then select **Manage courses**.\n4. Select the course's **Copy course** icon, shown as **two overlapping squares**.\n5. In the pop-up form, enter the appropriate name for the new course.\n6. For the **short name**, use either the full course name or the course acronym and associated number, such as **EWS 1349**.\n7. Once all the information is entered, select **Copy and return** or **Copy and view**.\n8. Wait for **Current Operation** to display **Complete**. The course copy is then complete.\n\nFor a visual walkthrough, watch the [Moodle course-copy video tutorial](https://portal.mcele.usmc.mil/content/mcele-portal/en/media/detail.html?Id=8527A2A4B6B0).\n\n**AO training reminder:** Complete the required [MClearn courses—1100, 2100, and 3100](https://elearning.mcele.usmc.mil/moodle/course/index.php?categoryid=1264). Failure to complete the required training may result in removal of your AO permissions.",
   "provenance": {
     "type": "adapted",

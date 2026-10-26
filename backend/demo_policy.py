@@ -2,30 +2,30 @@
 from contextvars import ContextVar
 from dataclasses import dataclass
 import re
+from access_support import ALL_ROLES, NEW_ARTICLES, resolve_support_context
 
 COURSES = {
     'CYBERM0000': {'id':'CYBERM0000','title':'CYBERM0000 biennial training','aliases':['CYBERM0000'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':None},
-    '5500': {'id':'5500','title':'Sergeants School Seminar Program','aliases':['5500','Sergeants School Seminar','Sergeants School Seminar Program'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
-    '6800': {'id':'6800','title':'SNCO Leadership School Seminar','aliases':['6800','SNCO Leadership School Seminar'], 'discovery_portal':'MCeLE','content_area':None,'enrollment_area':'MCeLE'},
+    '5500': {'id':'5500','title':'Sergeants School Seminar Program','aliases':['5500','EPME5500','Sergeants School Seminar','Sergeants School Seminar Program'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
+    '6800': {'id':'6800','title':'SNCO Leadership School Seminar','aliases':['6800','EPME6800','SNCO Leadership School Seminar'], 'discovery_portal':'MCeLE','content_area':None,'enrollment_area':'MCeLE'},
+    'EPME3000': {'id':'EPME3000','title':'Leading Marines DEP','aliases':['EPME3000','EPME3000AA','Leading Marines','Leading Marines DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME4000': {'id':'EPME4000','title':'Corporals Course DEP','aliases':['EPME4000','EPME4000AA','Corporals Course','Corporals Course DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME5000': {'id':'EPME5000','title':'Sergeants School DEP','aliases':['EPME5000','EPME5000BA','Sergeants School DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
+    'EPME6000': {'id':'EPME6000','title':'Career Course DEP','aliases':['EPME6000','EPME6000BA','Career Course DEP'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
     'CSC': {'id':'CSC','title':'Command and Staff (CSC)','aliases':['CSC','Command and Staff','Command and Staff (CSC)'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
     'EWS': {'id':'EWS','title':'EWS','aliases':['EWS','expiditionary school warfare'], 'discovery_portal':'MCeLE','content_area':'Moodle','enrollment_area':'MCeLE'},
     'CDETBAIC01': {'id':'CDETBAIC01','title':'Basic AI Course','aliases':['CDETBAIC01','Basic AI Course'], 'discovery_portal':'MCeLE','content_area':'MCeLE','enrollment_area':'MCeLE'},
 }
 
 PROFILES = {
-    'student': {'id':'student','name':'Demo Student','role':'Student','display_role':'Student','course_ids':['CYBERM0000'],'delivery_areas':['MCeLE']},
-    'instructor': {'id':'instructor','name':'Demo Instructor','role':'Adjunct Faculty','display_role':'Instructor','course_ids':[],'delivery_areas':['Moodle']},
-    'ao': {'id':'ao','name':'Demo Academics Officer','role':'Academics Officer','display_role':'Academics Officer (AO)','course_ids':[],'delivery_areas':['Moodle']},
-    'training-manager': {'id':'training-manager','name':'Demo Training Manager','role':'Training Manager','display_role':'Training Manager','course_ids':['5500','6800'],'delivery_areas':['MCeLE']},
-    'regional-director': {'id':'regional-director','name':'Demo Regional Director','role':'Regional Director','display_role':'Regional Director','course_ids':[],'delivery_areas':[]},
+    'student': {'id':'student','name':'Sgt Mateo A. Rodriguez','username':'mateo.a.rodriguez','rank':'Sgt','rank_name':'Sergeant','pay_grade':'E-5','greeting_name':'Sgt Rodriguez','role':'Student','display_role':'Student','course_ids':['CYBERM0000'],'delivery_areas':['MCeLE']},
+    'instructor': {'id':'instructor','name':'MSgt James Thompson','username':'james.thompson','rank':'MSgt','rank_name':'Master Sergeant','pay_grade':'E-8','greeting_name':'MSgt Thompson','role':'Adjunct Faculty','display_role':'Instructor','course_ids':[],'delivery_areas':['Moodle']},
+    'ao': {'id':'ao','name':'LtCol Daniel R. Walker','username':'daniel.r.walker','rank':'LtCol','rank_name':'Lieutenant Colonel','pay_grade':'O-5','greeting_name':'LtCol Walker','role':'Academics Officer','display_role':'Academics Officer (AO)','course_ids':[],'delivery_areas':['Moodle']},
+    'training-manager': {'id':'training-manager','name':'GySgt Alicia M. Bennett','username':'alicia.m.bennett','rank':'GySgt','rank_name':'Gunnery Sergeant','pay_grade':'E-7','greeting_name':'GySgt Bennett','role':'Training Manager','display_role':'Training Manager','course_ids':['5500','6800'],'delivery_areas':['MCeLE']},
+    'regional-director': {'id':'regional-director','name':'Col Rebecca Mitchell','username':'rebecca.mitchell','rank':'Col','rank_name':'Colonel','pay_grade':'O-6','greeting_name':'Col Mitchell','role':'Regional Director','display_role':'Regional Director','course_ids':[],'delivery_areas':[]},
 }
 # These are independent grants. Profile course associations are context hints only.
-ARTICLE_POLICY = {
-    'MCELE-LAUNCH-001': ('Student','MCeLE','general',()),
-    'MOODLE-COPY-002': ('Adjunct Faculty','Moodle','general',()),
-    'MOODLE-COPY-001': ('Academics Officer','Moodle','general',()),
-    'MCELE-ECDEP-001': ('Training Manager','MCeLE','courses',('5500','6800')),
-}
+from article_registry import ARTICLE_POLICY
 ERROR_HOST = 'sts1.auth.ecuf.deas.mil'
 
 @dataclass(frozen=True)
@@ -77,15 +77,37 @@ def course_mentions(text: str) -> list[str]:
 
 
 def task_activity(text: str) -> str | None:
-    management=bool(re.search(r'\b(?:copy|copying|create|creating|AO|academics officer|permissions?|MClearn)\b',text,re.I))
-    enrollment=bool(re.search(r'\b(?:enroll\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*)\b',text,re.I))
+    management=bool(re.search(r'\b(?:copy|copying|clone|cloning|create|creating|created|authored|permissions?|MClearn|Content Management|Quality Assurance)\b',text,re.I))
+    enrollment=bool(re.search(r'\b(?:enroll\w*|eligib\w*|prerequisit\w*|recommend|deny|11580|NAVMC)\b',text,re.I)) or bool(re.search(r'\b(?:seminar|EPME\w*|PME|ECDEP)\b',text,re.I) and re.search(r'\b(?:request|approv\w*|requirements?|qualif\w*|take|start)\b',text,re.I))
     content=bool(re.search(r'\b(?:launch\w*|content|lesson|refused to connect|screenshot|error)\b',text,re.I))
+    credit=bool(re.search(r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|SAT year|anniversary year|calendar year|fiscal year)\b',text,re.I))
     if management and enrollment:
         return 'ambiguous'
     if management:return 'course-management'
+    if credit:return 'course-credit'
     if enrollment:return 'enrollment'
     if content:return 'course-content'
     return None
+
+
+def support_topic(text: str) -> str | None:
+    """Separate tasks sharing one activity so prior evidence cannot choose a new article."""
+    if re.search(r'\b(?:copy|copying|clone|cloning)\b', text, re.I) and re.search(
+            r'\b(?:stuck|slow|loading|fails?|timeout|never submits|not working|didn.t work|did not work)\b', text, re.I):
+        return 'copy-troubleshooting'
+    if re.search(r'\b(?:created|authored)\b', text, re.I) and re.search(r'\b(?:not working|won.t|broken|problem|issue|fail\w*)\b', text, re.I):
+        return 'course-problem'
+    patterns = (
+        ('enrollment-report', r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b'),
+        ('ecdep', r'\b(?:ECDEP|recommend|deny|enrollment request|seminar request)\b'),
+        ('epme', r'\b(?:eligib\w*|prerequisit\w*|EPME\w*)\b'),
+        ('rrc', r'\b(?:RRC|Reserve Retirement Credits?|retirement points?|anniversary year|calendar year|fiscal year)\b'),
+        ('csc', r'\bCSC\b'),
+        ('copy-troubleshooting', r'\b(?:copy|copying|clone)\b.{0,100}\b(?:stuck|slow|loading|fails?|timeout|never submits)\b'),
+        ('copy', r'\b(?:copy|copying|clone|cloning)\b'),
+        ('launch', r'\b(?:launch\w*|refused to connect)\b'),
+    )
+    return next((topic for topic, pattern in patterns if re.search(pattern, text, re.I)), None)
 
 
 def resolve_context(selected: str | None, previous: dict, previous_selected: str | None,
@@ -97,9 +119,25 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
     unknown=bool(selected and not chosen)
     changed_selection=selected != previous_selected
     mentions=course_mentions(question+'\n'+image_text)
+    support = resolve_support_context(selected, previous, previous_selected, question, image_text, COURSES, chosen, mentions)
+    if support is not None:
+        context, prompt, changed = support
+        if context.get('support_article_id') == 'MCELE-LAUNCH-002' and exact_error(question+'\n'+image_text) and context.get('system_area') == 'MCeLE':
+            context.pop('unresolved', None)
+            prompt = None
+        return context, prompt, changed
     question_moodle=bool(re.search(r'\bmoodle\b',question,re.I))
     screenshot_moodle=bool(re.search(r'\bmoodle\b',image_text,re.I))
     activity=task_activity(question)
+    # Interface labels asked about during a procedure belong to that procedure;
+    # the generic word "content" must not turn management into course content.
+    if previous.get('activity') == 'course-management' and re.search(
+            r'\b(?:where|what|how)\b.{0,35}\b(?:Content Management|Quality Assurance|Manage courses|short name)\b', question, re.I):
+        activity='course-management'
+    csc_context=chosen=='CSC' or mentions==['CSC']
+    if csc_context and re.search(r"\b(?:access|get to|missing|not (?:appear|show)|doesn't (?:appear|show)|can't find|cannot find|where is|My Courses|Moodle)\b",question,re.I):
+        # CSC discovery/enrollment begins in MCeLE even though its content opens in Moodle.
+        activity='enrollment'
     course_id=chosen or (mentions[0] if len(mentions)==1 and not unknown else None)
     # An explicitly new, general Moodle task may leave an automatically inferred course.
     if not course_id and not unknown and not changed_selection and not (question_moodle and activity and activity!=previous.get('activity')):
@@ -112,13 +150,20 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
     course=COURSES.get(course_id,{})
     system=None
     if course:
-        system=course.get('enrollment_area') if activity=='enrollment' else (course.get('content_area') if activity in ('course-content','course-management') else None)
+        if activity=='course-credit':
+            system='MCeLE'
+        else:
+            system=course.get('enrollment_area') if activity=='enrollment' else (course.get('content_area') if activity in ('course-content','course-management') else None)
     else:
         if question_moodle or screenshot_moodle:
             system='Moodle'
         if re.search(r'\b(?:in|on|through|delivered by|hosted by)\s+mcele\b',question,re.I):
             system='MCeLE'
-        if activity=='enrollment' and re.search(r'\b(?:ECDEP|PME|seminar)\b',question,re.I):
+        if activity=='enrollment' and re.search(r'\b(?:ECDEP|EPME\w*|PME|seminar)\b',question,re.I):
+            system='MCeLE'
+        if activity=='enrollment' and re.search(r'\b(?:Enrollment Report|enrollment status|verify (?:a )?Marine)\b',question,re.I):
+            system='MCeLE'
+        if activity=='course-credit':
             system='MCeLE'
         if not system and not course_changed and activity==previous.get('activity'):
             system=previous.get('system_area')
@@ -134,6 +179,8 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
              'course_known':bool(course), 'activity':activity if activity!='ambiguous' else None,
              'system_area':system,'delivery_area':course.get('content_area'),
              'enrollment_area':course.get('enrollment_area'),'discovery_portal':course.get('discovery_portal')}
+    topic = support_topic(question)
+    context['topic'] = topic or (previous.get('topic') if not course_changed and activity == previous.get('activity') else None)
     conflict=len(mentions)>1 or bool(chosen and mentions and mentions!=[chosen])
     # For known courses, task mapping wins over a casual mention of the other portal.
     # Explicit contradictory task location or screenshot evidence must be clarified.
@@ -145,6 +192,7 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
         context['unresolved']=True
         return context,'The course, task, and system details conflict. Are you working on enrollment in MCeLE or course content/management in Moodle? Please confirm the task and change or clear the course field if needed.',True
     changed=course_changed or bool(previous.get('unresolved')) or any(context.get(k)!=previous.get(k) for k in ('activity','system_area'))
+    changed = changed or bool(topic and previous.get('topic') and topic != previous['topic'])
     if not activity:
         return context,'What are you trying to do with this course: enroll or manage an enrollment request, launch/access course content, or copy/manage the course?',changed
     if not system:
@@ -156,19 +204,37 @@ def resolve_context(selected: str | None, previous: dict, previous_selected: str
 def resolve_access(profile: dict, context: dict, evidence: str) -> RetrievalAccess:
     role=profile['role']
     area,course=context.get('system_area'),context.get('course_id')
+    if context.get('support_flow'):
+        aid = context.get('support_article_id')
+        if aid == 'MCELE-LAUNCH-002' and role == 'Student' and exact_error(evidence) and area == 'MCeLE':
+            aid = 'MCELE-LAUNCH-001'
+        policy = ARTICLE_POLICY.get(aid)
+        roles = policy[0] if policy and isinstance(policy[0], tuple) else ((policy[0],) if policy else ())
+        permitted = bool(policy and role in roles and area == policy[1] and not context.get('unresolved')
+                         and (policy[2] != 'courses' or course in policy[3]))
+        return RetrievalAccess(role, area, course, (aid,) if permitted else ())
+    enrollment_report=context.get('topic') == 'enrollment-report' or (not context.get('topic') and bool(re.search(r'\b(?:Enrollment Report|enrollment status|verif\w+.{0,30}enroll\w*)\b',evidence,re.I)))
     activities={'MCELE-LAUNCH-001':'course-content','MOODLE-COPY-002':'course-management',
-                'MOODLE-COPY-001':'course-management','MCELE-ECDEP-001':'enrollment'}
+                'MOODLE-COPY-001':'course-management','MOODLE-COPY-003':'course-management',
+                'MCELE-ECDEP-001':'enrollment','MCELE-ENROLLMENT-REPORT-001':'enrollment',
+                'MCELE-RRC-001':'course-credit','MCELE-EPME-001':'enrollment',
+                'MCELE-CSC-001':'enrollment'}
     ids=tuple(aid for aid,(grant,delivery,scope,courses) in ARTICLE_POLICY.items()
               if role==grant and area==delivery and not context.get('unresolved')
               and context.get('activity')==activities[aid]
               and (scope=='general' or course in courses or (course is None and not context.get('course_query')))
+              and (aid!='MCELE-ENROLLMENT-REPORT-001' or enrollment_report)
+              and (aid!='MCELE-ECDEP-001' or not enrollment_report)
+              and (aid!='MCELE-CSC-001' or course=='CSC')
               and (aid!='MCELE-LAUNCH-001' or exact_error(evidence)))
     return RetrievalAccess(role,area,course,ids)
 
 
 def clarification(profile: dict, context: dict, evidence: str) -> str | None:
+    if context.get('support_flow'):
+        return None
     if profile['role']=='Regional Director':
         return 'Regional Director is a presentation placeholder. No knowledge articles are assigned to this demo role yet.'
     if profile['role']=='Student' and context.get('system_area')=='MCeLE' and context.get('activity')=='course-content' and not exact_error(evidence):
-        return 'Please attach a screenshot or type the exact error shown when the course fails to launch. A launch failure alone is not enough to choose the right troubleshooting steps.'
+        return 'What exact error appears when you try to launch the course? You can type it or attach a screenshot.'
     return None

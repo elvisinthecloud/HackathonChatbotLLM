@@ -1,0 +1,44 @@
+{
+  "status": "offline_experiment_not_deployed",
+  "live_behavior_verified": false,
+  "blocked_by": "User confirmed GPU machine powered down for electrical outlet work.",
+  "deployed_baseline_release": "724fd72f045deb9f",
+  "offline_candidate_release": "5732f56869aa50fd",
+  "current_model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+  "requested_comparison_model": "qwen3.8:27b",
+  "comparison_model_installed": false,
+  "observed_failure": "Recorded username recovery and certificate traces assess that no further details are needed, then choose ask instead of retrieving guidance.",
+  "hypothesis": "A smaller single-envelope output schema is worth testing for action-selection reliability. The traces do not establish grammar bias as the cause.",
+  "changes": [
+    "Replace active whole-response anyOf branches with a single envelope and move enum; conditional checks remain on the server.",
+    "Explicit think:false with unchanged context, temperature and output budget.",
+    "Prepare 16 synthetic conversations / 38 turns: 13 recorded cases and 3 new paraphrases."
+  ],
+  "runtime_files_changed": [
+    "backend/flexible_support.py"
+  ],
+  "runtime_files_unchanged": 56,
+  "sample_schema_serialized_bytes": {
+    "before": 11081,
+    "after": 3158,
+    "note": "One fixture, not token count or runtime benchmark."
+  },
+  "offline_checks": {
+    "python_tests_passed": 310,
+    "new_boundary_tests": 4,
+    "independent_code_review": "Sol GPT-6.1 found no scoped access or conditional-guard regression."
+  },
+  "limits": [
+    "Correct assessment followed by ask remains structurally possible; this experiment does not enforce semantic consistency.",
+    "Broader grammar may increase invalid combinations, repairs or fallbacks.",
+    "Mocked tests verify server boundaries and request construction, not LLM behavior or runtime compatibility.",
+    "No live run, download, deployment, GPU memory or latency measurement occurred."
+  ],
+  "next_live_checks": [
+    "Verify health and actual model-storage space.",
+    "Replay original-model baseline before transport changes.",
+    "Test revised transport with original model and actual dynamic schema including think:false.",
+    "Compare Qwen3.8 on the same chosen app revision, inputs, articles and role grants.",
+    "Review usefulness, unnecessary questions, corrections, progress, repairs, access and latency."
+  ]
+}

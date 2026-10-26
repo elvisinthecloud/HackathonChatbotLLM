@@ -1,0 +1,79 @@
+{
+  "checked_on": "2026-10-05",
+  "status": "staged_on_atlas_not_activated_llm_unavailable",
+  "candidate_release": "fd7b201e3eba6934",
+  "deployed_baseline": "724fd72f045deb9f",
+  "current_model": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+  "model_changed": false,
+  "new_live_conversations": 0,
+  "python_tests": 332,
+  "javascript_tests": 6,
+  "historical_conversations_in_report": 7,
+  "historical_exchanges_in_report": 19,
+  "agents": [
+    {
+      "name": "Astra \u00b7 Reply consistency implementation",
+      "model": "GPT-6 Astra \u00b7 low",
+      "work": "Added structured clarification checks, strict response validation, and the existing bounded repair feedback.",
+      "result": "7 new simulated regression tests passed; one bypass fixed during review."
+    },
+    {
+      "name": "Sol \u00b7 Conversation review",
+      "model": "GPT-6.1 Sol \u00b7 medium",
+      "work": "Reviewed seven complete historical live conversations across vague issues, recovery, corrections, certificates, progress, CAC and permissions.",
+      "result": "19 verbatim exchanges reproduced; no new live requests."
+    },
+    {
+      "name": "Sol \u00b7 Adversarial testing",
+      "model": "GPT-6.1 Sol \u00b7 medium",
+      "work": "Exercised role/source limits, corrections, negative progress, malformed replies and bounded repairs; migrated active mocks to the real wire shape.",
+      "result": "15 independent tests plus full 332-test Python suite passed."
+    },
+    {
+      "name": "Sol \u00b7 Independent code review",
+      "model": "GPT-6.1 Sol \u00b7 medium",
+      "work": "Reviewed the patch and probed already-answered questions and mismatched clarification reasons.",
+      "result": "7 focused checks passed; two semantic limitations demonstrated."
+    },
+    {
+      "name": "Parent \u00b7 Integration and report review",
+      "model": "Primary agent",
+      "work": "Reviewed changes and agent evidence, checked app availability, ran JavaScript formatting tests and verified this report.",
+      "result": "6 JavaScript checks passed; live LLM unavailable."
+    }
+  ],
+  "changes": [
+    "Each model question must declare both the missing detail and why it affects the next step. An ask paired with null clarification fields is rejected.",
+    "Non-question moves require null clarification fields, so contradictory structured decisions trigger repair.",
+    "Old or malformed response formats cannot bypass the new check. One existing repair is retained; there is no added review call.",
+    "The prompt asks the model to reconcile latest corrections, prior answers, unresolved obstacles and reported progress. Its reasoning stays out of the user-facing reply.",
+    "Server role permissions, exact article quotations and source access checks remain in place."
+  ],
+  "pending": [
+    "Restore the existing LLM service before deploying or claiming better live behavior.",
+    "Replay the prepared 16 conversations / 38 turns on the current model, then run adaptive conversations with fresh wording.",
+    "Review unnecessary questions, correction handling, parent-task resumption, usefulness, exact source support and latency separately.",
+    "Compare the candidate with the existing deployed release and investigate extra repairs or fallback replies before rollout."
+  ],
+  "limitations": [
+    "Structured consistency does not prove that a missing detail is genuinely missing or relevant.",
+    "No live candidate behavior, model compatibility, latency or GPU claim.",
+    "Current corpus has 19 articles / 24 demo chunks; expansion to 200\u2013300 articles remains untested."
+  ],
+  "report_verification": {
+    "desktop_viewport": "1280x900",
+    "mobile_viewport": "390x844",
+    "horizontal_overflow": false,
+    "page_errors": [],
+    "expandable_sections": 16,
+    "historical_reply_expansion_verified": true
+  },
+  "deployment": {
+    "staged_release": "fd7b201e3eba6934",
+    "remote_files_verified": 57,
+    "remote_hashes_match": true,
+    "active_release": "724fd72f045deb9f",
+    "activated": false,
+    "blocker": "Existing Qwen endpoint unreachable; both app deployments report ollama=false. Normal deployment requires embeddings and a live conversation check."
+  }
+}

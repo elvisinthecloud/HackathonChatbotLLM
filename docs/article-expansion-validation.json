@@ -1,0 +1,55 @@
+{
+  "status": "deployed-and-seven-article-set-verified",
+  "release_id": "34e27280c7bae06d",
+  "validated_on": "2026-09-16",
+  "isolated_project": "mcele-hackathon-demo",
+  "dataset_id": "mcele-curated-v1",
+  "curated_article_count": 7,
+  "database_chunk_count": 9,
+  "chunk_count_note": "Seven answer chunks plus two retrieval-only AO routing embeddings.",
+  "offline_tests_passed": 21,
+  "live_checks": {
+    "ao_stuck_copy": {
+      "question": "I am trying to copy my moodle course but it keeps taking forever and isn't working?",
+      "source_path": "MOODLE-COPY-003",
+      "source_title": "Troubleshoot a Moodle course copy that is slow, stuck, or fails",
+      "trace_id": "769f5bc605cfd89f8f61f989605060d2",
+      "passed": true
+    },
+    "ao_normal_copy_regression": {
+      "question": "How do I copy a course in Moodle?",
+      "source_path": "MOODLE-COPY-001",
+      "trace_id": "ee09b1c16873211e67e2454ae03731c0",
+      "passed": true
+    },
+    "training_manager_enrollment_report": {
+      "question": "I want to verify a Marine’s enrollment status. How can I do that?",
+      "source_path": "MCELE-ENROLLMENT-REPORT-001",
+      "source_title": "Verify a Marine's enrollment status with the Enrollment Report",
+      "source_score": 0.8324,
+      "trace_id": "aa7c1d5ada759158f967ca51ef799c5d",
+      "passed": true
+    },
+    "student_repeat_course_rrc": {
+      "question": "Can I redo a course I already completed to get more Reserve Retirement Credits in a new calendar year?",
+      "source_path": "MCELE-RRC-001",
+      "source_title": "Can I repeat a completed course for additional Reserve Retirement Credits?",
+      "source_score": 0.8181,
+      "trace_id": "308e4ed5a83ff29913bf7ad3d91c8337",
+      "passed": true
+    },
+    "student_repeat_course_rrc_fiscal_year": {
+      "question": "Can I retake a completed course for more points in a new fiscal year?",
+      "source_path": "MCELE-RRC-001",
+      "source_title": "Can I repeat a completed course for additional Reserve Retirement Credits?",
+      "source_score": 0.7782,
+      "trace_id": "4d7787555c1e3011a9bf19f6f0db7cc4",
+      "passed": true
+    }
+  },
+  "original_chatbot": {
+    "healthy": true,
+    "chunk_count": 315,
+    "modified": false
+  }
+}

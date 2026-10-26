@@ -21,7 +21,7 @@ LOCAL = Path(__file__).resolve().parents[1]
 def archive(hashes):
     output = io.BytesIO()
     with tarfile.open(fileobj=output, mode='w:gz') as tar:
-        for rel in (*ALLOWLIST, 'release-hashes.json'):
+        for rel in (*hashes, 'release-hashes.json'):
             raw = json.dumps(hashes, sort_keys=True).encode() if rel == 'release-hashes.json' else (LOCAL / rel).read_bytes()
             if rel in hashes and hashlib.sha256(raw).hexdigest() != hashes[rel]:
                 raise ValueError('Source changed while packaging; rerun plan')
@@ -41,7 +41,7 @@ def ssh_command(transport):
     raise ValueError('Unsupported deployment transport')
 
 
-def stage(blob, tag, transport='ssh'):
+def stage(blob, tag, transport='ssh', files=None):
     # This bootstrap is carried as code, not a remote file; every archive member is
     # validated before any directory creation. No extractall or shell interpolation.
     remote_code = r'''
@@ -84,7 +84,7 @@ else:
   with p.open('xb') as f: f.write(data)
 print('Staged verified demo release '+tag+'; no containers started.')
 '''
-    command = 'python3 -c ' + shlex.quote(remote_code) + ' ' + shlex.quote(tag) + ' ' + shlex.quote(json.dumps([*ALLOWLIST, 'release-hashes.json']))
+    command = 'python3 -c ' + shlex.quote(remote_code) + ' ' + shlex.quote(tag) + ' ' + shlex.quote(json.dumps([*(files if files is not None else ALLOWLIST), 'release-hashes.json']))
     subprocess.run(ssh_command(transport) + [command], input=blob, check=True)
 
 
@@ -97,6 +97,8 @@ def main():
     mode.add_argument('--check', action='store_true')
     mode.add_argument('--stage', action='store_true', help='Upload approved files only; no services')
     mode.add_argument('--apply', action='store_true', help='Upload and deploy after approval and secret provisioning')
+    parser.add_argument('--reindex', action='store_true', help='Explicitly update reviewed article index during apply')
+    parser.add_argument('--allow-model-unavailable', action='store_true', help='Allow code activation while inference is unavailable')
     args = parser.parse_args()
     hashes = source_hashes(LOCAL)
     tag = release_id(hashes)
@@ -109,9 +111,13 @@ def main():
         return
     if os.environ.get('MCELE_DEMO_DEPLOY_APPROVED') != '1':
         raise SystemExit('Explicit first-deployment approval is required; then set MCELE_DEMO_DEPLOY_APPROVED=1.')
-    stage(blob, tag, args.transport)
+    stage(blob, tag, args.transport, files=hashes)
     if args.apply:
         command = 'python3 "$HOME"/' + shlex.quote(PROJECT + '/releases/' + tag + '/scripts/atlas_release.py') + ' --apply'
+        if args.reindex:
+            command += ' --reindex'
+        if args.allow_model_unavailable:
+            command += ' --allow-model-unavailable'
         subprocess.run(ssh_command(args.transport) + [command], check=True)
 
 
